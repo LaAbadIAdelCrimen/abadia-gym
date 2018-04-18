@@ -133,13 +133,13 @@ class AbadiaEnv(gym.Env):
         banana_is_sold = (random.random() < chance_to_take)
 
         if banana_is_sold:
-            self.is_banana_sold = True
+            self.is_banana_sold = False
 
         remaining_steps = self.TOTAL_TIME_STEPS - self.curr_step
         time_is_over = (remaining_steps <= 0)
         throw_away = time_is_over and not self.is_banana_sold
         if throw_away:
-            self.is_banana_sold = True  # abuse this a bit
+            self.is_banana_sold = False # abuse this a bit
             self.price = 0.0
 
     def _get_reward(self):

@@ -21,9 +21,14 @@ import gym_abadia
 env = gym.make('abadia-v0')
 ```
 
-See https://github.com/matthiasplappert/keras-rl/tree/master/examples for some
-examples.
+how to test with a dumb agent. 
+Launch the game engine: 
 
+./VigasocoSDL abadia -input:libVigasocoFakeInputPlugin.so,FakeInputPlugin  -audio:libVigasocoNULLAudioPlugin.so,NULLAudioPlugin
+
+run the dumb agent: 
+
+(python3) ~/proyectos/abadia-gym (master ✘)✹✭ ᐅ python3 agentv1.py
 
 ## The Environment
 
