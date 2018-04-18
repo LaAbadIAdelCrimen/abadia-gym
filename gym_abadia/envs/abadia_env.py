@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*-
 
 """
-Simulate the simplifie Banana selling environment.
+Simulate the "Abbey of crime" environment.
 
-Each episode is selling a single banana.
+Each episode is making a single action (doing nothing is an action) .
 """
 
 # core modules
@@ -23,9 +23,9 @@ def get_chance(x):
     return (1.0 + e) / (1. + math.exp(x + 1))
 
 
-class BananaEnv(gym.Env):
+class AbadiaEnv(gym.Env):
     """
-    Define a simple Banana environment.
+    Define a Abadia environment.
 
     The environment defines which actions can be taken at which point and
     when the agent receives which reward.
@@ -33,8 +33,9 @@ class BananaEnv(gym.Env):
 
     def __init__(self):
         self.__version__ = "0.1.0"
-        print("BananaEnv - Version {}".format(self.__version__))
+        print("AbadiaEnv - Version {}".format(self.__version__))
 
+        # TODO: JT: check what variables we need.
         # General variables defining the environment
         self.MAX_PRICE = 2.0
         self.TOTAL_TIME_STEPS = 2

@@ -1,1 +1,1 @@
-from gym_banana.envs.banana_env import BananaEnv
+from gym_abadia.envs.abadia_env import AbadiaEnv
