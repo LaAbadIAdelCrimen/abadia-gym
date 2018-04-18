@@ -16,6 +16,8 @@ import gym
 import numpy as np
 from gym import spaces
 
+# AbadIA dependencies
+import requests
 
 def get_chance(x):
     """Get probability that a banana will be sold at price x."""
@@ -35,6 +37,21 @@ class AbadiaEnv(gym.Env):
         self.__version__ = "0.1.0"
         print("AbadiaEnv - Version {}".format(self.__version__))
 
+        self.url = "http://localhost:4477/"
+
+        # Define what the agent can do
+        # 0 -> NOP
+        # 1 -> STEP
+        # 2 -> RIGHT
+        # 3 -> LEFT
+        # 4 -> DOWN
+
+        self.action_space = spaces.Discrete(5)
+
+        # json from the dump state of the episode
+
+        self.json_dump = "[{}]"
+
         # TODO: JT: check what variables we need.
         # General variables defining the environment
         self.MAX_PRICE = 2.0
@@ -43,9 +60,6 @@ class AbadiaEnv(gym.Env):
         self.curr_step = -1
         self.is_banana_sold = False
 
-        # Define what the agent can do
-        # Sell at 0.00 EUR, 0.10 Euro, ..., 2.00 Euro
-        self.action_space = spaces.Discrete(21)
 
         # Observation is the remaining time
         low = np.array([0.0,  # remaining_tries
@@ -58,7 +72,7 @@ class AbadiaEnv(gym.Env):
         self.curr_episode = -1
         self.action_episode_memory = []
 
-    def _step(self, action):
+    def step(self, action):
         """
         The agent takes a step in the environment.
 
@@ -96,7 +110,7 @@ class AbadiaEnv(gym.Env):
         ob = self._get_state()
         return ob, reward, self.is_banana_sold, {}
 
-    def _take_action(self, action):
+    def take_action(self, action):
         self.action_episode_memory[self.curr_episode].append(action)
         self.price = ((float(self.MAX_PRICE) /
                       (self.action_space.n - 1)) * action)
@@ -121,7 +135,7 @@ class AbadiaEnv(gym.Env):
         else:
             return 0.0
 
-    def _reset(self):
+    def reset(self):
         """
         Reset the state of the environment and returns an initial observation.
 
@@ -133,16 +147,29 @@ class AbadiaEnv(gym.Env):
         self.action_episode_memory.append([])
         self.is_banana_sold = False
         self.price = 1.00
+
         return self._get_state()
 
-    def _render(self, mode='human', close=False):
+    def render(self, mode='human', close=False):
+        print ("state info: {}\n".format(self))
         return
 
     def _get_state(self):
         """Get the observation."""
-        ob = [self.TOTAL_TIME_STEPS - self.curr_step]
+        # ob = [self.TOTAL_TIME_STEPS - self.curr_step]
+        ob = sendcmd("dump")
         return ob
 
     def _seed(self, seed):
         random.seed(seed)
         np.random.seed
+
+    def _sendcmd(command):
+        cmd = "{}/{}".format(self.url, command)
+        print("request: {}".format(cmd))
+        r = requests.get(cmd)
+        print("return: {}".format(r))
+        print(r.text)
+        print(r.json())
+        return r.json
+
