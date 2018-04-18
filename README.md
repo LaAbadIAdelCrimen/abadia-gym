@@ -1,5 +1,5 @@
 This repository contains a PIP package which is an OpenAI environment for
-simulating an enironment in which bananas get sold.
+simulating an environment for the AbadIA (The abbey of crime game).
 
 
 ## Installation
@@ -16,9 +16,9 @@ pip install -e .
 
 ```
 import gym
-import gym_banana
+import gym_abadia
 
-env = gym.make('Banana-v0')
+env = gym.make('abadia-v0')
 ```
 
 See https://github.com/matthiasplappert/keras-rl/tree/master/examples for some
