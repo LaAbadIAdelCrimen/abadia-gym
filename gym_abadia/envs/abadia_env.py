@@ -52,6 +52,8 @@ class AbadiaEnv(gym.Env):
 
         self.json_dump = "[{}]"
 
+        self.actions_list = ("cmd/N", "cmd/A", "cmd/D", "cmd/I", "cmd/B")
+
         # TODO: JT: check what variables we need.
         # General variables defining the environment
         self.MAX_PRICE = 2.0
@@ -71,6 +73,16 @@ class AbadiaEnv(gym.Env):
         # Store what the agent tried
         self.curr_episode = -1
         self.action_episode_memory = []
+
+    def sendCmd(self, url, command):
+        print("{}:{}".format(url, command))
+        cmd = "{}/{}".format(url, command)
+        print("request: {}".format(cmd))
+        r = requests.get(cmd)
+        print("return: {}".format(r))
+        print(r.text)
+        print(r.json())
+        return r.json
 
     def step(self, action):
         """
@@ -108,6 +120,8 @@ class AbadiaEnv(gym.Env):
         self._take_action(action)
         reward = self._get_reward()
         ob = self._get_state()
+
+        self.sendCmd(self.url, self.actions_list[action])
         return ob, reward, self.is_banana_sold, {}
 
     def _take_action(self, action):
@@ -135,15 +149,6 @@ class AbadiaEnv(gym.Env):
         else:
             return 0.0
 
-    def sendCmd(self, url, command):
-        print("{}:{}".format(url, command))
-        cmd = "{}/{}".format(url, command)
-        print("request: {}".format(cmd))
-        r = requests.get(cmd)
-        print("return: {}".format(r))
-        print(r.text)
-        print(r.json())
-        return r.json
 
     def reset(self):
         """
