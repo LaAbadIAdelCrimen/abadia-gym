@@ -34,10 +34,10 @@ class AbadiaEnv(gym.Env):
     """
 
     def __init__(self):
-        self.__version__ = "0.1.0"
+        self.__version__ = "0.0.2"
         print("AbadiaEnv - Version {}".format(self.__version__))
 
-        self.url = "http://localhost:4477/"
+        self.url = "http://localhost:4477"
 
         # Define what the agent can do
         # 0 -> NOP
@@ -110,7 +110,7 @@ class AbadiaEnv(gym.Env):
         ob = self._get_state()
         return ob, reward, self.is_banana_sold, {}
 
-    def take_action(self, action):
+    def _take_action(self, action):
         self.action_episode_memory[self.curr_episode].append(action)
         self.price = ((float(self.MAX_PRICE) /
                       (self.action_space.n - 1)) * action)
@@ -135,6 +135,16 @@ class AbadiaEnv(gym.Env):
         else:
             return 0.0
 
+    def sendCmd(self, url, command):
+        print("{}:{}".format(url, command))
+        cmd = "{}/{}".format(url, command)
+        print("request: {}".format(cmd))
+        r = requests.get(cmd)
+        print("return: {}".format(r))
+        print(r.text)
+        print(r.json())
+        return r.json
+
     def reset(self):
         """
         Reset the state of the environment and returns an initial observation.
@@ -157,19 +167,12 @@ class AbadiaEnv(gym.Env):
     def _get_state(self):
         """Get the observation."""
         # ob = [self.TOTAL_TIME_STEPS - self.curr_step]
-        ob = sendcmd("dump")
+        ob = self.sendCmd(self.url, "dump")
         return ob
 
     def _seed(self, seed):
         random.seed(seed)
         np.random.seed
 
-    def _sendcmd(command):
-        cmd = "{}/{}".format(self.url, command)
-        print("request: {}".format(cmd))
-        r = requests.get(cmd)
-        print("return: {}".format(r))
-        print(r.text)
-        print(r.json())
-        return r.json
+
 
