@@ -10,6 +10,7 @@ Each episode is making a single action (doing nothing is an action) .
 # core modules
 import random
 import math
+import json
 
 # 3rd party modules
 import gym
@@ -50,9 +51,11 @@ class AbadiaEnv(gym.Env):
 
         # json from the dump state of the episode
 
-        self.json_dump = "[{}]"
+        self.json_dump = {}
 
         self.actions_list = ("cmd/N", "cmd/A", "cmd/D", "cmd/I", "cmd/B")
+        self.obsequium = -1
+
 
         # TODO: JT: check what variables we need.
         # General variables defining the environment
@@ -60,7 +63,7 @@ class AbadiaEnv(gym.Env):
         self.TOTAL_TIME_STEPS = 2
 
         self.curr_step = -1
-        self.is_banana_sold = False
+        self.is_game_done = False
 
 
         # Observation is the remaining time
@@ -75,14 +78,14 @@ class AbadiaEnv(gym.Env):
         self.action_episode_memory = []
 
     def sendCmd(self, url, command):
-        print("{}:{}".format(url, command))
+        # print("{}:{}".format(url, command))
         cmd = "{}/{}".format(url, command)
-        print("request: {}".format(cmd))
+        # print("request: {}".format(cmd))
         r = requests.get(cmd)
-        print("return: {}".format(r))
-        print(r.text)
-        print(r.json())
-        return r.json
+        # print("return: {}".format(r))
+        # print(r.text)
+        print("cmd {} -> {}".format(cmd, r.json))
+        return r.json()
 
     def step(self, action):
         """
@@ -114,37 +117,43 @@ class AbadiaEnv(gym.Env):
                  However, official evaluations of your agent are not allowed to
                  use this for learning.
         """
-        if self.is_banana_sold:
+
+        ob = self.sendCmd(self.url, self.actions_list[action])
+        print("ob -> {}".format(ob['obsequium']))
+
+        self.obsequium = int(ob["obsequium"])
+        self.bonus     = int(ob["bonus"])
+
+        # we need to check is make sense finish it
+        if self.is_game_done:
             raise RuntimeError("Episode is done")
         self.curr_step += 1
         self._take_action(action)
-        reward = self._get_reward()
-        ob = self._get_state()
 
-        self.sendCmd(self.url, self.actions_list[action])
-        return ob, reward, self.is_banana_sold, {}
+        reward = self._get_reward()
+
+        # TODO: revisar ob = self._get_state()
+
+        return ob, reward, self.is_game_done, {}
 
     def _take_action(self, action):
         self.action_episode_memory[self.curr_episode].append(action)
-        self.price = ((float(self.MAX_PRICE) /
-                      (self.action_space.n - 1)) * action)
 
-        chance_to_take = get_chance(self.price)
-        banana_is_sold = (random.random() < chance_to_take)
+        game_is_done = (self.obsequium <= 0)
 
-        if banana_is_sold:
-            self.is_banana_sold = False
+        if game_is_done:
+            self.is_game_done = True
 
-        remaining_steps = self.TOTAL_TIME_STEPS - self.curr_step
-        time_is_over = (remaining_steps <= 0)
-        throw_away = time_is_over and not self.is_banana_sold
-        if throw_away:
-            self.is_banana_sold = False # abuse this a bit
-            self.price = 0.0
+        # remaining_steps = self.TOTAL_TIME_STEPS - self.curr_step
+        # time_is_over = (remaining_steps <= 0)
+        # throw_away = time_is_over and not self.is_banana_sold
+        # if throw_away:
+            # self.is_banana_sold = False # abuse this a bit
+            # self.price = 0.0
 
     def _get_reward(self):
-        """Reward is given for a sold banana."""
-        if self.is_banana_sold:
+        """Reward is about how complete is the game"""
+        if self.is_game_done:
             return self.price - 1
         else:
             return 0.0
@@ -160,13 +169,13 @@ class AbadiaEnv(gym.Env):
         """
         self.curr_episode += 1
         self.action_episode_memory.append([])
-        self.is_banana_sold = False
+        self.is_game_done = False
         self.price = 1.00
-
+        self.sendCmd(self.url,"reset")
         return self._get_state()
 
     def render(self, mode='human', close=False):
-        print ("state info: {}\n".format(self))
+        print("state info: {}\n".format(self))
         return
 
     def _get_state(self):
