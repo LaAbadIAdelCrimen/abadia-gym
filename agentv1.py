@@ -1,17 +1,14 @@
 # Agent v1 a.k.a. DoNothing
 # this agent is a very simple agent to test abadia gym
 
-
 import gym
 import gym_abadia
 import numpy as np
 
-board_visited = (300, 300)
 
 env = gym.make('Abadia-v0')
 for i_episode in range(20):
     observation = env.reset()
-    np.zeros(board_visited)
     for t in range(100):
         print("observation: {}\n".format(observation['Guillermo']))
         x = int(observation['Guillermo']['posX'])
