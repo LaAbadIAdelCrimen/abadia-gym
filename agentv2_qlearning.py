@@ -16,35 +16,30 @@ yy = .95
 
 rList = []
 
-for i_episode in range(2000):
+for i_episode in range(100):
 
     state = env.reset()
     # Reset environment and get first new state
     rAll = 0
     done = False
 
-    for t in range(100):
-        print("observation: {}\n".format(state['Guillermo']))
+    for t in range(200):
         x = int(state['Guillermo']['posX'])
         y = int(state['Guillermo']['posY'])
         ori = int(state['Guillermo']['orientacion'])
         # env.render(mode="human")
 
-
-        # action = env.action_space.sample()
         # Choose an action by greedily (with noise) picking from Q table
         action = np.argmax(Q[x, y, :] + np.random.randn(1, env.action_space.n) * (1. / (i_episode + 1)))
 
+        # Get new state and reward from environment
         newState, reward, done, info = env.step(action)
 
-        print ("Episode: {} X,Y -> {},{} ori {} Action {} reward {}".format(i_episode, x, y, ori, action, reward))
+        print ("Episode:{}:{} X,Y->{},{},{} A({}) r:{} tr:{}".format(i_episode, t, x, y, ori, action, reward, rAll))
 
         if done:
             print("Episode finished after {} timesteps".format(t+1))
             break
-
-        # Get new state and reward from environment
-        # s1, r, d, _ = env.step(a)
 
         # Update Q-Table with new knowledge
         newX = int(newState['Guillermo']['posX'])
@@ -57,3 +52,8 @@ for i_episode in range(2000):
 
     # jList.append(j)
     rList.append(rAll)
+
+print("Score over time: " + str(sum(rList)/100))
+
+print("Final Q-Table Values")
+print(Q)

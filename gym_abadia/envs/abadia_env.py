@@ -55,6 +55,7 @@ class AbadiaEnv(gym.Env):
 
         self.actions_list = ("cmd/N", "cmd/A", "cmd/D", "cmd/I", "cmd/B")
         self.obsequium = -1
+        self.prevPantalla = -1
 
 
         # TODO: JT: check what variables we need.
@@ -78,12 +79,9 @@ class AbadiaEnv(gym.Env):
         self.action_episode_memory = []
 
     def sendCmd(self, url, command):
-        # print("{}:{}".format(url, command))
         cmd = "{}/{}".format(url, command)
-        # print("request: {}".format(cmd))
         r = requests.get(cmd)
-        # print("return: {}".format(r))
-        # print(r.text)
+        print("cmd {} -> {}".format(cmd, r.text))
         print("cmd {} -> {}".format(cmd, r.json))
         return r.json()
 
@@ -119,7 +117,7 @@ class AbadiaEnv(gym.Env):
         """
 
         ob = self.sendCmd(self.url, self.actions_list[action])
-        print("ob -> {}".format(ob['obsequium']))
+        print("ob -> {}".format(ob)) # ['obsequium']))
 
         self.obsequium = int(ob["obsequium"])
         self.bonus     = int(ob["bonus"])
@@ -129,6 +127,17 @@ class AbadiaEnv(gym.Env):
             raise RuntimeError("Episode is done")
         self.curr_step += 1
         self._take_action(action)
+
+        # reward = self._get_reward()
+
+        reward = 0;
+
+        if (self.prevPantalla == -1):
+            self.prevPantalla = int(ob['numPantalla'])
+        else:
+            if (self.prevPantalla != int(ob['numPantalla'])):
+                reward += 1
+                self.prevPantalla = int(ob['numPantalla'])
 
         reward = self._get_reward()
 
