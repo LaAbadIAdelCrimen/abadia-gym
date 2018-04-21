@@ -41,10 +41,10 @@ class AbadiaEnv(gym.Env):
         self.url = "http://localhost:4477"
 
         # Define what the agent can do
-        # 0 -> NOP
-        # 1 -> STEP
-        # 2 -> RIGHT
-        # 3 -> LEFT
+        # 0 -> STEP
+        # 1 -> RIGHT
+        # 2 -> LEFT
+        # 3 -> NOP
         # 4 -> DOWN
 
         self.action_space = spaces.Discrete(5)
@@ -53,7 +53,7 @@ class AbadiaEnv(gym.Env):
 
         self.json_dump = {}
 
-        self.actions_list = ("cmd/N", "cmd/A", "cmd/D", "cmd/I", "cmd/B")
+        self.actions_list = ("cmd/A", "cmd/D", "cmd/I", "cmd/N", "cmd/B")
         self.obsequium = -1
         self.prevPantalla = -1
 
@@ -81,8 +81,8 @@ class AbadiaEnv(gym.Env):
     def sendCmd(self, url, command):
         cmd = "{}/{}".format(url, command)
         r = requests.get(cmd)
-        print("cmd {} -> {}".format(cmd, r.text))
-        print("cmd {} -> {}".format(cmd, r.json))
+        # print("cmd {} -> {}".format(cmd, r.text))
+        # print("cmd {} -> {}".format(cmd, r.json))
         return r.json()
 
     def step(self, action):
@@ -117,7 +117,7 @@ class AbadiaEnv(gym.Env):
         """
 
         ob = self.sendCmd(self.url, self.actions_list[action])
-        print("ob -> {}".format(ob)) # ['obsequium']))
+        # print("ob -> {}".format(ob)) # ['obsequium']))
 
         self.obsequium = int(ob["obsequium"])
         self.bonus     = int(ob["bonus"])
@@ -136,10 +136,10 @@ class AbadiaEnv(gym.Env):
             self.prevPantalla = int(ob['numPantalla'])
         else:
             if (self.prevPantalla != int(ob['numPantalla'])):
-                reward += 1
+                reward += 10
                 self.prevPantalla = int(ob['numPantalla'])
 
-        reward = self._get_reward()
+        # reward = self._get_reward()
 
         # TODO: revisar ob = self._get_state()
 
@@ -181,6 +181,7 @@ class AbadiaEnv(gym.Env):
         self.is_game_done = False
         self.price = 1.00
         self.sendCmd(self.url,"reset")
+        self.sendCmd(self.url,"cmd/e")
         return self._get_state()
 
     def render(self, mode='human', close=False):
