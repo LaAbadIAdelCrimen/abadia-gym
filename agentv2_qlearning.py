@@ -51,16 +51,18 @@ lr = .8
 yy = .95
 
 rList = []
+bucle = 0
 
-for i_episode in range(50):
+Visited = np.zeros([512,512])
+for i_episode in range(500):
 
     state = env.reset()
     # Reset environment and get first new state
     rAll = 0
     done = False
-    Visited = np.zeros([512,512])
+    # Visited = np.zeros([512,512])
 
-    for t in range(100):
+    for t in range(500):
         x = int(env.Personajes['Guillermo']['posX'])
         y = int(env.Personajes['Guillermo']['posY'])
 
@@ -91,10 +93,10 @@ for i_episode in range(50):
                 if (Visited[newX, newY] % 10 == 0):
                     reward -= 0.05
                 Visited[newX, newY] += 1
-                print("-------------------------------------------------------")
-                print("({},{}) Ori {} inc X {} inc Y {} Visited {}".format(
-                    x, y, ori, newX - x, newY -y, Visited[newX, newY]))
-                print("-------------------------------------------------------")
+                # print("-------------------------------------------------------")
+                # print("({},{}) Ori {} inc X {} inc Y {} Visited {}".format(
+                #    x, y, ori, newX - x, newY -y, Visited[newX, newY]))
+                # print("-------------------------------------------------------")
             if (x == newX and y == newY):
                 if (ori == 0):
                     Visited[x+1, y] += -0.01
@@ -105,18 +107,25 @@ for i_episode in range(50):
                 if (ori == 3):
                     Visited[x, y+1] += -0.01
                 reward -= 0.5
-                print("-------------------------------------------------------")
-                print("({},{}) Ori {} inc X {} inc Y {} y el puto Adso esta en {},{} Visited {}".format(
-                    x, y, ori, newX - x, newY -y, adsoX, adsoY, Visited[newX, newY]))
-                print("-------------------------------------------------------")
+                bucle += 1
+                # print("-------------------------------------------------------")
+                # print("({},{}) Ori {} inc X {} inc Y {} y el puto Adso esta en {},{} Visited {}".format(
+                #    x, y, ori, newX - x, newY -y, adsoX, adsoY, Visited[newX, newY]))
+                # print("-------------------------------------------------------")
 
         if (action == 4 or action == 5):
             if (x == newX and y == newY):
                 reward -= 0.2
+                bucle += 1
 
         if (action == 6 or action == 7):
             if (x == newX and y == newY):
                 reward -= 0.5
+
+        if (bucle >= 5):
+            bucle = 0
+            for n in range(env.action_space.n):
+                Q[x,y,n] = 0.0
 
         # Update Q-Table with new knowledge
         Q[x, y, action] = Q[x, y, action] + lr * (reward + yy * np.max(Q[newX, newY, :]) - Q[x, y, action])
