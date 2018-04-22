@@ -35,12 +35,16 @@ env = gym.make('Abadia-v0')
 # Q = np.zeros([env.observation_space.n, env.action_space.n])
 
 nameSnap = "snapshoots/current-qtable"
-fsnap = open(nameSnap, "a+")
 
 if os.path.exists(nameSnap) and os.path.getsize(nameSnap) > 0:
+    fsnap = open(nameSnap, "rb+")
     Q = np.load(fsnap)
 else:
+    fsnap = open(nameSnap, "wb+")
     Q = np.zeros([512, 512, env.action_space.n])
+    np.save(fsnap,Q)
+    fsnap.flush()
+    fsnap.close()
 
 # Set learning parameters
 lr = .8
@@ -56,7 +60,7 @@ for i_episode in range(50):
     done = False
     Visited = np.zeros([512,512])
 
-    for t in range(5000):
+    for t in range(100):
         x = int(env.Personajes['Guillermo']['posX'])
         y = int(env.Personajes['Guillermo']['posY'])
 
@@ -129,7 +133,12 @@ for i_episode in range(50):
 
     # jList.append(j)
     rList.append(rAll)
+
+    fsnap = open(nameSnap, "wb+")
     np.save(fsnap, Q)
+    fsnap.flush()
+    fsnap.close()
+
 
 print("Score over time: " + str(sum(rList)/100))
 
