@@ -9,9 +9,9 @@ import os
 def pintaRejilla():
     print("")
     print("+---------------------+")
-    for xx in range(x-10, x+10):
+    for yy in range(y-10, y+10):
         print("|", end="")
-        for yy in range(y-10, y+10):
+        for xx in range(x-10, x+10):
             if (xx == x and yy == y):
                 print("G", end="")
             else:

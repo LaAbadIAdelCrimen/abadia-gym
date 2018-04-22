@@ -94,7 +94,7 @@ class AbadiaEnv(gym.Env):
     def sendCmd(self, url, command):
         cmd = "{}/{}".format(url, command)
         r = requests.get(cmd)
-        print("cmd {} -> {}".format(cmd, r.text))
+        # print("cmd {} -> {}".format(cmd, r.text))
         # print("cmd {} -> {}".format(cmd, r.json))
         return r.json()
 
