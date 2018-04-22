@@ -4,6 +4,7 @@
 import gym
 import gym_abadia
 import numpy as np
+import os
 
 def pintaRejilla():
     print("")
@@ -26,9 +27,16 @@ def pintaRejilla():
 
 env = gym.make('Abadia-v0')
 
-#Initialize table with all zeros
+#Initialize Q-table with all zeros
 # Q = np.zeros([env.observation_space.n, env.action_space.n])
-Q = np.zeros([512, 512, env.action_space.n])
+
+nameSnap = "snapshoots/current-qtable"
+fsnap = open(nameSnap, "a+")
+
+if os.path.exists(nameSnap) and os.path.getsize(nameSnap) > 0:
+    Q = np.load(fsnap)
+else:
+    Q = np.zeros([512, 512, env.action_space.n])
 
 # Set learning parameters
 lr = .8
@@ -45,13 +53,13 @@ for i_episode in range(50):
     Visited = np.zeros([512,512])
 
     for t in range(5000):
-        x = int(state['Guillermo']['posX'])
-        y = int(state['Guillermo']['posY'])
+        x = int(env.Personajes['Guillermo']['posX'])
+        y = int(env.Personajes['Guillermo']['posY'])
 
-        adsoX = int(state['Adso']['posX'])
-        adsoY = int(state['Adso']['posY'])
+        adsoX = int(env.Personajes['Adso']['posX'])
+        adsoY = int(env.Personajes['Adso']['posY'])
 
-        ori = int(state['Guillermo']['orientacion'])
+        ori = int(env.Personajes['Guillermo']['orientacion'])
         # env.render(mode="human")
 
         # Choose an action by greedily (with noise) picking from Q table
@@ -61,13 +69,12 @@ for i_episode in range(50):
         # Get new state and reward from environment
         newState, reward, done, info = env.step(action)
 
-
         if done:
             print("Episode finished after {} timesteps".format(t+1))
             break
 
-        newX = int(newState['Guillermo']['posX'])
-        newY = int(newState['Guillermo']['posY'])
+        newX = int(env.Personajes['Guillermo']['posX'])
+        newY = int(env.Personajes['Guillermo']['posY'])
 
 
         if (Visited[newX, newY] == 0):
@@ -92,6 +99,7 @@ for i_episode in range(50):
 
     # jList.append(j)
     rList.append(rAll)
+    np.save(fsnap, Q)
 
 print("Score over time: " + str(sum(rList)/100))
 

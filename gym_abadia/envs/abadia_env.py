@@ -66,6 +66,19 @@ class AbadiaEnv(gym.Env):
         self.curr_step = -1
         self.is_game_done = False
 
+        self.Personajes = {
+            "Guillermo":  {},
+            "Adso":       {},
+            "Abad":       {},
+            "Malaquias":  {},
+            "Berengario": {},
+            "Severino":   {},
+            "Jorge":      {},
+            "Bernardo":   {}
+        }
+
+        self.listaPersonajes = ("Guillermo", "Adso", "Abad", "Malaquias", "Berengario",
+            "Severino", "Jorge", "Bernardo")
 
         # Observation is the remaining time
         low = np.array([0.0,  # remaining_tries
@@ -81,7 +94,7 @@ class AbadiaEnv(gym.Env):
     def sendCmd(self, url, command):
         cmd = "{}/{}".format(url, command)
         r = requests.get(cmd)
-        # print("cmd {} -> {}".format(cmd, r.text))
+        print("cmd {} -> {}".format(cmd, r.text))
         # print("cmd {} -> {}".format(cmd, r.json))
         return r.json()
 
@@ -119,6 +132,12 @@ class AbadiaEnv(gym.Env):
         ob = self.sendCmd(self.url, self.actions_list[action])
         # print("ob -> {}".format(ob)) # ['obsequium']))
 
+        # extracting all the values from the json
+        # first personajes
+
+        self._get_personajes_info(ob)
+
+
         self.obsequium = int(ob["obsequium"])
         self.bonus     = int(ob["bonus"])
 
@@ -141,9 +160,25 @@ class AbadiaEnv(gym.Env):
 
         # reward = self._get_reward()
 
-        # TODO: revisar ob = self._get_state()
-
         return ob, reward, self.is_game_done, {}
+
+    def _get_personajes_info(self, ob):
+        # print ("ob personajes -> {} ", ob['Personajes']['Personaje'][0])
+
+        for persona in self.listaPersonajes[:]:
+            datos = self.Personajes[persona]
+            datos = {}
+        for personaje in ob['Personajes']['Personaje']:
+            if (len(personaje) == 1):
+                break
+            persona = self.listaPersonajes[int(personaje['id'])]
+            datos = self.Personajes[persona]
+            for key, value in personaje.items():
+                #if key != "id" or key != "fil":
+                datos[key] = value
+            self.Personajes[persona] = datos
+            # print ("{} personaje: {}", persona, datos)
+
 
     def _take_action(self, action):
         self.action_episode_memory[self.curr_episode].append(action)
@@ -192,6 +227,7 @@ class AbadiaEnv(gym.Env):
         """Get the observation."""
         # ob = [self.TOTAL_TIME_STEPS - self.curr_step]
         ob = self.sendCmd(self.url, "dump")
+        self._get_personajes_info(ob)
         return ob
 
     def _seed(self, seed):
