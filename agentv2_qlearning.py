@@ -19,9 +19,13 @@ def pintaRejilla():
                     print("A", end="")
                 else:
                     if (Visited[xx,yy] == 0):
-                        print(" ", end="")
+                        print("·", end="")
                     else:
-                        print("v", end="")
+                        if (Visited[xx,yy] > 0):
+                            print(" ", end="")
+                        else:
+                            print("#", end="")
+
         print("|")
     print("+---------------------+")
 
@@ -76,18 +80,44 @@ for i_episode in range(50):
         newX = int(env.Personajes['Guillermo']['posX'])
         newY = int(env.Personajes['Guillermo']['posY'])
 
+        if (action <= 3):
+            if (x != newX or y != newY):
+                if (Visited[newX, newY] == 0):
+                    reward += 0.05
+                if (Visited[newX, newY] % 10 == 0):
+                    reward -= 0.05
+                Visited[newX, newY] += 1
+                print("-------------------------------------------------------")
+                print("({},{}) Ori {} inc X {} inc Y {} Visited {}".format(
+                    x, y, ori, newX - x, newY -y, Visited[newX, newY]))
+                print("-------------------------------------------------------")
+            if (x == newX and y == newY):
+                if (ori == 0):
+                    Visited[x+1, y] += -0.01
+                if (ori == 1):
+                    Visited[x, y-1] += -0.01
+                if (ori == 2):
+                    Visited[x-1, y] += -0.01
+                if (ori == 3):
+                    Visited[x, y+1] += -0.01
+                reward -= 0.5
+                print("-------------------------------------------------------")
+                print("({},{}) Ori {} inc X {} inc Y {} y el puto Adso esta en {},{} Visited {}".format(
+                    x, y, ori, newX - x, newY -y, adsoX, adsoY, Visited[newX, newY]))
+                print("-------------------------------------------------------")
 
-        if (Visited[newX, newY] == 0):
-            reward += 0.1
-        if (Visited[newX, newY] >=10):
-            reward -= 0.1
+        if (action == 4 or action == 5):
+            if (x == newX and y == newY):
+                reward -= 0.2
 
-        Visited[newX, newY] += 1
+        if (action == 6 or action == 7):
+            if (x == newX and y == newY):
+                reward -= 0.5
 
         # Update Q-Table with new knowledge
         Q[x, y, action] = Q[x, y, action] + lr * (reward + yy * np.max(Q[newX, newY, :]) - Q[x, y, action])
-        print ("Episode:{}:{} X,Y->{},{},{} A({}) r:{} tr:{} Q(s,a)= {}".format(i_episode, t, x, y,
-                                                                     ori, action, reward, rAll, Q[x,y]), end="\r")
+        print("Episode({}:{}) A({}) XYO {},{},{} -> {},{} r:{} tr:{} Q(s,a)= {}".format(
+                i_episode, t, action, x, y, ori, newX, newY, reward, rAll, Q[x,y]), end="\r")
 
         if (t % 20 == 0):
             pintaRejilla()

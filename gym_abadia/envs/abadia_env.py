@@ -41,20 +41,24 @@ class AbadiaEnv(gym.Env):
         self.url = "http://localhost:4477"
 
         # Define what the agent can do
-        # 0 -> STEP
-        # 1 -> RIGHT
-        # 2 -> LEFT
-        # 3 -> NOP
-        # 4 -> DOWN
+        # 0 -> STEP ORI 0
+        # 1 -> STEP ORI 1
+        # 2 -> STEP ORI 2
+        # 3 -> STEP ORI 3
+        # 4 -> RIGHT
+        # 5 -> LEFT
+        # 6 -> NOP
+        # 7 -> DOWN
 
-        self.action_space = spaces.Discrete(5)
+        self.action_space = spaces.Discrete(8)
 
         # json from the dump state of the episode
 
         self.json_dump = {}
 
-        self.actions_list = ("cmd/A", "cmd/D", "cmd/I", "cmd/N", "cmd/B")
+        self.actions_list = ("cmd/A", "cmd/A" ,"cmd/A", "cmd/A", "cmd/D", "cmd/I", "cmd/N", "cmd/B")
         self.obsequium = -1
+        self.porcentaje = -1
         self.prevPantalla = -1
 
 
@@ -138,8 +142,9 @@ class AbadiaEnv(gym.Env):
         self._get_personajes_info(ob)
 
 
-        self.obsequium = int(ob["obsequium"])
-        self.bonus     = int(ob["bonus"])
+        self.obsequium  = int(ob["obsequium"])
+        self.porcentaje = int(ob["porcentaje"])
+        self.bonus      = int(ob["bonus"])
 
         # we need to check is make sense finish it
         if self.is_game_done:
@@ -155,8 +160,12 @@ class AbadiaEnv(gym.Env):
             self.prevPantalla = int(ob['numPantalla'])
         else:
             if (self.prevPantalla != int(ob['numPantalla'])):
-                reward += 10
+                reward += 0.1
                 self.prevPantalla = int(ob['numPantalla'])
+
+        reward += (self.porcentaje) / 33
+
+        reward += (self.obsequium / 300)
 
         # reward = self._get_reward()
 
