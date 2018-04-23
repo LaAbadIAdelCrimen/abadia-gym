@@ -6,12 +6,17 @@ import gym_abadia
 import numpy as np
 import os
 
-def pintaRejilla():
+def pintaRejilla(width, height):
+    w = int(width/2)
+    h = int(height/2)
+    yRejilla = 0
+    xRejilla = 0
+
     print("")
-    print("+---------------------+")
-    for yy in range(y-10, y+10):
+    print("+" + "-"*(w*2) + "+" + "-"*24 + "+")
+    for yy in range(y-h, y+h):
         print("|", end="")
-        for xx in range(x-10, x+10):
+        for xx in range(x-w, x+w):
             if (xx == x and yy == y):
                 print("G", end="")
             else:
@@ -26,8 +31,20 @@ def pintaRejilla():
                         else:
                             print("#", end="")
 
+        print("|", end="")
+        if yRejilla < 24:
+            for xx in range(0, 23):
+                if (env.rejilla[yRejilla][xx] == 0):
+                    print (" ", end="")
+                else:
+                    if (env.rejilla[yRejilla][xx] >= 16):
+                        print ("P", end="")
+                    else:
+                        print ("#", end="")
+        yRejilla += 1
         print("|")
-    print("+---------------------+")
+
+    print("+" + "-"*(w*2) + "+")
 
 env = gym.make('Abadia-v0')
 
@@ -54,7 +71,7 @@ rList = []
 bucle = 0
 
 Visited = np.zeros([512,512])
-for i_episode in range(500):
+for i_episode in range(1000):
 
     state = env.reset()
     # Reset environment and get first new state
@@ -81,7 +98,10 @@ for i_episode in range(500):
 
         if done:
             print("Episode finished after {} timesteps".format(t+1))
-            break
+            if (env.haFracasado):
+                env.grabo_partida()
+                env.reset_fin_partida()
+                break
 
         newX = int(env.Personajes['Guillermo']['posX'])
         newY = int(env.Personajes['Guillermo']['posY'])
@@ -128,12 +148,15 @@ for i_episode in range(500):
                 Q[x,y,n] = 0.0
 
         # Update Q-Table with new knowledge
-        Q[x, y, action] = Q[x, y, action] + lr * (reward + yy * np.max(Q[newX, newY, :]) - Q[x, y, action])
+        Q[x, y, action] = \
+            Q[x, y, action] + lr * (reward + yy * np.max(Q[newX, newY, :]) - Q[x, y, action])
+
         print("Episode({}:{}) A({}) XYO {},{},{} -> {},{} r:{} tr:{} Q(s,a)= {}".format(
-                i_episode, t, action, x, y, ori, newX, newY, reward, rAll, Q[x,y]), end="\r")
+                i_episode, t, action, x, y, ori, newX, newY, np.round(reward,2), np.round(rAll,2),
+                np.round(Q[x,y],4)), end="\r")
 
         if (t % 20 == 0):
-            pintaRejilla()
+            pintaRejilla(40, 20)
 
         rAll += reward
         state = newState

@@ -59,7 +59,9 @@ class AbadiaEnv(gym.Env):
         self.actions_list = ("cmd/A", "cmd/A" ,"cmd/A", "cmd/A", "cmd/D", "cmd/I", "cmd/N", "cmd/B")
         self.obsequium = -1
         self.porcentaje = -1
+        self.haFracasado = False
         self.prevPantalla = -1
+        self.rejilla = []
 
 
         # TODO: JT: check what variables we need.
@@ -142,13 +144,20 @@ class AbadiaEnv(gym.Env):
         self._get_personajes_info(ob)
 
 
-        self.obsequium  = int(ob["obsequium"])
-        self.porcentaje = int(ob["porcentaje"])
-        self.bonus      = int(ob["bonus"])
+        self.obsequium    = int(ob['obsequium'])
+        self.porcentaje   = int(ob['porcentaje'])
+        self.bonus        = int(ob['bonus'])
+        self.haFracasado =  (ob['haFracasado'] == 'True')
+
+        self.rejilla = ob['rejilla']
+        # print(self.rejilla)
+
+        if (self.haFracasado == True):
+            self.game_is_gone = True
 
         # we need to check is make sense finish it
-        if self.is_game_done:
-            raise RuntimeError("Episode is done")
+        # if self.is_game_done or self.porcentaje == 100:
+        #   raise RuntimeError("Episode is done")
         self.curr_step += 1
         self._take_action(action)
 
@@ -244,4 +253,9 @@ class AbadiaEnv(gym.Env):
         np.random.seed
 
 
+    def graba_partida(self):
+        pass
+
+    def reset_fin_partida(self):
+        ob = self.sendCmd(self.url, "cmd/_")
 
