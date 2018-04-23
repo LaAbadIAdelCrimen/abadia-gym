@@ -79,7 +79,7 @@ for i_episode in range(1000):
     done = False
     # Visited = np.zeros([512,512])
 
-    for t in range(500):
+    for t in range(1500):
         x = int(env.Personajes['Guillermo']['posX'])
         y = int(env.Personajes['Guillermo']['posY'])
 
