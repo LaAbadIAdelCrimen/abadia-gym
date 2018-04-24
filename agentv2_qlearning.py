@@ -41,6 +41,14 @@ def pintaRejilla(width, height):
                         print ("P", end="")
                     else:
                         print ("#", end="")
+
+        print("|", end="")
+        if yRejilla < 24:
+            for xx in range(0, 23):
+                if (env.rejilla[yRejilla][xx] == 0):
+                    print ("  ", end="")
+                else:
+                    print ("{}".format(format(env.rejilla[yRejilla][xx], '2x')), end="")
         yRejilla += 1
         print("|")
 
@@ -51,17 +59,29 @@ env = gym.make('Abadia-v0')
 #Initialize Q-table with all zeros
 # Q = np.zeros([env.observation_space.n, env.action_space.n])
 
-nameSnap = "snapshoots/current-qtable"
+nameQtableSnap = "snapshoots/current-qtable"
 
-if os.path.exists(nameSnap) and os.path.getsize(nameSnap) > 0:
-    fsnap = open(nameSnap, "rb+")
-    Q = np.load(fsnap)
+if os.path.exists(nameQtableSnap) and os.path.getsize(nameQtableSnap) > 0:
+    fqtablesnap = open(nameQtableSnap, "rb+")
+    Q = np.load(fqtablesnap)
 else:
-    fsnap = open(nameSnap, "wb+")
+    fqtablesnap = open(nameQtableSnap, "wb+")
     Q = np.zeros([512, 512, env.action_space.n])
-    np.save(fsnap,Q)
-    fsnap.flush()
-    fsnap.close()
+    np.save(fqtablesnap, Q)
+    fqtablesnap.flush()
+    fqtablesnap.close()
+
+nameVisitedSnap = "snapshoots/current-visited"
+
+if os.path.exists(nameVisitedSnap) and os.path.getsize(nameVisitedSnap) > 0:
+    fvisitedsnap = open(nameVisitedSnap, "rb+")
+    Visited = np.load(fvisitedsnap)
+else:
+    fvisitedsnap = open(nameVisitedSnap, "wb+")
+    Visited = np.zeros([512, 512])
+    np.save(fvisitedsnap, Visited)
+    fvisitedsnap.flush()
+    fvisitedsnap.close()
 
 # Set learning parameters
 lr = .8
@@ -70,7 +90,6 @@ yy = .95
 rList = []
 bucle = 0
 
-Visited = np.zeros([512,512])
 for i_episode in range(1000):
 
     state = env.reset()
@@ -166,11 +185,15 @@ for i_episode in range(1000):
     # jList.append(j)
     rList.append(rAll)
 
-    fsnap = open(nameSnap, "wb+")
-    np.save(fsnap, Q)
-    fsnap.flush()
-    fsnap.close()
+    fqtablesnap = open(nameQtableSnap, "wb+")
+    np.save(fqtablesnap, Q)
+    fqtablesnap.flush()
+    fqtablesnap.close()
 
+    fvisitedsnap = open(nameVisitedSnap, "wb+")
+    np.save(fvisitedsnap, Visited)
+    fvisitedsnap.flush()
+    fvisitedsnap.close()
 
 print("Score over time: " + str(sum(rList)/100))
 
