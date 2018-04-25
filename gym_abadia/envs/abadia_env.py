@@ -109,12 +109,15 @@ class AbadiaEnv(gym.Env):
         self.curr_episode = -1
         self.action_episode_memory = []
 
-    def sendCmd(self, url, command):
+    def sendCmd(self, url, command, type="json"):
         cmd = "{}/{}".format(url, command)
         r = requests.get(cmd)
         # print("cmd {} -> {}".format(cmd, r.text))
         # print("cmd {} -> {}".format(cmd, r.json))
-        return r.json()
+        if (type == "json"):
+            return r.json()
+        else:
+            return r.text
 
     def step(self, action):
         """
@@ -159,7 +162,7 @@ class AbadiaEnv(gym.Env):
         self.obsequium    = int(ob['obsequium'])
         self.porcentaje   = int(ob['porcentaje'])
         self.bonus        = int(ob['bonus'])
-        self.pantalla     = int(ob['numPantalla'])
+        self.numPantalla     = int(ob['numPantalla'])
         self.dia          = int(ob['dia'])
         self.momentoDia   = int(ob['momentoDia'])
         self.haFracasado  = (ob['haFracasado'] == 'True')
@@ -186,6 +189,7 @@ class AbadiaEnv(gym.Env):
             if (self.prevPantalla != int(ob['numPantalla'])):
                 reward += 0.1
                 self.prevPantalla = int(ob['numPantalla'])
+                self.save_game_checkpoint()
 
         reward += (self.porcentaje) / 33
 
@@ -299,9 +303,9 @@ class AbadiaEnv(gym.Env):
         self.fdGame    = open(self.dump_path + "/" + self.gameName, "w")
         self.fdActions = open(self.dump_path + "/" + self.actionsName, "w")
 
-    def game_checkpoint(self):
+    def save_game_checkpoint(self):
 
-        checkpoint = self.sendCmd(self.url, "cmd/save")
+        checkpoint = self.sendCmd(self.url, "save", type="raw")
 
         now = datetime.datetime.now()
         self.dump_path = now.strftime('partidas/%Y%m%d')
@@ -313,5 +317,7 @@ class AbadiaEnv(gym.Env):
         self.checkpointName += "_{}_{}_{}_{}_{}.checkpoint".format(self.dia, self.momentoDia,
                                                 self.numPantalla, self.obsequium, self.bonus)
 
-
         self.fdCheckpoint = open(self.dump_path + "/" + self.checkpointName, "w")
+        print()
+        self.fdCheckpoint.write(checkpoint)
+        self.fdCheckpoint.flush()

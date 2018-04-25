@@ -171,9 +171,9 @@ for i_episode in range(1000):
         Q[x, y, action] = \
             Q[x, y, action] + lr * (reward + yy * np.max(Q[newX, newY, :]) - Q[x, y, action])
 
-        print("Episode({}:{}) A({}) XYO {},{},{} -> {},{} r:{} tr:{} Q(s,a)= {}".format(
-                i_episode, t, action, x, y, ori, newX, newY, np.round(reward,2), np.round(rAll,2),
-                np.round(Q[x,y],4)), end="\r")
+        print("Episode({}:{}) A({})XYOP {},{},{},{} -> {},{} r:{} tr:{} Q(s,a)= {}".format(
+                i_episode, t, action, x, y, ori, env.numPantalla, newX, newY, np.round(reward,2),
+                np.round(rAll,2), np.round(Q[x,y],4)), end="\r")
 
         if (t % 20 == 0):
             pintaRejilla(40, 20)
