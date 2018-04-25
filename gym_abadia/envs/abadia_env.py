@@ -275,8 +275,8 @@ class AbadiaEnv(gym.Env):
         pass
 
     def save_action(self, state, action, reward, nextstate):
-        self.fdActions.write("action: \{ state: {}, action:{}, reward:{}, nextstate{} \}\n"
-                             .format(state, action, reward, nextstate))
+        self.fdActions.write("action: {} state: {}, action:{}, reward:{}, nextstate{} {}\n"
+                             .format("{", state, action, reward, nextstate, "}"))
 
     def reset_fin_partida(self):
         ob = self.sendCmd(self.url, "cmd/_")
