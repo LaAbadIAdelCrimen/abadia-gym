@@ -290,7 +290,7 @@ class AbadiaEnv(gym.Env):
         path.mkdir(parents=True, exist_ok=True)
 
         # create the game and actions files
-        self.fdGame    = open(self.gameName, "w")
-        self.fdActions = open(self.actionsName, "w")
+        self.fdGame    = open(self.dump_path + self.gameName, "w")
+        self.fdActions = open(self.dump_path + self.actionsName, "w")
 
 
