@@ -274,6 +274,10 @@ class AbadiaEnv(gym.Env):
     def graba_partida(self):
         pass
 
+    def save_action(self, state, action, reward, nextstate):
+        self.fdActions.write("action: \{ state: {}, action:{}, reward:{}, nextstate{} \}\n"
+                             .format(state, action, reward, nextstate))
+
     def reset_fin_partida(self):
         ob = self.sendCmd(self.url, "cmd/_")
 
@@ -286,7 +290,7 @@ class AbadiaEnv(gym.Env):
         path.mkdir(parents=True, exist_ok=True)
 
         # create the game and actions files
-        fdGame    = open(self.gameName, "w")
-        fdActions = open(self.actionsName, "w")
+        self.fdGame    = open(self.gameName, "w")
+        self.fdActions = open(self.actionsName, "w")
 
 
