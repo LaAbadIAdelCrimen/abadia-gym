@@ -93,6 +93,7 @@ bucle = 0
 for i_episode in range(1000):
 
     state = env.reset()
+    print("reseteado:{}".format(env.Personajes))
     # Reset environment and get first new state
     rAll = 0
     done = False
@@ -115,7 +116,6 @@ for i_episode in range(1000):
         # Get new state and reward from environment
         newState, reward, done, info = env.step(action)
         env.save_action(state, action, reward, newState)
-
         if done:
             print("Episode finished after {} timesteps".format(t+1))
             if (env.haFracasado):

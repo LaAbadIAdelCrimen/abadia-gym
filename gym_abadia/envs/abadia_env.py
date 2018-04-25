@@ -11,6 +11,7 @@ Each episode is making a single action (doing nothing is an action) .
 import random
 import math
 import json
+import time
 import datetime
 from pathlib import Path
 
@@ -174,7 +175,7 @@ class AbadiaEnv(gym.Env):
 
         # reward = self._get_reward()
 
-        reward = 0;
+        reward = 0
 
         if (self.prevPantalla == -1):
             self.prevPantalla = int(ob['numPantalla'])
@@ -240,7 +241,7 @@ class AbadiaEnv(gym.Env):
         -------
         observation (object): the initial observation of the space.
         """
-        now = datetime.date.today()
+        now = datetime.datetime.now()
         self.gameName    = now.strftime('abadia_game_%y-%m-%d_%H:%M:%S:%f.json')
         self.actionsName = now.strftime('abadia_actions_%y-%m-%d_%H:%M:%S:%f.json')
 
@@ -249,10 +250,8 @@ class AbadiaEnv(gym.Env):
         self.is_game_done = False
 
         self.sendCmd(self.url,"reset")
-        self.sendCmd(self.url,"cmd/e")
-
         self.init_dumps_files()
-
+        time.sleep(2)
         return self._get_state()
 
     def render(self, mode='human', close=False):
@@ -284,13 +283,13 @@ class AbadiaEnv(gym.Env):
     def init_dumps_files(self):
 
         # check is directory exist, if not we will create it
-        now = datetime.date.today()
+        now = datetime.datetime.now()
         self.dump_path = now.strftime('partidas/%Y%m%d')
         path = Path(self.dump_path)
         path.mkdir(parents=True, exist_ok=True)
 
         # create the game and actions files
-        self.fdGame    = open(self.dump_path + self.gameName, "w")
-        self.fdActions = open(self.dump_path + self.actionsName, "w")
+        self.fdGame    = open(self.dump_path + "/" + self.gameName, "w")
+        self.fdActions = open(self.dump_path + "/" + self.actionsName, "w")
 
 
