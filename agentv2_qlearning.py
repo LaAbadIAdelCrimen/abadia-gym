@@ -93,7 +93,7 @@ bucle = 0
 for i_episode in range(1000):
 
     state = env.reset()
-    print("reseteado:{}".format(env.Personajes))
+    # print("reseteado:{}".format(env.Personajes))
     # Reset environment and get first new state
     rAll = 0
     done = False

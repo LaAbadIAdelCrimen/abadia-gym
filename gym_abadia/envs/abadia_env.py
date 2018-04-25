@@ -159,7 +159,10 @@ class AbadiaEnv(gym.Env):
         self.obsequium    = int(ob['obsequium'])
         self.porcentaje   = int(ob['porcentaje'])
         self.bonus        = int(ob['bonus'])
-        self.haFracasado =  (ob['haFracasado'] == 'True')
+        self.pantalla     = int(ob['numPantalla'])
+        self.dia          = int(ob['dia'])
+        self.momentoDia   = int(ob['momentoDia'])
+        self.haFracasado  = (ob['haFracasado'] == 'True')
 
         self.rejilla = ob['rejilla']
         # print(self.rejilla)
@@ -232,7 +235,6 @@ class AbadiaEnv(gym.Env):
         else:
             return 0.0
 
-
     def reset(self):
         """
         Reset the state of the environment and returns an initial observation.
@@ -297,4 +299,19 @@ class AbadiaEnv(gym.Env):
         self.fdGame    = open(self.dump_path + "/" + self.gameName, "w")
         self.fdActions = open(self.dump_path + "/" + self.actionsName, "w")
 
+    def game_checkpoint(self):
 
+        checkpoint = self.sendCmd(self.url, "cmd/save")
+
+        now = datetime.datetime.now()
+        self.dump_path = now.strftime('partidas/%Y%m%d')
+        path = Path(self.dump_path)
+        path.mkdir(parents=True, exist_ok=True)
+
+        # create the game and actions files
+        self.checkpointName  = now.strftime('abadia_checkpoint_%y-%m-%d_%H:%M:%S:%f')
+        self.checkpointName += "_{}_{}_{}_{}_{}.checkpoint".format(self.dia, self.momentoDia,
+                                                self.numPantalla, self.obsequium, self.bonus)
+
+
+        self.fdCheckpoint = open(self.dump_path + "/" + self.checkpointName, "w")
