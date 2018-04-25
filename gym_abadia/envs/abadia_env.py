@@ -11,11 +11,15 @@ Each episode is making a single action (doing nothing is an action) .
 import random
 import math
 import json
+import datetime
+from pathlib import Path
 
 # 3rd party modules
 import gym
 import numpy as np
 from gym import spaces
+
+
 
 # AbadIA dependencies
 import requests
@@ -38,7 +42,14 @@ class AbadiaEnv(gym.Env):
         self.__version__ = "0.0.2"
         print("AbadiaEnv - Version {}".format(self.__version__))
 
-        self.url = "http://localhost:4477"
+
+        self.url    = "http://localhost:4477"
+        self.server = "http://localhost"
+        self.port   = "4477"
+
+        self.gameName    = ""
+        self.actionsName = ""
+        self.dump_path  = "partidas/now/"
 
         # Define what the agent can do
         # 0 -> STEP ORI 0
@@ -229,12 +240,19 @@ class AbadiaEnv(gym.Env):
         -------
         observation (object): the initial observation of the space.
         """
+        now = datetime.date.today()
+        self.gameName    = now.strftime('abadia_game_%y-%m-%d_%H:%M:%S:%f.json')
+        self.actionsName = now.strftime('abadia_actions_%y-%m-%d_%H:%M:%S:%f.json')
+
         self.curr_episode += 1
         self.action_episode_memory.append([])
         self.is_game_done = False
-        self.price = 1.00
+
         self.sendCmd(self.url,"reset")
         self.sendCmd(self.url,"cmd/e")
+
+        self.init_dumps_files()
+
         return self._get_state()
 
     def render(self, mode='human', close=False):
@@ -258,4 +276,13 @@ class AbadiaEnv(gym.Env):
 
     def reset_fin_partida(self):
         ob = self.sendCmd(self.url, "cmd/_")
+
+    def init_dumps_files(self):
+
+        now = datetime.date.today()
+        self.dump_path = now.strftime('partidas/%y-%m-%d')
+        path = Path(self.dump_path)
+        path.mkdir(parents=True, exist_ok=True)
+
+
 
