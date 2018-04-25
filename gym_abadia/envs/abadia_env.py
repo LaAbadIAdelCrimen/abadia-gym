@@ -279,10 +279,14 @@ class AbadiaEnv(gym.Env):
 
     def init_dumps_files(self):
 
+        # check is directory exist, if not we will create it
         now = datetime.date.today()
-        self.dump_path = now.strftime('partidas/%y-%m-%d')
+        self.dump_path = now.strftime('partidas/%Y%m%d')
         path = Path(self.dump_path)
         path.mkdir(parents=True, exist_ok=True)
 
+        # create the game and actions files
+        fdGame    = open(self.gameName, "w")
+        fdActions = open(self.actionsName, "w")
 
 
