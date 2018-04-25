@@ -274,8 +274,13 @@ class AbadiaEnv(gym.Env):
         pass
 
     def save_action(self, state, action, reward, nextstate):
+        s1 = state.copy()
+        s2 = nextstate.copy()
+        s1.pop('rejilla')
+        s2.pop('rejilla')
+
         self.fdActions.write("action: {} state: {}, action:{}, reward:{}, nextstate{} {}\n"
-                             .format("{", state, action, reward, nextstate, "}"))
+                             .format("{", s1, action, reward, s2, "}"))
 
     def reset_fin_partida(self):
         ob = self.sendCmd(self.url, "cmd/_")
