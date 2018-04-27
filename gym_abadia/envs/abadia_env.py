@@ -318,6 +318,14 @@ class AbadiaEnv(gym.Env):
                                                 self.numPantalla, self.obsequium, self.bonus)
 
         self.fdCheckpoint = open(self.dump_path + "/" + self.checkpointName, "w")
-        print()
         self.fdCheckpoint.write(checkpoint)
         self.fdCheckpoint.flush()
+
+    def load_game_checkpoint(self, name):
+        name = "partidas/20180425/abadia_checkpoint_18-04-25_23:13:57:264379_1_4_27_23_0.checkpoint"
+        self.fdCheckpoint = open(name, "r")
+        checkpoint = self.fdCheckpoint.read()
+        requests.post(self.url+"/load", data=checkpoint)
+        time.sleep(2)
+        return self._get_state()
+

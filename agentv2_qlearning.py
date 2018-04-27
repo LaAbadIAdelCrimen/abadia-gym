@@ -54,150 +54,153 @@ def pintaRejilla(width, height):
 
     print("+" + "-"*(w*2) + "+")
 
-env = gym.make('Abadia-v0')
+def mainLoop():
 
-#Initialize Q-table with all zeros
-# Q = np.zeros([env.observation_space.n, env.action_space.n])
 
-nameQtableSnap = "snapshoots/current-qtable"
+    env = gym.make('Abadia-v0')
 
-if os.path.exists(nameQtableSnap) and os.path.getsize(nameQtableSnap) > 0:
-    fqtablesnap = open(nameQtableSnap, "rb+")
-    Q = np.load(fqtablesnap)
-else:
-    fqtablesnap = open(nameQtableSnap, "wb+")
-    Q = np.zeros([512, 512, env.action_space.n])
-    np.save(fqtablesnap, Q)
-    fqtablesnap.flush()
-    fqtablesnap.close()
+    # Initialize Q-table with all zeros
+    # Q = np.zeros([env.observation_space.n, env.action_space.n])
 
-nameVisitedSnap = "snapshoots/current-visited"
+    nameQtableSnap = "snapshoots/current-qtable"
 
-if os.path.exists(nameVisitedSnap) and os.path.getsize(nameVisitedSnap) > 0:
-    fvisitedsnap = open(nameVisitedSnap, "rb+")
-    Visited = np.load(fvisitedsnap)
-else:
-    fvisitedsnap = open(nameVisitedSnap, "wb+")
-    Visited = np.zeros([512, 512])
-    np.save(fvisitedsnap, Visited)
-    fvisitedsnap.flush()
-    fvisitedsnap.close()
+    if os.path.exists(nameQtableSnap) and os.path.getsize(nameQtableSnap) > 0:
+        fqtablesnap = open(nameQtableSnap, "rb+")
+        Q = np.load(fqtablesnap)
+    else:
+        fqtablesnap = open(nameQtableSnap, "wb+")
+        Q = np.zeros([512, 512, env.action_space.n])
+        np.save(fqtablesnap, Q)
+        fqtablesnap.flush()
+        fqtablesnap.close()
 
-# Set learning parameters
-lr = .8
-yy = .95
+    nameVisitedSnap = "snapshoots/current-visited"
 
-rList = []
-bucle = 0
+    if os.path.exists(nameVisitedSnap) and os.path.getsize(nameVisitedSnap) > 0:
+        fvisitedsnap = open(nameVisitedSnap, "rb+")
+        Visited = np.load(fvisitedsnap)
+    else:
+        fvisitedsnap = open(nameVisitedSnap, "wb+")
+        Visited = np.zeros([512, 512])
+        np.save(fvisitedsnap, Visited)
+        fvisitedsnap.flush()
+        fvisitedsnap.close()
 
-for i_episode in range(1000):
+    # Set learning parameters
+    lr = .8
+    yy = .95
 
-    state = env.reset()
-    # print("reseteado:{}".format(env.Personajes))
-    # Reset environment and get first new state
-    rAll = 0
-    done = False
-    # Visited = np.zeros([512,512])
+    rList = []
+    bucle = 0
 
-    for t in range(1500):
-        x = int(env.Personajes['Guillermo']['posX'])
-        y = int(env.Personajes['Guillermo']['posY'])
+    for i_episode in range(1000):
+        state = env.reset()
+        state = env.load_game_checkpoint("partidas/20180425/abadia_checkpoint_18-04-25_23:13:57:264379_1_4_27_23_0.checkpoint")
+        # print("reseteado:{}".format(env.Personajes))
+        # Reset environment and get first new state
+        rAll = 0
+        done = False
+        # Visited = np.zeros([512,512])
 
-        adsoX = int(env.Personajes['Adso']['posX'])
-        adsoY = int(env.Personajes['Adso']['posY'])
+        for t in range(1500):
+            x = int(env.Personajes['Guillermo']['posX'])
+            y = int(env.Personajes['Guillermo']['posY'])
 
-        ori = int(env.Personajes['Guillermo']['orientacion'])
-        # env.render(mode="human")
+            adsoX = int(env.Personajes['Adso']['posX'])
+            adsoY = int(env.Personajes['Adso']['posY'])
 
-        # Choose an action by greedily (with noise) picking from Q table
-        noise = np.random.randn(1, env.action_space.n) * (1. / (t + 1))
-        action = np.argmax(Q[x, y, :] + noise)
-        # print ("noise {}".format(noise))
-        # Get new state and reward from environment
-        newState, reward, done, info = env.step(action)
-        env.save_action(state, action, reward, newState)
-        if done:
-            print("Episode finished after {} timesteps".format(t+1))
-            if (env.haFracasado):
-                env.grabo_partida()
-                env.reset_fin_partida()
-                break
+            ori = int(env.Personajes['Guillermo']['orientacion'])
+            # env.render(mode="human")
 
-        newX = int(env.Personajes['Guillermo']['posX'])
-        newY = int(env.Personajes['Guillermo']['posY'])
+            # Choose an action by greedily (with noise) picking from Q table
+            noise = np.random.randn(1, env.action_space.n) * (1. / (t + 1))
+            action = np.argmax(Q[x, y, :] + noise)
 
-        if (action <= 3):
-            if (x != newX or y != newY):
-                if (Visited[newX, newY] == 0):
-                    reward += 0.05
-                if (Visited[newX, newY] % 10 == 0):
-                    reward -= 0.05
-                Visited[newX, newY] += 1
-                # print("-------------------------------------------------------")
-                # print("({},{}) Ori {} inc X {} inc Y {} Visited {}".format(
-                #    x, y, ori, newX - x, newY -y, Visited[newX, newY]))
-                # print("-------------------------------------------------------")
-            if (x == newX and y == newY):
-                if (ori == 0):
-                    Visited[x+1, y] += -0.01
-                if (ori == 1):
-                    Visited[x, y-1] += -0.01
-                if (ori == 2):
-                    Visited[x-1, y] += -0.01
-                if (ori == 3):
-                    Visited[x, y+1] += -0.01
-                reward -= 0.5
-                bucle += 1
-                # print("-------------------------------------------------------")
-                # print("({},{}) Ori {} inc X {} inc Y {} y el puto Adso esta en {},{} Visited {}".format(
-                #    x, y, ori, newX - x, newY -y, adsoX, adsoY, Visited[newX, newY]))
-                # print("-------------------------------------------------------")
+            # Get new state and reward from environment
+            newState, reward, done, info = env.step(action)
+            env.save_action(state, action, reward, newState)
+            if done:
+                print("Episode finished after {} timesteps".format(t+1))
+                if (env.haFracasado):
+                    env.grabo_partida()
+                    env.reset_fin_partida()
+                    break
 
-        if (action == 4 or action == 5):
-            if (x == newX and y == newY):
-                reward -= 0.2
-                bucle += 1
+            newX = int(env.Personajes['Guillermo']['posX'])
+            newY = int(env.Personajes['Guillermo']['posY'])
 
-        if (action == 6 or action == 7):
-            if (x == newX and y == newY):
-                reward -= 0.5
+            if (action <= 3):
+                if (x != newX or y != newY):
+                    if (Visited[newX, newY] == 0):
+                        reward += 0.05
+                    if (Visited[newX, newY] % 10 == 0):
+                        reward -= 0.05
+                    Visited[newX, newY] += 1
+                    # print("-------------------------------------------------------")
+                    # print("({},{}) Ori {} inc X {} inc Y {} Visited {}".format(
+                    #    x, y, ori, newX - x, newY -y, Visited[newX, newY]))
+                    # print("-------------------------------------------------------")
+                if (x == newX and y == newY):
+                    if (ori == 0):
+                        Visited[x+1, y] += -0.01
+                    if (ori == 1):
+                        Visited[x, y-1] += -0.01
+                    if (ori == 2):
+                        Visited[x-1, y] += -0.01
+                    if (ori == 3):
+                        Visited[x, y+1] += -0.01
+                    reward -= 0.5
+                    bucle += 1
+                    # print("-------------------------------------------------------")
+                    # print("({},{}) Ori {} inc X {} inc Y {} y el puto Adso esta en {},{} Visited {}".format(
+                    #    x, y, ori, newX - x, newY -y, adsoX, adsoY, Visited[newX, newY]))
+                    # print("-------------------------------------------------------")
 
-        if (bucle >= 5):
-            bucle = 0
-            for n in range(env.action_space.n):
-                Q[x,y,n] = 0.0
+            if (action == 4 or action == 5):
+                if (x == newX and y == newY):
+                    reward -= 0.2
+                    bucle += 1
 
-        # Update Q-Table with new knowledge
-        Q[x, y, action] = \
-            Q[x, y, action] + lr * (reward + yy * np.max(Q[newX, newY, :]) - Q[x, y, action])
+            if (action == 6 or action == 7):
+                if (x == newX and y == newY):
+                    reward -= 0.5
 
-        print("Episode({}:{}) A({})XYOP {},{},{},{} -> {},{} r:{} tr:{} Q(s,a)= {}".format(
+            if (bucle >= 5):
+                bucle = 0
+                for n in range(env.action_space.n):
+                    Q[x,y,n] = 0.0
+
+            # Update Q-Table with new knowledge
+            Q[x, y, action] = \
+                Q[x, y, action] + lr * (reward + yy * np.max(Q[newX, newY, :]) - Q[x, y, action])
+
+            print("Episode({}:{}) A({})XYOP {},{},{},{} -> {},{} r:{} tr:{} Q(s,a)= {}".format(
                 i_episode, t, action, x, y, ori, env.numPantalla, newX, newY, np.round(reward,2),
                 np.round(rAll,2), np.round(Q[x,y],4)), end="\r")
 
-        if (t % 20 == 0):
-            pintaRejilla(40, 20)
+            if (t % 20 == 0):
+                pintaRejilla(40, 20)
 
-        rAll += reward
-        state = newState
-        if done == True:
-            break
+            rAll += reward
+            state = newState
+            if done == True:
+                break
 
-    # jList.append(j)
-    rList.append(rAll)
+        # jList.append(j)
+        rList.append(rAll)
 
-    fqtablesnap = open(nameQtableSnap, "wb+")
-    np.save(fqtablesnap, Q)
-    fqtablesnap.flush()
-    fqtablesnap.close()
+        fqtablesnap = open(nameQtableSnap, "wb+")
+        np.save(fqtablesnap, Q)
+        fqtablesnap.flush()
+        fqtablesnap.close()
 
-    fvisitedsnap = open(nameVisitedSnap, "wb+")
-    np.save(fvisitedsnap, Visited)
-    fvisitedsnap.flush()
-    fvisitedsnap.close()
+        fvisitedsnap = open(nameVisitedSnap, "wb+")
+        np.save(fvisitedsnap, Visited)
+        fvisitedsnap.flush()
+        fvisitedsnap.close()
 
-print("Score over time: " + str(sum(rList)/100))
+    print("Score over time: " + str(sum(rList)/100))
 
-print("Final Q-Table Values")
-print(Q)
+    print("Final Q-Table Values")
+    print(Q)
 
