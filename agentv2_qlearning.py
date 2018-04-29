@@ -7,6 +7,8 @@ import numpy as np
 import os
 import argparse
 
+Visited = np.zeros([512, 512])
+
 def init_env(env):
     argparser = argparse.ArgumentParser()
     argparser.add_argument('-s', '--server', help='server name')
