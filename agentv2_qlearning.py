@@ -33,6 +33,18 @@ def pintaRejilla(width, height):
     yRejilla = 0
     xRejilla = 0
 
+    # TODO: to display all the characters, now only Guillermo and Adso
+    # pers = {}
+    # for per in env.Personajes:
+    #    datos = {'x': per['posX'], 'y': per['posY']}
+    #   pers.update(per['id']:datos)
+    #
+
+    x     = int(env.Personajes['Guillermo']['posX'])
+    y     = int(env.Personajes['Guillermo']['posY'])
+    adsoX = int(env.Personajes['Adso']['posX'])
+    adsoY = int(env.Personajes['Adso']['posY'])
+
     print("")
     print("+" + "-"*(w*2) + "+" + "-"*24 + "+")
     for yy in range(y-h, y+h):
