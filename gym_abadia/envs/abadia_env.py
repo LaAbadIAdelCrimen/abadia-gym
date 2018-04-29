@@ -48,8 +48,10 @@ class AbadiaEnv(gym.Env):
         self.server = "http://localhost"
         self.port   = "4477"
 
-        self.gameName    = ""
-        self.actionsName = ""
+
+        self.gameName       = ""
+        self.actionsName    = ""
+        self.checkpointName = ""
         self.dump_path  = "partidas/now/"
 
         # Define what the agent can do
@@ -108,6 +110,9 @@ class AbadiaEnv(gym.Env):
         # Store what the agent tried
         self.curr_episode = -1
         self.action_episode_memory = []
+
+    def set_url(self):
+        self.url = self.server + ":" + self.port
 
     def sendCmd(self, url, command, type="json"):
         cmd = "{}/{}".format(url, command)

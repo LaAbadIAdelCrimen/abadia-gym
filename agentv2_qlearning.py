@@ -5,6 +5,27 @@ import gym
 import gym_abadia
 import numpy as np
 import os
+import argparse
+
+def init_env(env):
+    argparser = argparse.ArgumentParser()
+    argparser.add_argument('-s', '--server', help='server name')
+    argparser.add_argument('-p', '--port', help='port number')
+    argparser.add_argument('-c', '--checkpoint', help='checkpoint file')
+    args = argparser.parse_args()
+    print("args {}".format(args))
+
+    if args.server != None:
+        env.server = args.server
+        env.set_url()
+
+    if args.port != None:
+        env.port = args.port
+        env.set_url()
+
+    if args.checkpoint != None:
+        env.checkpointName = args.checkpoint
+
 
 def pintaRejilla(width, height):
     w = int(width/2)
@@ -56,8 +77,6 @@ def pintaRejilla(width, height):
 
 def mainLoop():
 
-
-    env = gym.make('Abadia-v0')
 
     # Initialize Q-table with all zeros
     # Q = np.zeros([env.observation_space.n, env.action_space.n])
@@ -203,4 +222,10 @@ def mainLoop():
 
     print("Final Q-Table Values")
     print(Q)
+
+if __name__ == '__main__':
+    env = gym.make('Abadia-v0')
+    init_env(env)
+    mainLoop()
+
 
