@@ -163,13 +163,7 @@ class AbadiaEnv(gym.Env):
         # extracting all the values from the json
         # first personajes
 
-        while(True):
-            if len(ob['Personajes']) >= 1:
-                self._get_personajes_info(ob)
-                break
-            self.sendCmd(self.url, "cmd/_")
-            time.sleep(1)
-
+        self._get_personajes_info(ob)
 
         self.obsequium    = int(ob['obsequium'])
         self.porcentaje   = int(ob['porcentaje'])
@@ -279,8 +273,18 @@ class AbadiaEnv(gym.Env):
     def _get_state(self):
         """Get the observation."""
         # ob = [self.TOTAL_TIME_STEPS - self.curr_step]
-        ob = self.sendCmd(self.url, "dump")
-        self._get_personajes_info(ob)
+        print("I wiil got the state")
+        while (True):
+            ob = self.sendCmd(self.url, "dump")
+            if len(ob['Personajes']['Personaje']) > 1:
+                print("getting the characters from ob:{}".format(ob))
+                self._get_personajes_info(ob)
+                break
+            else:
+                print("no personajes, try to reset")
+                self.sendCmd(self.url, "cmd/_")
+                time.sleep(1)
+
         return ob
 
     def _seed(self, seed):
@@ -325,19 +329,20 @@ class AbadiaEnv(gym.Env):
         path.mkdir(parents=True, exist_ok=True)
 
         # create the game and actions files
-        self.checkpointName  = now.strftime('abadia_checkpoint_%y-%m-%d_%H:%M:%S:%f')
-        self.checkpointName += "_{}_{}_{}_{}_{}.checkpoint".format(self.dia, self.momentoDia,
+        self.checkpointTmpName  = now.strftime('abadia_checkpoint_%y-%m-%d_%H:%M:%S:%f')
+        self.checkpointTmpName += "_{}_{}_{}_{}_{}.checkpoint".format(self.dia, self.momentoDia,
                                                 self.numPantalla, self.obsequium, self.bonus)
 
-        self.fdCheckpoint = open(self.dump_path + "/" + self.checkpointName, "w")
+        self.fdCheckpoint = open(self.dump_path + "/" + self.checkpointTmpName, "w")
         self.fdCheckpoint.write(checkpoint)
         self.fdCheckpoint.flush()
 
     def load_game_checkpoint(self, name):
-        name = "partidas/20180425/abadia_checkpoint_18-04-25_23:13:57:264379_1_4_27_23_0.checkpoint"
+        # name = "partidas/20180425/abadia_checkpoint_18-04-25_23:13:57:264379_1_4_27_23_0.checkpoint"
+        print("voy a abrir el fichero ({})".format(name))
         self.fdCheckpoint = open(name, "r")
         checkpoint = self.fdCheckpoint.read()
-        requests.post(self.url+"/load", data=checkpoint)
+        requests.post(self.url+"/load", data=checkpoint[:-6 ])
         time.sleep(2)
         return self._get_state()
 

@@ -134,7 +134,7 @@ def mainLoop():
         rAll = 0
         done = False
 
-        for t in range(1500):
+        for t in range(2500):
             x = int(env.Personajes['Guillermo']['posX'])
             y = int(env.Personajes['Guillermo']['posY'])
 
