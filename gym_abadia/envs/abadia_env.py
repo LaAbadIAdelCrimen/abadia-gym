@@ -51,7 +51,7 @@ class AbadiaEnv(gym.Env):
 
         self.gameName       = ""
         self.actionsName    = ""
-        self.checkpointName = ""
+        self.checkpointName = None
         self.dump_path  = "partidas/now/"
 
         # Define what the agent can do
@@ -99,6 +99,8 @@ class AbadiaEnv(gym.Env):
 
         self.listaPersonajes = ("Guillermo", "Adso", "Abad", "Malaquias", "Berengario",
             "Severino", "Jorge", "Bernardo")
+
+        self.Visited = np.zeros([512, 512])
 
         # Observation is the remaining time
         low = np.array([0.0,  # remaining_tries
@@ -161,7 +163,12 @@ class AbadiaEnv(gym.Env):
         # extracting all the values from the json
         # first personajes
 
-        self._get_personajes_info(ob)
+        while(True):
+            if len(ob['Personajes']) >= 1:
+                self._get_personajes_info(ob)
+                break
+            self.sendCmd(self.url, "cmd/_")
+            time.sleep(1)
 
 
         self.obsequium    = int(ob['obsequium'])

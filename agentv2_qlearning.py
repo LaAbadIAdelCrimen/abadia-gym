@@ -7,8 +7,6 @@ import numpy as np
 import os
 import argparse
 
-Visited = np.zeros([512, 512])
-
 def init_env(env):
     argparser = argparse.ArgumentParser()
     argparser.add_argument('-s', '--server', help='server name')
@@ -29,7 +27,7 @@ def init_env(env):
         env.checkpointName = args.checkpoint
 
 
-def pintaRejilla(width, height):
+def pintaRejilla(Visited, width, height):
     w = int(width/2)
     h = int(height/2)
     yRejilla = 0
@@ -47,7 +45,7 @@ def pintaRejilla(width, height):
     adsoX = int(env.Personajes['Adso']['posX'])
     adsoY = int(env.Personajes['Adso']['posY'])
 
-    print("")
+    print("Guillermo {},{} Adso {},{}".format(x, y, adsoX, adsoY))
     print("+" + "-"*(w*2) + "+" + "-"*24 + "+")
     for yy in range(y-h, y+h):
         print("|", end="")
@@ -111,11 +109,11 @@ def mainLoop():
 
     if os.path.exists(nameVisitedSnap) and os.path.getsize(nameVisitedSnap) > 0:
         fvisitedsnap = open(nameVisitedSnap, "rb+")
-        Visited = np.load(fvisitedsnap)
+        env.Visited = np.load(fvisitedsnap)
     else:
         fvisitedsnap = open(nameVisitedSnap, "wb+")
-        Visited = np.zeros([512, 512])
-        np.save(fvisitedsnap, Visited)
+        env.Visited = np.zeros([512, 512])
+        np.save(fvisitedsnap, env.Visited)
         fvisitedsnap.flush()
         fvisitedsnap.close()
 
@@ -128,12 +126,13 @@ def mainLoop():
 
     for i_episode in range(1000):
         state = env.reset()
-        state = env.load_game_checkpoint("partidas/20180425/abadia_checkpoint_18-04-25_23:13:57:264379_1_4_27_23_0.checkpoint")
+        if(env.checkpointName != None):
+            # state = env.load_game_checkpoint("partidas/20180425/abadia_checkpoint_18-04-25_23:13:57:264379_1_4_27_23_0.checkpoint")
+            state = env.load_game_checkpoint(env.checkpointName)
         # print("reseteado:{}".format(env.Personajes))
         # Reset environment and get first new state
         rAll = 0
         done = False
-        # Visited = np.zeros([512,512])
 
         for t in range(1500):
             x = int(env.Personajes['Guillermo']['posX'])
@@ -164,24 +163,24 @@ def mainLoop():
 
             if (action <= 3):
                 if (x != newX or y != newY):
-                    if (Visited[newX, newY] == 0):
+                    if (env.Visited[newX, newY] == 0):
                         reward += 0.05
-                    if (Visited[newX, newY] % 10 == 0):
+                    if (env.Visited[newX, newY] % 10 == 0):
                         reward -= 0.05
-                    Visited[newX, newY] += 1
+                    env.Visited[newX, newY] += 1
                     # print("-------------------------------------------------------")
                     # print("({},{}) Ori {} inc X {} inc Y {} Visited {}".format(
                     #    x, y, ori, newX - x, newY -y, Visited[newX, newY]))
                     # print("-------------------------------------------------------")
                 if (x == newX and y == newY):
                     if (ori == 0):
-                        Visited[x+1, y] += -0.01
+                        env.Visited[x+1, y] += -0.01
                     if (ori == 1):
-                        Visited[x, y-1] += -0.01
+                        env.Visited[x, y-1] += -0.01
                     if (ori == 2):
-                        Visited[x-1, y] += -0.01
+                        env.Visited[x-1, y] += -0.01
                     if (ori == 3):
-                        Visited[x, y+1] += -0.01
+                        env.Visited[x, y+1] += -0.01
                     reward -= 0.5
                     bucle += 1
                     # print("-------------------------------------------------------")
@@ -207,12 +206,12 @@ def mainLoop():
             Q[x, y, action] = \
                 Q[x, y, action] + lr * (reward + yy * np.max(Q[newX, newY, :]) - Q[x, y, action])
 
-            print("Episode({}:{}) A({})XYOP {},{},{},{} -> {},{} r:{} tr:{} Q(s,a)= {}".format(
-                i_episode, t, action, x, y, ori, env.numPantalla, newX, newY, np.round(reward,2),
+            print("Episode({}:{}) A({})XYOVP {},{},{},{},{} -> {},{} r:{} tr:{} Q(s,a)= {}".format(
+                i_episode, t, action, x, y, ori, np.round(env.Visited[x][y], 4), env.numPantalla, newX, newY, np.round(reward,2),
                 np.round(rAll,2), np.round(Q[x,y],4)), end="\r")
 
             if (t % 20 == 0):
-                pintaRejilla(40, 20)
+                pintaRejilla(env.Visited, 40, 20)
 
             rAll += reward
             state = newState
@@ -228,7 +227,7 @@ def mainLoop():
         fqtablesnap.close()
 
         fvisitedsnap = open(nameVisitedSnap, "wb+")
-        np.save(fvisitedsnap, Visited)
+        np.save(fvisitedsnap, env.Visited)
         fvisitedsnap.flush()
         fvisitedsnap.close()
 
