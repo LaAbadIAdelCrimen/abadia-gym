@@ -204,11 +204,11 @@ def mainLoop():
 
             # Update Q-Table with new knowledge
             Q[x, y, action] = \
-                Q[x, y, action] + lr * (reward + yy * np.max(Q[newX, newY, :]) - Q[x, y, action])
+                Q[x, y, action] + lr * (reward + yy * np.max(Q[newX, newY, :])) #  - Q[x, y, action])
 
             print("Episode({}:{}) A({})XYOVP {},{},{},{},{} -> {},{} r:{} tr:{} Q(s,a)= {}".format(
                 i_episode, t, action, x, y, ori, np.round(env.Visited[x][y], 4), env.numPantalla, newX, newY, np.round(reward,2),
-                np.round(rAll,2), np.round(Q[x,y],4)), end="\r")
+                np.round(rAll,2), np.round(Q[x,y],2)), end="\r")
 
             if (t % 20 == 0):
                 pintaRejilla(env.Visited, 40, 20)

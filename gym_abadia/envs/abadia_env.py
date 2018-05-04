@@ -197,9 +197,9 @@ class AbadiaEnv(gym.Env):
                 self.prevPantalla = int(ob['numPantalla'])
                 self.save_game_checkpoint()
 
-        reward += (self.porcentaje) / 33
-
-        reward += (self.obsequium / 300)
+        reward += self.porcentaje + self.obsequium
+        # reward += (self.obsequium / 300)
+        # reward += (self.obsequium / 300)
 
         # reward = self._get_reward()
 
