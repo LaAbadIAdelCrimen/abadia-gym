@@ -47,12 +47,14 @@ class AbadiaEnv(gym.Env):
         self.url    = "http://localhost:4477"
         self.server = "http://localhost"
         self.port   = "4477"
+        self.num_episodes   = 100
+        self.num_steps      = 1500
 
 
         self.gameName       = ""
         self.actionsName    = ""
         self.checkpointName = None
-        self.dump_path  = "partidas/now/"
+        self.dump_path      = "partidas/now/"
 
         # Define what the agent can do
         # 0 -> STEP ORI 0
@@ -169,6 +171,9 @@ class AbadiaEnv(gym.Env):
         self.haFracasado  = (ob['haFracasado'] == 'True')
 
         self.rejilla = ob['rejilla']
+
+
+
         # print(self.rejilla)
 
         # we need to check is make sense finish it
