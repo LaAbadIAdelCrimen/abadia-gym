@@ -76,6 +76,7 @@ class AbadiaEnv(gym.Env):
         self.haFracasado = False
         self.prevPantalla = -1
         self.rejilla = []
+        self.prev_ob = dict()
 
 
         self.curr_step = -1
@@ -170,9 +171,6 @@ class AbadiaEnv(gym.Env):
         self.rejilla = ob['rejilla']
         # print(self.rejilla)
 
-        if (self.haFracasado == True):
-            self.game_is_gone = True
-
         # we need to check is make sense finish it
         # if self.is_game_done or self.porcentaje == 100:
         #   raise RuntimeError("Episode is done")
@@ -183,19 +181,51 @@ class AbadiaEnv(gym.Env):
 
         reward = 0
 
+        # JT we need to check, that pass to another room
+        # not just stay all the time between rooms to get the reward
+
         if (self.prevPantalla == -1):
             self.prevPantalla = int(ob['numPantalla'])
         else:
             if (self.prevPantalla != int(ob['numPantalla'])):
-                reward += 0.1
+                reward += 50
                 self.prevPantalla = int(ob['numPantalla'])
                 self.save_game_checkpoint()
 
-        reward += self.porcentaje + self.obsequium
-        # reward += (self.obsequium / 300)
-        # reward += (self.obsequium / 300)
+        # reward += self.porcentaje + self.obsequium
 
-        # reward = self._get_reward()
+        # reward for incrementing the obsequium: > 0 +50 / < 0 -30
+        incr_obsequium = self.obsequium - int(self.prev_ob['obsequium'])
+        if incr_obsequium >= 0:
+            reward += (50 * incr_obsequium)
+        else:
+            reward += (-30 * incr_obsequium)
+
+        # reward for incrementing the bonus: >0 +500
+        incr_bonus = self.bonus - int(self.prev_ob['bonus'])
+        if incr_bonus >= 0:
+            reward += (500 * incr_bonus)
+
+        # if the game is over, we just finish the game and reward is -1000
+        # if we completed the game, we finish and the reward is 5000
+        # the percentage must be variable to help the AI to learn
+        # with variable explanatory/explotation
+
+        if (self.haFracasado == True):
+            self.game_is_done = True
+            reward = -1000
+
+        if (self.porcentaje >= 90):
+            self.game_is_done = True
+            reward = 5000
+
+        if reward == 0:
+            reward = -1
+
+        # we make a copy for the current observation in order to calculate
+        # the reward for the next state
+
+        self.prev_ob = ob
 
         return ob, reward, self.is_game_done, {}
 
