@@ -40,7 +40,7 @@ class AbadiaEnv(gym.Env):
     """
 
     def __init__(self):
-        self.__version__ = "0.0.2"
+        self.__version__ = "0.0.3"
         print("AbadiaEnv - Version {}".format(self.__version__))
 
 
@@ -61,27 +61,22 @@ class AbadiaEnv(gym.Env):
         # 3 -> STEP ORI 3
         # 4 -> RIGHT
         # 5 -> LEFT
-        # 6 -> NOP
-        # 7 -> DOWN
+        # 6 -> DOWN
+        # 7 -> NOP
 
-        self.action_space = spaces.Discrete(8)
+        self.action_space = spaces.Discrete(7)
 
         # json from the dump state of the episode
 
         self.json_dump = {}
 
-        self.actions_list = ("cmd/A", "cmd/A" ,"cmd/A", "cmd/A", "cmd/D", "cmd/I", "cmd/N", "cmd/B")
+        self.actions_list = ("cmd/A", "cmd/A" ,"cmd/A", "cmd/A", "cmd/D", "cmd/I", "cmd/B", "cmd/N")
         self.obsequium = -1
         self.porcentaje = -1
         self.haFracasado = False
         self.prevPantalla = -1
         self.rejilla = []
 
-
-        # TODO: JT: check what variables we need.
-        # General variables defining the environment
-        self.MAX_PRICE = 2.0
-        self.TOTAL_TIME_STEPS = 2
 
         self.curr_step = -1
         self.is_game_done = False
@@ -105,8 +100,7 @@ class AbadiaEnv(gym.Env):
         # Observation is the remaining time
         low = np.array([0.0,  # remaining_tries
                          ])
-        high = np.array([self.TOTAL_TIME_STEPS,  # remaining_tries
-                         ])
+        high = np.array([512, ])
         self.observation_space = spaces.Box(low, high)
 
         # Store what the agent tried
@@ -254,8 +248,8 @@ class AbadiaEnv(gym.Env):
         observation (object): the initial observation of the space.
         """
         now = datetime.datetime.now()
-        self.gameName    = now.strftime('abadia_game_%y-%m-%d_%H:%M:%S:%f.json')
-        self.actionsName = now.strftime('abadia_actions_%y-%m-%d_%H:%M:%S:%f.json')
+        self.gameName    = now.strftime('abadia_game_%y%m%d_%H%M%S_%f.json')
+        self.actionsName = now.strftime('abadia_actions_%y%m%d_%H%M%S_%f.json')
 
         self.curr_episode += 1
         self.action_episode_memory.append([])
@@ -301,8 +295,9 @@ class AbadiaEnv(gym.Env):
         s1.pop('rejilla')
         s2.pop('rejilla')
 
-        self.fdActions.write("action: {} state: {}, action:{}, reward:{}, nextstate{} {}\n"
-                             .format("{", s1, action, reward, s2, "}"))
+        self.fdActions.write("{}{}\"action\":{}\"state\":{},\"action\":{},\"reward\":{},\"nextstate\":{}{}{}\n"
+                             .format("[", "{", "{", json.dumps(s1), action, reward, json.dumps(s2), "}", "}]"))
+        self.fdActions.flush()
 
     def reset_fin_partida(self):
         ob = self.sendCmd(self.url, "cmd/_")
@@ -329,9 +324,9 @@ class AbadiaEnv(gym.Env):
         path.mkdir(parents=True, exist_ok=True)
 
         # create the game and actions files
-        self.checkpointTmpName  = now.strftime('abadia_checkpoint_%y-%m-%d_%H:%M:%S:%f')
+        self.checkpointTmpName  = now.strftime('abadia_checkpoint_%y%m%d_%H%M%S_%f')
         self.checkpointTmpName += "_{}_{}_{}_{}_{}.checkpoint".format(self.dia, self.momentoDia,
-                                                self.numPantalla, self.obsequium, self.bonus)
+                                                self.numPantalla, self.obsequium, np.round(self.porcentaje,2))
 
         self.fdCheckpoint = open(self.dump_path + "/" + self.checkpointTmpName, "w")
         self.fdCheckpoint.write(checkpoint)

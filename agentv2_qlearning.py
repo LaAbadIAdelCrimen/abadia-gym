@@ -118,8 +118,10 @@ def mainLoop():
         fvisitedsnap.close()
 
     # Set learning parameters
-    lr = .8
-    yy = .95
+    lr = .4
+    yy = .98
+    # lr = .8
+    # yy = .95
 
     rList = []
     bucle = 0
@@ -162,11 +164,21 @@ def mainLoop():
             newY = int(env.Personajes['Guillermo']['posY'])
 
             if (action <= 3):
+
+                if (ori == 0 and env.Visited[x + 1, y] < 0):
+                    reward = -1
+                if (ori == 1 and env.Visited[x, y - 1] < 0):
+                    reward = -1
+                if (ori == 2 and env.Visited[x - 1, y] < 0):
+                    reward = -1
+                if (ori == 3 and env.Visited[x, y + 1] < 0):
+                    reward = -1
+
                 if (x != newX or y != newY):
                     if (env.Visited[newX, newY] == 0):
-                        reward += 0.05
+                        reward += 1
                     if (env.Visited[newX, newY] % 10 == 0):
-                        reward -= 0.05
+                        reward -= 0.5
                     env.Visited[newX, newY] += 1
                     # print("-------------------------------------------------------")
                     # print("({},{}) Ori {} inc X {} inc Y {} Visited {}".format(
@@ -185,26 +197,44 @@ def mainLoop():
                     bucle += 1
                     # print("-------------------------------------------------------")
                     # print("({},{}) Ori {} inc X {} inc Y {} y el puto Adso esta en {},{} Visited {}".format(
-                    #    x, y, ori, newX - x, newY -y, adsoX, adsoY, Visited[newX, newY]))
+                 #    x, y, ori, newX - x, newY -y, adsoX, adsoY, Visited[newX, newY]))
                     # print("-------------------------------------------------------")
 
             if (action == 4 or action == 5):
+                if (ori == 0 and env.Visited[x + 1, y] < 0):
+                    reward = -1
+
+                if (ori == 1 and env.Visited[x, y - 1] < 0):
+                    reward = -1
+
+                if (ori == 2 and env.Visited[x - 1, y] < 0):
+                    reward = -1
+
+                if (ori == 3 and env.Visited[x, y + 1] < 0):
+                    reward = -1
+
                 if (x == newX and y == newY):
-                    reward -= 0.2
                     bucle += 1
 
-            if (action == 6 or action == 7):
-                if (x == newX and y == newY):
-                    reward -= 0.5
+            if action == 7:
+                bucle += 1
+                reward -= 5
 
-            if (bucle >= 5):
+            if action == 6:
+                if (x == newX and y == newY):
+                    reward -= 5
+                    bucle += 1
+
+            if (bucle >= 10):
                 bucle = 0
                 for n in range(env.action_space.n):
-                    Q[x,y,n] = 0.0
+                    Q[x,y,n] = 0
+                Q[x,y,action] = -50
+                reward = 0
 
             # Update Q-Table with new knowledge
             Q[x, y, action] = \
-                Q[x, y, action] + lr * (reward + yy * np.max(Q[newX, newY, :])) #  - Q[x, y, action])
+                Q[x, y, action] + lr * (reward + yy * np.max(Q[newX, newY, :]) - Q[x, y, action])
 
             print("Episode({}:{}) A({})XYOVP {},{},{},{},{} -> {},{} r:{} tr:{} Q(s,a)= {}".format(
                 i_episode, t, action, x, y, ori, np.round(env.Visited[x][y], 4), env.numPantalla, newX, newY, np.round(reward,2),
