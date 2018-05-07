@@ -192,19 +192,18 @@ class AbadiaEnv(gym.Env):
                 self.prevPantalla = int(ob['numPantalla'])
                 self.save_game_checkpoint()
 
-        # reward += self.porcentaje + self.obsequium
+        if len(self.prev_ob) > 0:
+            # reward for incrementing the obsequium: > 0 +50 / < 0 -30
+            incr_obsequium = self.obsequium - int(self.prev_ob['obsequium'])
+            if incr_obsequium >= 0:
+                reward += (50 * incr_obsequium)
+            else:
+                reward += (-30 * incr_obsequium)
 
-        # reward for incrementing the obsequium: > 0 +50 / < 0 -30
-        incr_obsequium = self.obsequium - int(self.prev_ob['obsequium'])
-        if incr_obsequium >= 0:
-            reward += (50 * incr_obsequium)
-        else:
-            reward += (-30 * incr_obsequium)
-
-        # reward for incrementing the bonus: >0 +500
-        incr_bonus = self.bonus - int(self.prev_ob['bonus'])
-        if incr_bonus >= 0:
-            reward += (500 * incr_bonus)
+            # reward for incrementing the bonus: >0 +500
+            incr_bonus = self.bonus - int(self.prev_ob['bonus'])
+            if incr_bonus >= 0:
+                reward += (500 * incr_bonus)
 
         # if the game is over, we just finish the game and reward is -1000
         # if we completed the game, we finish and the reward is 5000
