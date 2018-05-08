@@ -189,6 +189,7 @@ def mainLoop():
                     if (env.Visited[newX, newY] % 10 == 0):
                         reward -= 0.5
                     env.Visited[newX, newY] += 1
+
                     # print("-------------------------------------------------------")
                     # print("({},{}) Ori {} inc X {} inc Y {} Visited {}".format(
                     #    x, y, ori, newX - x, newY -y, Visited[newX, newY]))

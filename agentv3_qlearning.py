@@ -127,10 +127,10 @@ def mainLoop():
         fvisitedsnap.close()
 
     # Set learning parameters
-    lr = .4
-    yy = .98
-    # lr = .8
-    # yy = .95
+    # lr = .4
+    # yy = .98
+    lr = .8
+    yy = .95
 
     rList = []
     bucle = 0
@@ -159,8 +159,16 @@ def mainLoop():
             noise = np.random.randn(1, env.action_space.n) * (1. / (t + 1))
             action = np.argmax(Q[x, y, :] + noise)
 
-            # Get new state and reward from environment
-            newState, reward, done, info = env.step(action)
+            # Get new state and reward from environment and check if
+            # in the state of the game is Guillermo
+
+            while True:
+                newState, reward, done, info = env.step(action)
+                if env.estaGuillermo:
+                    break
+                # else:
+                    # print("Skipping a screen without Guillermo!!!!")
+
             env.save_action(state, action, reward, newState)
             if done:
                 print("Episode finished after {} timesteps".format(t+1))
@@ -172,74 +180,18 @@ def mainLoop():
             newX = int(env.Personajes['Guillermo']['posX'])
             newY = int(env.Personajes['Guillermo']['posY'])
 
-            if (action <= 3):
+            if (x != newX or y != newY):
+                env.Visited[newX, newY] += 1
 
-                if (ori == 0 and env.Visited[x + 1, y] < 0):
-                    reward = -1
-                if (ori == 1 and env.Visited[x, y - 1] < 0):
-                    reward = -1
-                if (ori == 2 and env.Visited[x - 1, y] < 0):
-                    reward = -1
-                if (ori == 3 and env.Visited[x, y + 1] < 0):
-                    reward = -1
-
-                if (x != newX or y != newY):
-                    if (env.Visited[newX, newY] == 0):
-                        reward += 1
-                    if (env.Visited[newX, newY] % 10 == 0):
-                        reward -= 0.5
-                    env.Visited[newX, newY] += 1
-                    # print("-------------------------------------------------------")
-                    # print("({},{}) Ori {} inc X {} inc Y {} Visited {}".format(
-                    #    x, y, ori, newX - x, newY -y, Visited[newX, newY]))
-                    # print("-------------------------------------------------------")
-                if (x == newX and y == newY):
-                    if (ori == 0):
-                        env.Visited[x+1, y] += -0.01
-                    if (ori == 1):
-                        env.Visited[x, y-1] += -0.01
-                    if (ori == 2):
-                        env.Visited[x-1, y] += -0.01
-                    if (ori == 3):
-                        env.Visited[x, y+1] += -0.01
-                    reward -= 0.5
-                    bucle += 1
-                    # print("-------------------------------------------------------")
-                    # print("({},{}) Ori {} inc X {} inc Y {} y el puto Adso esta en {},{} Visited {}".format(
-                 #    x, y, ori, newX - x, newY -y, adsoX, adsoY, Visited[newX, newY]))
-                    # print("-------------------------------------------------------")
-
-            if (action == 4 or action == 5):
-                if (ori == 0 and env.Visited[x + 1, y] < 0):
-                    reward = -1
-
-                if (ori == 1 and env.Visited[x, y - 1] < 0):
-                    reward = -1
-
-                if (ori == 2 and env.Visited[x - 1, y] < 0):
-                    reward = -1
-
-                if (ori == 3 and env.Visited[x, y + 1] < 0):
-                    reward = -1
-
-                if (x == newX and y == newY):
-                    bucle += 1
-
-            if action == 7:
-                bucle += 1
-                reward -= 5
-
-            if action == 6:
-                if (x == newX and y == newY):
-                    reward -= 5
-                    bucle += 1
-
-            if (bucle >= 10):
-                bucle = 0
-                for n in range(env.action_space.n):
-                    Q[x,y,n] = 0
-                Q[x,y,action] = -50
-                reward = 0
+            if (x == newX and y == newY):
+                if (ori == 0):
+                    env.Visited[x + 1, y] += -0.01
+                if (ori == 1):
+                    env.Visited[x, y - 1] += -0.01
+                if (ori == 2):
+                    env.Visited[x - 1, y] += -0.01
+                if (ori == 3):
+                    env.Visited[x, y + 1] += -0.01
 
             # Update Q-Table with new knowledge
             Q[x, y, action] = \
@@ -249,7 +201,7 @@ def mainLoop():
                 i_episode, t, action, x, y, ori, np.round(env.Visited[x][y], 4), env.numPantalla, newX, newY, np.round(reward,2),
                 np.round(rAll,2), np.round(Q[x,y],2)), end="\r")
 
-            if (t % 20 == 0):
+            if (t % 20 == 0 or reward > 0):
                 pintaRejilla(env.Visited, 40, 20)
 
             rAll += reward

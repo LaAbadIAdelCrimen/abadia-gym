@@ -79,6 +79,7 @@ class AbadiaEnv(gym.Env):
         self.prevPantalla = -1
         self.rejilla = []
         self.prev_ob = dict()
+        self.estaGuillermo= False
 
 
         self.curr_step = -1
@@ -165,11 +166,10 @@ class AbadiaEnv(gym.Env):
         self.obsequium    = int(ob['obsequium'])
         self.porcentaje   = int(ob['porcentaje'])
         self.bonus        = int(ob['bonus'])
-        self.numPantalla     = int(ob['numPantalla'])
+        self.numPantalla  = int(ob['numPantalla'])
         self.dia          = int(ob['dia'])
         self.momentoDia   = int(ob['momentoDia'])
         self.haFracasado  = (ob['haFracasado'] == 'True')
-
         self.rejilla = ob['rejilla']
 
 
@@ -189,13 +189,19 @@ class AbadiaEnv(gym.Env):
         # JT we need to check, that pass to another room
         # not just stay all the time between rooms to get the reward
 
-        if (self.prevPantalla == -1):
-            self.prevPantalla = int(ob['numPantalla'])
-        else:
-            if (self.prevPantalla != int(ob['numPantalla'])):
-                reward += 50
+        if self.estaGuillermo:
+            if (self.prevPantalla == -1):
                 self.prevPantalla = int(ob['numPantalla'])
-                self.save_game_checkpoint()
+            else:
+                if (self.prevPantalla != int(ob['numPantalla'])):
+                    reward += 50
+                    print("----------")
+                    print("reward by screen change !!!!! {} !=  {}".format(self.prevPantalla, int(ob['numPantalla'])))
+                    print("Personajes: {}".format(self.Personajes))
+                    print("ob: {}".format(ob))
+                    print("----------")
+                    self.prevPantalla = int(ob['numPantalla'])
+                    self.save_game_checkpoint()
 
         if len(self.prev_ob) > 0:
             # reward for incrementing the obsequium: > 0 +50 / < 0 -30
@@ -207,7 +213,7 @@ class AbadiaEnv(gym.Env):
 
             # reward for incrementing the bonus: >0 +500
             incr_bonus = self.bonus - int(self.prev_ob['bonus'])
-            if incr_bonus >= 0:
+            if incr_bonus > 0:
                 reward += (500 * incr_bonus)
 
         # if the game is over, we just finish the game and reward is -1000
@@ -235,10 +241,9 @@ class AbadiaEnv(gym.Env):
 
     def _get_personajes_info(self, ob):
         # print ("ob personajes -> {} ", ob['Personajes']['Personaje'][0])
-
+        self.estaGuillermo = False
         for persona in self.listaPersonajes[:]:
-            datos = self.Personajes[persona]
-            datos = {}
+            self.Personajes[persona] = {}
         for personaje in ob['Personajes']['Personaje']:
             if (len(personaje) == 1):
                 break
@@ -248,7 +253,10 @@ class AbadiaEnv(gym.Env):
                 #if key != "id" or key != "fil":
                 datos[key] = value
             self.Personajes[persona] = datos
-            # print ("{} personaje: {}", persona, datos)
+            if int(personaje['id']) == 0:
+                self.estaGuillermo = True
+
+        return self.estaGuillermo
 
 
     def _take_action(self, action):
@@ -301,18 +309,17 @@ class AbadiaEnv(gym.Env):
     def _get_state(self):
         """Get the observation."""
         # ob = [self.TOTAL_TIME_STEPS - self.curr_step]
-        print("I wiil got the state")
-        while (True):
+        print("I wil got the initial state with Guillermo")
+        while True:
             ob = self.sendCmd(self.url, "dump")
-            if len(ob['Personajes']['Personaje']) > 1:
+            if self._get_personajes_info(ob):
                 print("getting the characters from ob:{}".format(ob))
-                self._get_personajes_info(ob)
+                print("DONE")
                 break
             else:
                 print("no personajes, try to reset")
                 self.sendCmd(self.url, "cmd/_")
                 time.sleep(1)
-
         return ob
 
     def _seed(self, seed):
