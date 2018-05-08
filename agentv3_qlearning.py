@@ -164,12 +164,14 @@ def mainLoop():
 
             while True:
                 newState, reward, done, info = env.step(action)
+                # we also save the non Guillermo status because there is a lot
+                # of clues like monks location, objects, etc
+                env.save_action(state, action, reward, newState)
                 if env.estaGuillermo:
                     break
                 # else:
                     # print("Skipping a screen without Guillermo!!!!")
 
-            env.save_action(state, action, reward, newState)
             if done:
                 print("Episode finished after {} timesteps".format(t+1))
                 if (env.haFracasado):
