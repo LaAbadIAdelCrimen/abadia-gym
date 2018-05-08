@@ -310,15 +310,23 @@ class AbadiaEnv(gym.Env):
         """Get the observation."""
         # ob = [self.TOTAL_TIME_STEPS - self.curr_step]
         print("I wil got the initial state with Guillermo")
+        tooboring = 0
         while True:
             ob = self.sendCmd(self.url, "dump")
+            tooboring += 1
             if self._get_personajes_info(ob):
                 print("getting the characters from ob:{}".format(ob))
                 print("DONE")
                 break
             else:
-                print("no personajes, try to reset")
-                self.sendCmd(self.url, "cmd/_")
+                print("getting the characters from ob:{}".format(ob))
+                print("Guillermo is not present yet, waiting")
+                # self.sendCmd(self.url, "cmd/_")
+                if tooboring % 3 == 0:
+                    print("Getting Boring ...")
+                    self.sendCmd(self.url, "cmd/B")
+                    self.sendCmd(self.url, "cmd/A")
+                    time.sleep(1)
                 time.sleep(1)
         return ob
 
