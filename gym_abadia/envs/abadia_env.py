@@ -230,7 +230,7 @@ class AbadiaEnv(gym.Env):
             reward = 5000
 
         if reward == 0:
-            reward = -1
+            reward = -0.1
 
         # we make a copy for the current observation in order to calculate
         # the reward for the next state
