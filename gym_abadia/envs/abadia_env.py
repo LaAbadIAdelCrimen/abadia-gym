@@ -299,7 +299,7 @@ class AbadiaEnv(gym.Env):
 
         self.sendCmd(self.url,"reset")
         self.init_dumps_files()
-        time.sleep(2)
+        time.sleep(5)
         return self._get_state()
 
     def render(self, mode='human', close=False):
@@ -322,12 +322,16 @@ class AbadiaEnv(gym.Env):
                 print("getting the characters from ob:{}".format(ob))
                 print("Guillermo is not present yet, waiting")
                 # self.sendCmd(self.url, "cmd/_")
-                if tooboring % 3 == 0:
+                if tooboring % 10 == 0:
                     print("Getting Boring ...")
-                    self.sendCmd(self.url, "cmd/B")
-                    self.sendCmd(self.url, "cmd/A")
+                    if tooboring <= 10:
+                        self.sendCmd(self.url, "cmd/_")
+                    else:
+                        self.sendCmd(self.url, "fin")
+                    # self.sendCmd(self.url, "cmd/B")
+                    # self.sendCmd(self.url, "cmd/A")
                     time.sleep(1)
-                time.sleep(1)
+                time.sleep(2)
         return ob
 
     def _seed(self, seed):
