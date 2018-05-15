@@ -116,6 +116,9 @@ class AbadiaEnv(gym.Env):
         self.curr_episode = -1
         self.action_episode_memory = []
 
+        now = datetime.datetime.now()
+        self._seed(time.mktime(now.timetuple()))
+
     def set_url(self):
         self.url = self.server + ":" + self.port
 
@@ -251,7 +254,7 @@ class AbadiaEnv(gym.Env):
         ob['totalReward'] = self.totalReward
         # we make a copy for the current observation in order to calculate
         # the reward for the next state
-
+        self.ob = ob
         self.prev_ob = ob
 
         # JT chequear si esto está bien, no parece que este devolviendo bien el estado siguiente!!!
@@ -366,19 +369,19 @@ class AbadiaEnv(gym.Env):
     # "planta": "0", "sonidos": ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"], "frases": [], "Personajes": {"Personaje": [{"id": "0", "nombre": "Guillermo", "posX": "137", "posY": "168", "altura": "0", "orientacion": "0", "objetos": "32"}, {"id": "1", "nombre": "Adso", "posX": "134", "posY": "168", "altura": "0", "orientacion": "1", "objetos": "32"}]}, "Objetos": {"ListaObjetos": []}
     def get_commons(self):
         commons = dict()
-        commons.append({'timestamp': datetime.datetime.now(), 'numDia': int(self.ob['dia'])})
-        commons.append({'momentoDia': int(self.ob['momentoDia']), 'obsequium': int(self.ob['obsequium'])})
+        commons.update({'timestamp': datetime.datetime.now(), 'numDia': int(self.ob['dia'])})
+        commons.update({'momentoDia': int(self.ob['momentoDia']), 'obsequium': int(self.ob['obsequium'])})
         x = int(env.Personajes['Guillermo']['posX'])
         y = int(env.Personajes['Guillermo']['posX'])
         pantallaHex = "%1X%1X" % (x >> 4, y >> 4)
-        commons.append({'numPantalla': int(self.ob['numPantalla']), 'pantallaHex': pantallaHex})
-        commons.append({'planta': int(self.ob['planta']), 'guillermoPosX': x, 'guillermoPosY': y})
-        commons.append({'bonus': int(self.ob['bonus']), 'porcentaje': int(self.ob['porcentaje'])})
+        commons.update({'numPantalla': int(self.ob['numPantalla']), 'pantallaHex': pantallaHex})
+        commons.update({'planta': int(self.ob['planta']), 'guillermoPosX': x, 'guillermoPosY': y})
+        commons.update({'bonus': int(self.ob['bonus']), 'porcentaje': int(self.ob['porcentaje'])})
         return commons
 
     def add_event(self, name, des, reward):
         data = {'name': name, 'des': des, 'reward': reward}
-        data.append = self.get_commons()
+        data.update = self.get_commons()
 
         self.eventsAction.append(data)
         print("events {}".format(self.eventsAction))
