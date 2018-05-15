@@ -57,6 +57,8 @@ class AbadiaEnv(gym.Env):
         self.dump_path      = "partidas/now/"
         self.gameId = datetime.datetime.now().strftime('%y%m%d_%H%M%S_%f')
         self.checkpointSec  = 1
+        self.eventsTotal    = []
+        self.eventsAction   = []
 
 
         # Define what the agent can do
@@ -206,21 +208,26 @@ class AbadiaEnv(gym.Env):
                     print("Personajes: {}".format(self.Personajes))
                     print("ob: {}".format(ob))
                     print("----------")
+                    self.add_event("NewRoom", "prev {} curr {}".format(self.prevPantalla, int(ob['numPantalla'])), 50)
                     self.prevPantalla = int(ob['numPantalla'])
                     self.save_game_checkpoint()
 
         if len(self.prev_ob) > 0:
             # reward for incrementing the obsequium: > 0 +50 / < 0 -30
             incr_obsequium = self.obsequium - int(self.prev_ob['obsequium'])
-            if incr_obsequium >= 0:
+            if incr_obsequium > 0:
                 reward += (50 * incr_obsequium)
-            else:
+                self.add_event("IncrObsequium", "Incr {}".format(incr_obsequium), 50)
+
+            if incr_obsequium < 0:
                 reward += (-30 * incr_obsequium)
+                self.add_event("DecrObsequium", "Incr {}".format(incr_obsequium), -30)
 
             # reward for incrementing the bonus: >0 +500
             incr_bonus = self.bonus - int(self.prev_ob['bonus'])
             if incr_bonus > 0:
                 reward += (500 * incr_bonus)
+                self.add_event("Bonus", "prev {} curr {}".format(self.bonus, int(self.prev_ob['bonus'])), 500)
 
         # if the game is over, we just finish the game and reward is -1000
         # if we completed the game, we finish and the reward is 5000
@@ -350,11 +357,14 @@ class AbadiaEnv(gym.Env):
         random.seed(seed)
         np.random.seed
 
+    def add_event(self, name, des, reward):
+        self.eventsAction.append({'name': name, 'des':des, 'reward': reward})
+        print("events {}".format(self.eventsAction))
 
     def save_game(self):
-        self.fdGame.write("{}{}\"gameId\":\"{}\", \"totalSteps\":{}, \"obsequium\":{}, \"porcentaje\":{}, \"bonus\":{}{}\n"
-                             .format("[", "{", self.gameId, self.curr_step, self.obsequium,
-                                     self.porcentaje, self.bonus, "}]"))
+        self.fdGame.write("{}{}\"gameId\":\"{}\", \"totalSteps\":{}, \"obsequium\":{}, \"porcentaje\":{}, \"bonus\":{}"
+                .format("[", "{", self.gameId, self.curr_step, self.obsequium, self.porcentaje, self.bonus))
+        self.fdGame.write("{}\n".format("}]"))
         self.fdGame.flush()
         self.fdGame.close()
 
