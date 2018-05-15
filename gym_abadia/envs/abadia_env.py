@@ -40,7 +40,7 @@ class AbadiaEnv(gym.Env):
     """
 
     def __init__(self):
-        self.__version__ = "0.0.3"
+        self.__version__ = "0.0.4"
         print("AbadiaEnv - Version {}".format(self.__version__))
 
 
@@ -55,6 +55,9 @@ class AbadiaEnv(gym.Env):
         self.actionsName    = ""
         self.checkpointName = None
         self.dump_path      = "partidas/now/"
+        self.gameId = datetime.datetime.now().strftime('%y%m%d_%H%M%S_%f')
+        self.checkpointSec  = 1
+
 
         # Define what the agent can do
         # 0 -> STEP ORI 0
@@ -289,9 +292,9 @@ class AbadiaEnv(gym.Env):
         -------
         observation (object): the initial observation of the space.
         """
-        now = datetime.datetime.now()
-        self.gameName    = now.strftime('abadia_game_%y%m%d_%H%M%S_%f.json')
-        self.actionsName = now.strftime('abadia_actions_%y%m%d_%H%M%S_%f.json')
+        self.gameId      = datetime.datetime.now().strftime('%y%m%d_%H%M%S_%f')
+        self.gameName    = "abadia_game_{}.json".format(self.gameId)
+        self.actionsName = "abadia_actions_{}.json".format(self.gameId)
 
         self.curr_episode += 1
         self.action_episode_memory.append([])
@@ -377,7 +380,8 @@ class AbadiaEnv(gym.Env):
         path.mkdir(parents=True, exist_ok=True)
 
         # create the game and actions files
-        self.checkpointTmpName  = now.strftime('abadia_checkpoint_%y%m%d_%H%M%S_%f')
+        self.checkpointTmpName  = "abadia_checkpoint_{}_{}".format(self.gameId, self.checkpointSec)
+        self.checkpointSec     += 1
         self.checkpointTmpName += "_{}_{}_{}_{}_{}.checkpoint".format(self.dia, self.momentoDia,
                                                 self.numPantalla, self.obsequium, np.round(self.porcentaje,2))
 
