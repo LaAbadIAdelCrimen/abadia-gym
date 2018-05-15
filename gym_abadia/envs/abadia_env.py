@@ -366,10 +366,10 @@ class AbadiaEnv(gym.Env):
         print("events {}".format(self.eventsAction))
 
     def save_game(self):
-        self.fdGame.write("{}{}\"gameId\":\"{}\", \"totalSteps\":{}, \"obsequium\":{}, \"porcentaje\":{}, \"bonus\":{}"
+        self.fdGame.write("{}{}\"gameId\":\"{}\", \"totalSteps\":{}, \"obsequium\":{}, \"porcentaje\":{}, \"bonus\":{}, "
                           .format("[", "{", self.gameId, self.curr_step, self.obsequium, self.porcentaje, self.bonus))
 
-        self.fdGame.write("\"events\":\"{}\""
+        self.fdGame.write("\"events\":{}"
                 .format(json.dumps(self.eventsGame)))
 
         self.fdGame.write("{}\n".format("}]"))
