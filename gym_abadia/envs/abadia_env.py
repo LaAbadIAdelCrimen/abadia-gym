@@ -185,6 +185,9 @@ class AbadiaEnv(gym.Env):
         self.curr_step += 1
         self._take_action(action)
 
+        ob['jugada'] = self.curr_step
+        ob['gameId'] = self.gameId
+
         # reward = self._get_reward()
 
         reward = 0
@@ -235,10 +238,14 @@ class AbadiaEnv(gym.Env):
         if reward == 0:
             reward = -0.1
 
+        ob['reward'] = reward
+
         # we make a copy for the current observation in order to calculate
         # the reward for the next state
 
         self.prev_ob = ob
+
+        # JT chequear si esto está bien, no parece que este devolviendo bien el estado siguiente!!!
 
         return ob, reward, self.is_game_done, {}
 
@@ -297,6 +304,8 @@ class AbadiaEnv(gym.Env):
         self.actionsName = "abadia_actions_{}.json".format(self.gameId)
 
         self.curr_episode += 1
+        self.curr_step     = 1
+
         self.action_episode_memory.append([])
         self.is_game_done = False
 
