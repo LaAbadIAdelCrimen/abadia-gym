@@ -361,6 +361,14 @@ class AbadiaEnv(gym.Env):
         random.seed(seed)
         np.random.seed
 
+    # "haFracasado": "0", "bonus": "0", "investigacionCompleta": "0", "porcentaje": "0", "numPantalla": "23", "planta": "0", "sonidos": ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"], "frases": [], "Personajes": {"Personaje": [{"id": "0", "nombre": "Guillermo", "posX": "137", "posY": "168", "altura": "0", "orientacion": "0", "objetos": "32"}, {"id": "1", "nombre": "Adso", "posX": "134", "posY": "168", "altura": "0", "orientacion": "1", "objetos": "32"}]}, "Objetos": {"ListaObjetos": []}
+    def get_commons(self):
+        commons = dict()
+        commons.append({'timestamp': datetime.datetime.now(), 'numDia': int(self.ob['dia'])})
+        commons.append({'momentoDia': int(self.ob['momentoDia']), 'obsequium': int(self.ob['obsequium'])})
+        commons.append({'numPantalla': int(self.ob['numPantalla'])})
+
+
     def add_event(self, name, des, reward):
         self.eventsAction.append({'name': name, 'des':des, 'reward': reward})
         print("events {}".format(self.eventsAction))
