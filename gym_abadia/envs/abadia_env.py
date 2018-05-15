@@ -193,7 +193,7 @@ class AbadiaEnv(gym.Env):
         # reward = self._get_reward()
 
         reward = 0
-
+        self.eventsAction = []
         # JT we need to check, that pass to another room
         # not just stay all the time between rooms to get the reward
 
@@ -221,7 +221,7 @@ class AbadiaEnv(gym.Env):
 
             if incr_obsequium < 0:
                 reward += (-30 * incr_obsequium)
-                self.add_event("DecrObsequium", "Incr {}".format(incr_obsequium), -30)
+                self.add_event("DecrObsequium", "Decr {}".format(incr_obsequium), -30)
 
             # reward for incrementing the bonus: >0 +500
             incr_bonus = self.bonus - int(self.prev_ob['bonus'])
@@ -229,6 +229,7 @@ class AbadiaEnv(gym.Env):
                 reward += (500 * incr_bonus)
                 self.add_event("Bonus", "prev {} curr {}".format(self.bonus, int(self.prev_ob['bonus'])), 500)
 
+        self.eventsTotal.extend(self.eventsAction)
         # if the game is over, we just finish the game and reward is -1000
         # if we completed the game, we finish and the reward is 5000
         # the percentage must be variable to help the AI to learn
