@@ -57,7 +57,7 @@ class AbadiaEnv(gym.Env):
         self.dump_path      = "partidas/now/"
         self.gameId = datetime.datetime.now().strftime('%y%m%d_%H%M%S_%f')
         self.checkpointSec  = 1
-        self.eventsTotal    = []
+        self.eventsGame    = []
         self.eventsAction   = []
 
 
@@ -229,7 +229,7 @@ class AbadiaEnv(gym.Env):
                 reward += (500 * incr_bonus)
                 self.add_event("Bonus", "prev {} curr {}".format(self.bonus, int(self.prev_ob['bonus'])), 500)
 
-        self.eventsTotal.extend(self.eventsAction)
+        self.eventsGame.extend(self.eventsAction)
         # if the game is over, we just finish the game and reward is -1000
         # if we completed the game, we finish and the reward is 5000
         # the percentage must be variable to help the AI to learn
@@ -314,6 +314,9 @@ class AbadiaEnv(gym.Env):
         self.curr_episode += 1
         self.curr_step     = 1
 
+        self.eventsGame = []
+        self.eventsAction = []
+
         self.action_episode_memory.append([])
         self.is_game_done = False
 
@@ -364,7 +367,11 @@ class AbadiaEnv(gym.Env):
 
     def save_game(self):
         self.fdGame.write("{}{}\"gameId\":\"{}\", \"totalSteps\":{}, \"obsequium\":{}, \"porcentaje\":{}, \"bonus\":{}"
-                .format("[", "{", self.gameId, self.curr_step, self.obsequium, self.porcentaje, self.bonus))
+                          .format("[", "{", self.gameId, self.curr_step, self.obsequium, self.porcentaje, self.bonus))
+
+        self.fdGame.write("\"events\":\"{}\""
+                .format(json.dumps(self.eventsGame)))
+
         self.fdGame.write("{}\n".format("}]"))
         self.fdGame.flush()
         self.fdGame.close()
