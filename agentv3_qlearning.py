@@ -174,8 +174,8 @@ def mainLoop():
 
             if done:
                 print("Episode finished after {} timesteps".format(t+1))
+                env.save_game()
                 if (env.haFracasado):
-                    env.grabo_partida()
                     env.reset_fin_partida()
                     break
 
@@ -203,15 +203,17 @@ def mainLoop():
                 i_episode, t, action, x, y, ori, np.round(env.Visited[x][y], 4), env.numPantalla, newX, newY, np.round(reward,2),
                 np.round(rAll,2), np.round(Q[x,y],2)), end="\r")
 
-            if (t % 20 == 0 or reward > 0):
+            if (t % 10 == 0 or reward > 0):
                 pintaRejilla(env.Visited, 40, 20)
 
             rAll += reward
             state = newState
             if done == True:
+                env.save_game()
                 break
 
         # jList.append(j)
+        env.save_game()
         rList.append(rAll)
 
         fqtablesnap = open(nameQtableSnap, "wb+")

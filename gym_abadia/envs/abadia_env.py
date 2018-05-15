@@ -351,8 +351,12 @@ class AbadiaEnv(gym.Env):
         np.random.seed
 
 
-    def graba_partida(self):
-        pass
+    def save_game(self):
+        self.fdGame.write("{}{}\"gameId\":\"{}\", \"totalSteps\":{}, \"obsequium\":{}, \"porcentaje\":{}, \"bonus\":{}{}\n"
+                             .format("[", "{", self.gameId, self.curr_step, self.obsequium,
+                                     self.porcentaje, self.bonus, "}]"))
+        self.fdGame.flush()
+        self.fdGame.close()
 
     def save_action(self, state, action, reward, nextstate):
         s1 = state.copy()
