@@ -369,10 +369,10 @@ class AbadiaEnv(gym.Env):
     # "planta": "0", "sonidos": ["0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"], "frases": [], "Personajes": {"Personaje": [{"id": "0", "nombre": "Guillermo", "posX": "137", "posY": "168", "altura": "0", "orientacion": "0", "objetos": "32"}, {"id": "1", "nombre": "Adso", "posX": "134", "posY": "168", "altura": "0", "orientacion": "1", "objetos": "32"}]}, "Objetos": {"ListaObjetos": []}
     def get_commons(self):
         commons = dict()
-        commons.update({'timestamp': datetime.datetime.now(), 'numDia': int(self.ob['dia'])})
+        commons.update({'timestamp': "{}".format(datetime.datetime.now()), 'numDia': int(self.ob['dia'])})
         commons.update({'momentoDia': int(self.ob['momentoDia']), 'obsequium': int(self.ob['obsequium'])})
-        x = int(env.Personajes['Guillermo']['posX'])
-        y = int(env.Personajes['Guillermo']['posX'])
+        x = int(self.Personajes['Guillermo']['posX'])
+        y = int(self.Personajes['Guillermo']['posX'])
         pantallaHex = "%1X%1X" % (x >> 4, y >> 4)
         commons.update({'numPantalla': int(self.ob['numPantalla']), 'pantallaHex': pantallaHex})
         commons.update({'planta': int(self.ob['planta']), 'guillermoPosX': x, 'guillermoPosY': y})
@@ -381,7 +381,7 @@ class AbadiaEnv(gym.Env):
 
     def add_event(self, name, des, reward):
         data = {'name': name, 'des': des, 'reward': reward}
-        data.update = self.get_commons()
+        data.update(self.get_commons())
 
         self.eventsAction.append(data)
         print("events {}".format(self.eventsAction))
@@ -398,7 +398,7 @@ class AbadiaEnv(gym.Env):
 
         self.fdGame.write("{}\n".format("}]"))
         self.fdGame.flush()
-        self.fdGame.close()
+        # self.fdGame.close()
 
     def save_action(self, state, action, reward, nextstate):
         s1 = state.copy()
