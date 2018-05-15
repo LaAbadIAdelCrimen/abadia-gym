@@ -199,8 +199,8 @@ def mainLoop():
             Q[x, y, action] = \
                 Q[x, y, action] + lr * (reward + yy * np.max(Q[newX, newY, :]) - Q[x, y, action])
 
-            print("Episode({}:{}) A({})XYOVP {},{},{},{},{} -> {},{} r:{} tr:{} Q(s,a)= {}".format(
-                i_episode, t, action, x, y, ori, np.round(env.Visited[x][y], 4), env.numPantalla, newX, newY, np.round(reward,2),
+            print("Episode({}:{}) A({})XYOP {},{},{},{} -> {},{} r:{} tr:{} Q(s,a)= {}".format(
+                i_episode, t, action, x, y, ori, env.numPantalla, newX, newY, np.round(reward,2),
                 np.round(rAll,2), np.round(Q[x,y],2)), end="\r")
 
             if (t % 10 == 0 or reward > 0):
@@ -226,7 +226,7 @@ def mainLoop():
         fvisitedsnap.flush()
         fvisitedsnap.close()
 
-    print("Score over time: " + str(sum(rList)/100))
+    print("Score over time: " + str(sum(rList)/env.num_episodes))
 
     print("Final Q-Table Values")
     print(Q)

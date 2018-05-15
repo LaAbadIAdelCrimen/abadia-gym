@@ -57,9 +57,9 @@ class AbadiaEnv(gym.Env):
         self.dump_path      = "partidas/now/"
         self.gameId = datetime.datetime.now().strftime('%y%m%d_%H%M%S_%f')
         self.checkpointSec  = 1
-        self.eventsGame    = []
+        self.eventsGame     = []
         self.eventsAction   = []
-
+        self.totalReward    = 0.0
 
         # Define what the agent can do
         # 0 -> STEP ORI 0
@@ -217,11 +217,11 @@ class AbadiaEnv(gym.Env):
             incr_obsequium = self.obsequium - int(self.prev_ob['obsequium'])
             if incr_obsequium > 0:
                 reward += (50 * incr_obsequium)
-                self.add_event("IncrObsequium", "Incr {}".format(incr_obsequium), 50)
+                self.add_event("IncrObsequium", "Obsequium {} Incr {}".format(self.prev_ob['obsequium']),incr_obsequium), 50)
 
             if incr_obsequium < 0:
                 reward += (-30 * incr_obsequium)
-                self.add_event("DecrObsequium", "Decr {}".format(incr_obsequium), -30)
+                self.add_event("DecrObsequium", "Obsequium {} Decr {}".format(self.prev_ob['obsequium']), incr_obsequium), -30)
 
             # reward for incrementing the bonus: >0 +500
             incr_bonus = self.bonus - int(self.prev_ob['bonus'])
@@ -246,8 +246,9 @@ class AbadiaEnv(gym.Env):
         if reward == 0:
             reward = -0.1
 
+        self.totalReward += reward
         ob['reward'] = reward
-
+        ob['totalReward'] = self.totalReward
         # we make a copy for the current observation in order to calculate
         # the reward for the next state
 
@@ -314,8 +315,9 @@ class AbadiaEnv(gym.Env):
         self.curr_episode += 1
         self.curr_step     = 1
 
-        self.eventsGame = []
+        self.eventsGame   = []
         self.eventsAction = []
+        self.totalReward  = 0.0
 
         self.action_episode_memory.append([])
         self.is_game_done = False
