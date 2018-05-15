@@ -217,11 +217,11 @@ class AbadiaEnv(gym.Env):
             incr_obsequium = self.obsequium - int(self.prev_ob['obsequium'])
             if incr_obsequium > 0:
                 reward += (50 * incr_obsequium)
-                self.add_event("IncrObsequium", "Obsequium {} Incr {}".format(self.prev_ob['obsequium']),incr_obsequium), 50)
+                self.add_event("IncrObsequium", "Obsequium {} Incr {}".format(self.prev_ob['obsequium'],incr_obsequium), 50)
 
             if incr_obsequium < 0:
                 reward += (-30 * incr_obsequium)
-                self.add_event("DecrObsequium", "Obsequium {} Decr {}".format(self.prev_ob['obsequium']), incr_obsequium), -30)
+                self.add_event("DecrObsequium", "Obsequium {} Decr {}".format(self.prev_ob['obsequium'], incr_obsequium), -30)
 
             # reward for incrementing the bonus: >0 +500
             incr_bonus = self.bonus - int(self.prev_ob['bonus'])
@@ -377,12 +377,18 @@ class AbadiaEnv(gym.Env):
         return commons
 
     def add_event(self, name, des, reward):
-        self.eventsAction.append({'name': name, 'des':des, 'reward': reward, self.get_commons()})
+        data = {'name': name, 'des': des, 'reward': reward}
+        data.append = self.get_commons()
+
+        self.eventsAction.append(data)
         print("events {}".format(self.eventsAction))
 
     def save_game(self):
         self.fdGame.write("{}{}\"gameId\":\"{}\", \"totalSteps\":{}, \"obsequium\":{}, \"porcentaje\":{}, \"bonus\":{}, "
                           .format("[", "{", self.gameId, self.curr_step, self.obsequium, self.porcentaje, self.bonus))
+
+        self.fdGame.write("\"totalReward\": \"{}\", "
+                          .format("%.4f" % self.totalReward))
 
         self.fdGame.write("\"events\":{}"
                 .format(json.dumps(self.eventsGame)))
