@@ -223,7 +223,7 @@ class AbadiaEnv(gym.Env):
                 self.add_event("IncrObsequium", "Obsequium {} Incr {}".format(self.prev_ob['obsequium'],incr_obsequium), 50)
 
             if incr_obsequium < 0:
-                reward += (-30 * incr_obsequium)
+                reward += (-30 * -incr_obsequium)
                 self.add_event("DecrObsequium", "Obsequium {} Decr {}".format(self.prev_ob['obsequium'], incr_obsequium), -30)
 
             # reward for incrementing the bonus: >0 +500
@@ -380,7 +380,7 @@ class AbadiaEnv(gym.Env):
         return commons
 
     def add_event(self, name, des, reward):
-        data = {'name': name, 'des': des, 'reward': reward}
+        data = {'name': name, 'des': des, 'reward': reward, 'totalReward': self.totalReward}
         data.update(self.get_commons())
 
         self.eventsAction.append(data)

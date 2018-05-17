@@ -1,3 +1,6 @@
 #!/bin/bash
 
-find partidas -name "*.checkpoint" | cut -d"_"  -f8 | sort -n | uniq -c
+echo "Last 200 checkpoints by room (not checkd)"
+find partidas -name "*.checkpoint" | sort -rn | head -200 | cut -d"_"  -f9 | sort -n | uniq -c
+echo "All time  checkpoints"
+find partidas -name "*.checkpoint" | sort -rn | cut -d"_"  -f9 | sort -n | uniq -c
