@@ -215,22 +215,22 @@ class AbadiaEnv(gym.Env):
                     self.prevPantalla = int(ob['numPantalla'])
                     self.save_game_checkpoint()
 
-        if len(self.prev_ob) > 0:
+        if len(self.prev_ob) > 0 and int(self.prev_ob['obsequium']) > 0:
             # reward for incrementing the obsequium: > 0 +50 / < 0 -30
             incr_obsequium = self.obsequium - int(self.prev_ob['obsequium'])
             if incr_obsequium > 0:
                 reward += (50 * incr_obsequium)
-                self.add_event("IncrObsequium", "Obsequium {} Incr {}".format(self.prev_ob['obsequium'],incr_obsequium), 50)
+                self.add_event("IncrObsequium", "Obsequium {} Incr {}".format(self.prev_ob['obsequium'],incr_obsequium), 50*incr_obsequium)
 
             if incr_obsequium < 0:
-                reward += (-30 * -incr_obsequium)
-                self.add_event("DecrObsequium", "Obsequium {} Decr {}".format(self.prev_ob['obsequium'], incr_obsequium), -30)
+                reward += (30 * incr_obsequium)
+                self.add_event("DecrObsequium", "Obsequium {} Decr {}".format(self.prev_ob['obsequium'], incr_obsequium),-30*incr_obsequium)
 
             # reward for incrementing the bonus: >0 +500
             incr_bonus = self.bonus - int(self.prev_ob['bonus'])
             if incr_bonus > 0:
                 reward += (500 * incr_bonus)
-                self.add_event("Bonus", "prev {} curr {}".format(self.bonus, int(self.prev_ob['bonus'])), 500)
+                self.add_event("Bonus", "prev {} curr {}".format(self.bonus, int(self.prev_ob['bonus'])), 500 * incr_bonus)
 
         self.eventsGame.extend(self.eventsAction)
         # if the game is over, we just finish the game and reward is -1000
@@ -246,6 +246,9 @@ class AbadiaEnv(gym.Env):
             self.game_is_done = True
             reward = 5000
 
+        if self.game_is_done and reward > 0:
+            self.save_game_checkpoint()
+            
         if reward == 0:
             reward = -0.1
 
