@@ -246,9 +246,7 @@ class AbadiaEnv(gym.Env):
             self.game_is_done = True
             reward = 5000
 
-        if self.game_is_done and reward > 0:
-            self.save_game_checkpoint()
-            
+
         if reward == 0:
             reward = -0.1
 
@@ -289,9 +287,6 @@ class AbadiaEnv(gym.Env):
 
         game_is_done = (self.obsequium <= 0)
 
-        if game_is_done:
-            self.is_game_done = True
-
         # remaining_steps = self.TOTAL_TIME_STEPS - self.curr_step
         # time_is_over = (remaining_steps <= 0)
         # throw_away = time_is_over and not self.is_banana_sold
@@ -326,7 +321,8 @@ class AbadiaEnv(gym.Env):
         self.totalReward  = 0.0
 
         self.action_episode_memory.append([])
-        self.is_game_done = False
+        # self.is_game_done = False
+        self.game_is_done = False
 
         self.sendCmd(self.url,"reset")
         self.init_dumps_files()

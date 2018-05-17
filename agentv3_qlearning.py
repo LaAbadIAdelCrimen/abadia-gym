@@ -212,8 +212,11 @@ def mainLoop():
                 env.save_game()
                 break
 
-        # jList.append(j)
+        if env.rAll > 0:
+            env.save_game_checkpoint()
+
         env.save_game()
+
         rList.append(rAll)
 
         fqtablesnap = open(nameQtableSnap, "wb+")
