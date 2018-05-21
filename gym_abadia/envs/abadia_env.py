@@ -107,10 +107,11 @@ class AbadiaEnv(gym.Env):
         self.Visited = np.zeros([512, 512])
 
         # Observation is the remaining time
-        low = np.array([0.0,  # remaining_tries
-                         ])
-        high = np.array([512, ])
-        self.observation_space = spaces.Box(low, high)
+        X = np.array([0,256])
+        Y = np.array([0, 256])
+        O = np.array([0,4])
+
+        self.observation_space = spaces.Box(X, Y, O)
 
         # Store what the agent tried
         self.curr_episode = -1
