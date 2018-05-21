@@ -458,3 +458,64 @@ class AbadiaEnv(gym.Env):
         time.sleep(2)
         return self._get_state()
 
+    def pintaRejilla(self, width, height):
+        w = int(width / 2)
+        h = int(height / 2)
+        yRejilla = 0
+        xRejilla = 0
+
+        # TODO: to display all the characters, now only Guillermo and Adso
+        # pers = {}
+        # for per in env.Personajes:
+        #    datos = {'x': per['posX'], 'y': per['posY']}
+        #   pers.update(per['id']:datos)
+        #
+
+        x = int(env.Personajes['Guillermo']['posX'])
+        y = int(env.Personajes['Guillermo']['posY'])
+        adsoX = int(env.Personajes['Adso']['posX'])
+        adsoY = int(env.Personajes['Adso']['posY'])
+
+        print("Guillermo {},{} Adso {},{}".format(x, y, adsoX, adsoY))
+        print("+" + "-" * (w * 2) + "+" + "-" * 22 + "+")
+        for yy in range(y - h, y + h):
+            print("|", end="")
+            for xx in range(x - w, x + w):
+                if (xx == x and yy == y):
+                    print("G", end="")
+                else:
+                    if (xx == adsoX and yy == adsoY):
+                        print("A", end="")
+                    else:
+                        if (self.Visited[xx, yy] == 0):
+                            print("·", end="")
+                        else:
+                            if (self.Visited[xx, yy] > 0):
+                                print(" ", end="")
+                            else:
+                                print("#", end="")
+
+            print("|", end="")
+            if yRejilla < 24:
+                for xx in range(0, 23):
+                    if (env.rejilla[yRejilla][xx] == 0):
+                        print(" ", end="")
+                    else:
+                        if (env.rejilla[yRejilla][xx] >= 16):
+                            print("P", end="")
+                        else:
+                            print("#", end="")
+
+            print("|", end="")
+            if yRejilla < 24:
+                for xx in range(0, 23):
+                    if (env.rejilla[yRejilla][xx] == 0):
+                        print("  ", end="")
+                    else:
+                        print("{}".format(format(env.rejilla[yRejilla][xx], '2x')), end="")
+            yRejilla += 1
+            print("|")
+
+        print("+" + "-" * (w * 2) + "+" + "-" * 22 + "+")
+
+
