@@ -106,12 +106,13 @@ class AbadiaEnv(gym.Env):
 
         self.Visited = np.zeros([512, 512])
 
-        # Observation is the remaining time
+        # Observation is the position of Guillermo and the information of the room
         X = np.array([0,256])
         Y = np.array([0, 256])
         O = np.array([0,4])
 
-        self.observation_space = spaces.Box(X, Y, O)
+        high = np.array([np.inf] * 3)  # useful range is -1 .. +1, but spikes can be higher
+        self.observation_space = spaces.Box(-high, high)
 
         # Store what the agent tried
         self.curr_episode = -1
@@ -288,6 +289,10 @@ class AbadiaEnv(gym.Env):
 
         return self.estaGuillermo
 
+    # check is make sense do it for special state
+    def stateVector(self):
+        x, y, ori = self.personajeByName('Guillermo')
+        return [x, y, ori]
 
     def _take_action(self, action):
         self.action_episode_memory[self.curr_episode].append(action)
