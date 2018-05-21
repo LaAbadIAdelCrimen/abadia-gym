@@ -177,7 +177,7 @@ class AbadiaEnv(gym.Env):
         self.numPantalla  = int(ob['numPantalla'])
         self.dia          = int(ob['dia'])
         self.momentoDia   = int(ob['momentoDia'])
-        self.haFracasado  = (ob['haFracasado'] == 'True')
+        self.haFracasado  = (ob['haFracasado'] == '1')
         self.rejilla = ob['rejilla']
 
 
@@ -239,11 +239,17 @@ class AbadiaEnv(gym.Env):
         # with variable explanatory/explotation
 
         if (self.haFracasado == True):
+            print("GAME OVER")
             self.game_is_done = True
             reward = -1000
 
         if (self.porcentaje >= 90):
             self.game_is_done = True
+            print("FACKING YEAH GAME DONE")
+            print("FACKING YEAH GAME DONE")
+            print("FACKING YEAH GAME DONE")
+            print("FACKING YEAH GAME DONE")
+            print("FACKING YEAH GAME DONE")
             reward = 5000
 
 
@@ -260,7 +266,7 @@ class AbadiaEnv(gym.Env):
 
         # JT chequear si esto está bien, no parece que este devolviendo bien el estado siguiente!!!
 
-        return ob, reward, self.is_game_done, {}
+        return ob, reward, self.game_is_done, {}
 
     def _get_personajes_info(self, ob):
         # print ("ob personajes -> {} ", ob['Personajes']['Personaje'][0])
@@ -371,7 +377,7 @@ class AbadiaEnv(gym.Env):
         commons.update({'timestamp': "{}".format(datetime.datetime.now()), 'numDia': int(self.ob['dia'])})
         commons.update({'momentoDia': int(self.ob['momentoDia']), 'obsequium': int(self.ob['obsequium'])})
         x = int(self.Personajes['Guillermo']['posX'])
-        y = int(self.Personajes['Guillermo']['posX'])
+        y = int(self.Personajes['Guillermo']['posY'])
         pantallaHex = "%1X%1X" % (x >> 4, y >> 4)
         commons.update({'numPantalla': int(self.ob['numPantalla']), 'pantallaHex': pantallaHex})
         commons.update({'planta': int(self.ob['planta']), 'guillermoPosX': x, 'guillermoPosY': y})

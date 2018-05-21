@@ -212,7 +212,7 @@ def mainLoop():
                 env.save_game()
                 break
 
-        if env.rAll > 0:
+        if rAll > 0:
             env.save_game_checkpoint()
 
         env.save_game()
