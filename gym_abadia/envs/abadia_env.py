@@ -458,6 +458,10 @@ class AbadiaEnv(gym.Env):
         time.sleep(2)
         return self._get_state()
 
+    def personajeByName(self, name):
+        # TODO JT: we need to check that there are values for this personaje
+        return int(self.Personajes[name]['posX']), int(self.Personajes[name]['posY'], int(self.Personajes[name]['orientacion']))
+
     def pintaRejilla(self, width, height):
         w = int(width / 2)
         h = int(height / 2)
@@ -471,10 +475,8 @@ class AbadiaEnv(gym.Env):
         #   pers.update(per['id']:datos)
         #
 
-        x = int(self.Personajes['Guillermo']['posX'])
-        y = int(self.Personajes['Guillermo']['posY'])
-        adsoX = int(self.Personajes['Adso']['posX'])
-        adsoY = int(self.Personajes['Adso']['posY'])
+        x, y, ori           = self.personajeByName('Guillermo')
+        adsoX, adsoY, adsoO = self.personajeByName('Adso')
 
         print("Guillermo {},{} Adso {},{}".format(x, y, adsoX, adsoY))
         print("+" + "-" * (w * 2) + "+" + "-" * 22 + "+")
