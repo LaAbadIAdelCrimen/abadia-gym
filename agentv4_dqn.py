@@ -74,7 +74,7 @@ class DQN:
             else:
                 Q_future = max(self.target_model.predict(new_state)[0])
                 target[0][action] = reward + Q_future * self.gamma
-            self.model.fit(state, target, epochs=1, verbose=1)
+            self.model.fit(state, target, epochs=1, verbose=0)
 
     def target_train(self):
         weights = self.model.get_weights()
@@ -226,11 +226,11 @@ def mainLoop():
         if t >= env.num_steps:
             print("Failed to complete in trial {}".format(env.num_episodes))
             if t % 10 == 0:
-                dqn_agent.save_model("trial-{}.model".format(i_episode))
-        else:
-            print("Completed in {} trials".format(i_episode))
-            dqn_agent.save_model("success.model")
-            break
+                dqn_agent.save_model("models/{}_trial_{}.model".format(env.gameId, i_episode))
+        # else:
+        #   print("Completed in {} trials".format(i_episode))
+        #   dqn_agent.save_model("models/success.model")
+        #   break
 
         fvisitedsnap = open(nameVisitedSnap, "wb+")
         np.save(fvisitedsnap, env.Visited)
