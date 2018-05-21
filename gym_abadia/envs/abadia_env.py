@@ -292,7 +292,7 @@ class AbadiaEnv(gym.Env):
     # check is make sense do it for special state
     def stateVector(self):
         x, y, ori = self.personajeByName('Guillermo')
-        return [x, y, ori]
+        return np.array([x, y, ori]).reshape(1,3)
 
     def _take_action(self, action):
         self.action_episode_memory[self.curr_episode].append(action)
@@ -466,7 +466,7 @@ class AbadiaEnv(gym.Env):
 
     def personajeByName(self, name):
         # TODO JT: we need to check that there are values for this personaje
-        return int(self.Personajes[name]['posX']), int(self.Personajes[name]['posY'], int(self.Personajes[name]['orientacion']))
+        return int(self.Personajes[name]['posX']), int(self.Personajes[name]['posY']), int(self.Personajes[name]['orientacion'])
 
     def pintaRejilla(self, width, height):
         w = int(width / 2)
