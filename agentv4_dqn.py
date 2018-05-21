@@ -220,13 +220,13 @@ def mainLoop():
             env.save_game_checkpoint()
 
         env.save_game()
+        dqn_agent.save_model("models/model_v1_{}_trial_{}.model".format(env.gameId, i_episode))
+        dqn_agent.save_model("models/model_v1_lastest.model".format(env.gameId))
 
         rList.append(rAll)
 
         if t >= env.num_steps:
             print("Failed to complete in trial {}".format(env.num_episodes))
-            if t % 10 == 0:
-                dqn_agent.save_model("models/{}_trial_{}.model".format(env.gameId, i_episode))
         # else:
         #   print("Completed in {} trials".format(i_episode))
         #   dqn_agent.save_model("models/success.model")
