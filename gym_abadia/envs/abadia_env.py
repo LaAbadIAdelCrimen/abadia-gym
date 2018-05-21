@@ -471,10 +471,10 @@ class AbadiaEnv(gym.Env):
         #   pers.update(per['id']:datos)
         #
 
-        x = int(env.Personajes['Guillermo']['posX'])
-        y = int(env.Personajes['Guillermo']['posY'])
-        adsoX = int(env.Personajes['Adso']['posX'])
-        adsoY = int(env.Personajes['Adso']['posY'])
+        x = int(self.Personajes['Guillermo']['posX'])
+        y = int(self.Personajes['Guillermo']['posY'])
+        adsoX = int(self.Personajes['Adso']['posX'])
+        adsoY = int(self.Personajes['Adso']['posY'])
 
         print("Guillermo {},{} Adso {},{}".format(x, y, adsoX, adsoY))
         print("+" + "-" * (w * 2) + "+" + "-" * 22 + "+")
@@ -498,10 +498,10 @@ class AbadiaEnv(gym.Env):
             print("|", end="")
             if yRejilla < 24:
                 for xx in range(0, 23):
-                    if (env.rejilla[yRejilla][xx] == 0):
+                    if (self.rejilla[yRejilla][xx] == 0):
                         print(" ", end="")
                     else:
-                        if (env.rejilla[yRejilla][xx] >= 16):
+                        if (self.rejilla[yRejilla][xx] >= 16):
                             print("P", end="")
                         else:
                             print("#", end="")
@@ -509,10 +509,10 @@ class AbadiaEnv(gym.Env):
             print("|", end="")
             if yRejilla < 24:
                 for xx in range(0, 23):
-                    if (env.rejilla[yRejilla][xx] == 0):
+                    if (self.rejilla[yRejilla][xx] == 0):
                         print("  ", end="")
                     else:
-                        print("{}".format(format(env.rejilla[yRejilla][xx], '2x')), end="")
+                        print("{}".format(format(self.rejilla[yRejilla][xx], '2x')), end="")
             yRejilla += 1
             print("|")
 
