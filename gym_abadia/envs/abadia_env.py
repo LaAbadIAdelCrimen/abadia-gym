@@ -123,10 +123,15 @@ class AbadiaEnv(gym.Env):
 
     def set_url(self):
         self.url = self.server + ":" + self.port
+    # TODO JT refactoring and eliminate this function
+    def sendReset(self):
+        return self.sendCmd(self.url, "reset")
 
     def sendCmd(self, url, command, type="json"):
         cmd = "{}/{}".format(url, command)
-        r = requests.get(cmd)
+        requests.get(cmd)
+        cmdDump = "{}/dump".format(url)
+        r = requests.get(cmdDump)
         # print("cmd {} -> {}".format(cmd, r.text))
         # print("cmd {} -> {}".format(cmd, r.json))
         if (type == "json"):
@@ -180,7 +185,7 @@ class AbadiaEnv(gym.Env):
         self.dia          = int(ob['dia'])
         self.momentoDia   = int(ob['momentoDia'])
         self.haFracasado  = (ob['haFracasado'] == '1')
-        self.rejilla = ob['rejilla']
+        self.rejilla = ob['Rejilla']
 
 
 
@@ -275,7 +280,7 @@ class AbadiaEnv(gym.Env):
         self.estaGuillermo = False
         for persona in self.listaPersonajes[:]:
             self.Personajes[persona] = {}
-        for personaje in ob['Personajes']['Personaje']:
+        for personaje in ob['Personajes']:
             if (len(personaje) == 1):
                 break
             persona = self.listaPersonajes[int(personaje['id'])]
@@ -336,10 +341,17 @@ class AbadiaEnv(gym.Env):
         # self.is_game_done = False
         self.game_is_done = False
 
-        self.sendCmd(self.url,"reset")
+        print("-----> RESET the GAME")
+        ob = self.sendReset()
+        print("reset status {}".format(ob))
+        print("-----> DONE")
+        print("-----> INIT dumps files: START ...")
         self.init_dumps_files()
-        time.sleep(5)
-        return self._get_state()
+        print("-----> INIT dumps files: DONE")
+        # time.sleep(5)
+        if self._get_personajes_info(ob):
+            print("Esta Guillermo")
+        return ob
 
     def render(self, mode='human', close=False):
         print("state info: {}\n".format(self))
@@ -348,10 +360,11 @@ class AbadiaEnv(gym.Env):
     def _get_state(self):
         """Get the observation."""
         # ob = [self.TOTAL_TIME_STEPS - self.curr_step]
-        print("I wil got the initial state with Guillermo")
+        print("--------> I wil got the initial state with Guillermo")
         tooboring = 0
         while True:
             ob = self.sendCmd(self.url, "dump")
+            print("{}".format(ob))
             tooboring += 1
             if self._get_personajes_info(ob):
                 print("getting the characters from ob:{}".format(ob))
@@ -414,8 +427,8 @@ class AbadiaEnv(gym.Env):
     def save_action(self, state, action, reward, nextstate):
         s1 = state.copy()
         s2 = nextstate.copy()
-        s1.pop('rejilla')
-        s2.pop('rejilla')
+        # s1.pop('Rejilla')
+        # s2.pop('Rejilla')
 
         self.fdActions.write("{}{}\"action\":{}\"state\":{},\"action\":{},\"reward\":{},\"nextstate\":{}{}{}\n"
                              .format("[", "{", "{", json.dumps(s1), action, reward, json.dumps(s2), "}", "}]"))
