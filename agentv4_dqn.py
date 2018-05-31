@@ -100,8 +100,6 @@ def mainLoop():
                 env.save_action(state, action, reward, newState)
                 if env.estaGuillermo:
                     break
-                # else:
-                    # print("Skipping a screen without Guillermo!!!!")
 
             dqn_agent.remember(env.prev_vector, action, reward, env.vector, done)
 
@@ -134,9 +132,9 @@ def mainLoop():
             #      .format(i_episode, t, action, x, y, ori, env.numPantalla, newX, newY, np.round(reward,2),
             #              np.round(rAll,2), np.round(Q[x,y],2)), end="\r")
 
-            print("Episode({}:{}) A({})XYOP {},{},{},{} -> {},{} r:{} tr:{}  "
+            print("Episode({}:{}) A({})XYOP {},{},{},{} -> {},{} r:{} tr:{} V:{}"
                 .format(i_episode, t, action, x, y, ori, env.numPantalla, newX, newY, np.round(reward,2),
-                np.round(rAll,2), end="\r"))
+                np.round(rAll,2), env.predictions, end="\r"))
 
             if (t % 10 == 0 or reward > 0):
                 env.pintaRejilla(40, 20)

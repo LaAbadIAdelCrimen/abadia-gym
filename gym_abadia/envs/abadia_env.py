@@ -185,7 +185,7 @@ class AbadiaEnv(gym.Env):
         self.dia          = int(ob['dia'])
         self.momentoDia   = int(ob['momentoDia'])
         self.haFracasado  = (ob['haFracasado'] == '1')
-        self.rejilla = ob['Rejilla']
+        self.rejilla      = ob['Rejilla']
 
 
 
@@ -296,8 +296,9 @@ class AbadiaEnv(gym.Env):
 
     # check is make sense do it for special state
     def stateVector(self):
-        x, y, ori = self.personajeByName('Guillermo')
-        return np.array([x, y, ori]).reshape(1,3)
+        x, y, ori    = self.personajeByName('Guillermo')
+        ax, ay, aori = self.personajeByName('Adso')
+        return np.array([x, y, ori, ax, ay, aori]).reshape(1,6)
 
     def _take_action(self, action):
         self.action_episode_memory[self.curr_episode].append(action)
@@ -336,6 +337,7 @@ class AbadiaEnv(gym.Env):
         self.eventsGame   = []
         self.eventsAction = []
         self.totalReward  = 0.0
+        self.predictions  = []
 
         self.action_episode_memory.append([])
         # self.is_game_done = False
