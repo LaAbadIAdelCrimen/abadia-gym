@@ -111,7 +111,7 @@ class AbadiaEnv(gym.Env):
         Y = np.array([0, 256])
         O = np.array([0,4])
 
-        high = np.array([np.inf] * 3)  # useful range is -1 .. +1, but spikes can be higher
+        high = np.array([np.inf] * 6)  # useful range is -1 .. +1, but spikes can be higher
         self.observation_space = spaces.Box(-high, high)
 
         # Store what the agent tried
