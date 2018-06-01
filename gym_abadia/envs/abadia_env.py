@@ -40,7 +40,7 @@ class AbadiaEnv(gym.Env):
     """
 
     def __init__(self):
-        self.__version__ = "0.0.5"
+        self.__version__ = "0.0.6"
         print("AbadiaEnv - Version {}".format(self.__version__))
 
 
@@ -63,22 +63,19 @@ class AbadiaEnv(gym.Env):
         self.totalReward    = 0.0
 
         # Define what the agent can do
-        # 0 -> STEP ORI 0
-        # 1 -> STEP ORI 1
-        # 2 -> STEP ORI 2
-        # 3 -> STEP ORI 3
-        # 4 -> RIGHT
-        # 5 -> LEFT
-        # 6 -> DOWN
-        # 7 -> NOP
+        # 0 -> STEP FORWARD
+        # 1 -> RIGHT
+        # 2 -> LEFT
+        # 3 -> DOWN
+        # 4 -> GET
 
-        self.action_space = spaces.Discrete(7)
+        self.action_space = spaces.Discrete(5)
 
         # json from the dump state of the episode
 
         self.json_dump = {}
 
-        self.actions_list = ("cmd/A", "cmd/A" ,"cmd/A", "cmd/A", "cmd/D", "cmd/I", "cmd/B", "cmd/N")
+        self.actions_list = ("cmd/A", "cmd/D", "cmd/I", "cmd/B", "cmd/N", "cmd/_")
         self.obsequium = -1
         self.porcentaje = -1
         self.haFracasado = False
@@ -112,7 +109,7 @@ class AbadiaEnv(gym.Env):
         Y = np.array([0, 256])
         O = np.array([0,4])
 
-        high = np.array([np.inf] * 6)  # useful range is -1 .. +1, but spikes can be higher
+        high = np.array([np.inf] * 15)  # useful range is -1 .. +1, but spikes can be higher
         self.observation_space = spaces.Box(-high, high)
 
         # Store what the agent tried
@@ -243,14 +240,14 @@ class AbadiaEnv(gym.Env):
                 self.add_event("Bonus", "prev {} curr {}".format(self.bonus, int(self.prev_ob['bonus'])), 500 * incr_bonus)
 
         # we check if Guillermo change his position. Positive reward if yes, negative if no
-        if action >= 0 and action <= 3:
+        if action == 0:
             if len(self.prev_ob) > 0 and len(self.prev_ob['Personajes']) > 0:
                 prev = self.dataPersonaje(self.prev_ob, "Guillermo")
                 curr = self.dataPersonaje(ob, "Guillermo")
                 if (prev['posX'] != curr['posX']) or (prev['posY'] != curr['posY']):
                     print("se ha movido: {},{} -> {},{}".format(prev['posX'], prev['posY'],
                                                             curr['posX'], curr['posY']))
-                    reward += 0.2
+                    reward += 0.5
 
         self.eventsGame.extend(self.eventsAction)
         # if the game is over, we just finish the game and reward is -1000
@@ -275,7 +272,7 @@ class AbadiaEnv(gym.Env):
 
 
         if reward == 0:
-            reward = -0.1
+            reward = -0.5
 
         self.totalReward += reward
         ob['reward'] = reward
@@ -309,10 +306,25 @@ class AbadiaEnv(gym.Env):
         return self.estaGuillermo
 
     # check is make sense do it for special state
+
+    def normalizaVisited(self, x, y):
+        bordes = []
+        for X in range(x-1, x+2):
+            for Y in range(y-1, y+2):
+                if (self.Visited[X,Y] < 0):
+                    bordes.append(1)
+                else:
+                    bordes.append(0)
+        print("bordes {}".format(bordes))
+        return bordes
+
     def stateVector(self):
         x, y, ori    = self.personajeByName('Guillermo')
         ax, ay, aori = self.personajeByName('Adso')
-        return np.array([x, y, ori, ax, ay, aori]).reshape(1,6)
+
+        vector = np.append([x, y, ori, ax, ay, aori],self.normalizaVisited(x,y))
+        print("vector {}".format(vector))
+        return vector.reshape(1,15)
 
     def _take_action(self, action):
         self.action_episode_memory[self.curr_episode].append(action)
@@ -536,7 +548,7 @@ class AbadiaEnv(gym.Env):
                         print("<", end="")
                 else:
                     if (xx == adsoX and yy == adsoY):
-                        print("A", end="")
+                        print("a", end="")
                     else:
                         if (self.Visited[xx, yy] == 0):
                             print("·", end="")
