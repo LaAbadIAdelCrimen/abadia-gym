@@ -22,6 +22,7 @@ def init_env(env):
     argparser.add_argument('-s', '--server', help='server name')
     argparser.add_argument('-p', '--port', help='port number')
     argparser.add_argument('-c', '--checkpoint', help='checkpoint file')
+    argparser.add_argument('-m', '--model', help='model file')
     argparser.add_argument('-e', '--episodes', help='number of episodes')
     argparser.add_argument('-n', '--steps', help='total steps of the episode')
 
@@ -38,6 +39,9 @@ def init_env(env):
 
     if args.checkpoint != None:
         env.checkpointName = args.checkpoint
+
+    if args.model != None:
+        env.modelName = args.model
 
     if args.episodes != None:
         env.num_episodes = int(args.episodes)
@@ -134,7 +138,7 @@ def mainLoop():
 
             print("Episode({}:{}) A({})XYOP {},{},{},{} -> {},{} r:{} tr:{} V:{}"
                 .format(i_episode, t, action, x, y, ori, env.numPantalla, newX, newY, np.round(reward,2),
-                np.round(rAll,2), env.predictions, end="\r"))
+                np.round(rAll,2), np.round(env.predictions,3), end="\r"))
 
             if (t % 10 == 0 or reward > 0):
                 env.pintaRejilla(40, 20)

@@ -40,7 +40,7 @@ class AbadiaEnv(gym.Env):
     """
 
     def __init__(self):
-        self.__version__ = "0.0.4"
+        self.__version__ = "0.0.5"
         print("AbadiaEnv - Version {}".format(self.__version__))
 
 
@@ -54,6 +54,7 @@ class AbadiaEnv(gym.Env):
         self.gameName       = ""
         self.actionsName    = ""
         self.checkpointName = None
+        self.modelName      = None
         self.dump_path      = "partidas/now/"
         self.gameId = datetime.datetime.now().strftime('%y%m%d_%H%M%S_%f')
         self.checkpointSec  = 1
@@ -184,7 +185,7 @@ class AbadiaEnv(gym.Env):
         self.numPantalla  = int(ob['numPantalla'])
         self.dia          = int(ob['dia'])
         self.momentoDia   = int(ob['momentoDia'])
-        self.haFracasado  = (ob['haFracasado'] == '1')
+        self.haFracasado  = ob['haFracasado']
         self.rejilla      = ob['Rejilla']
 
 
@@ -222,6 +223,7 @@ class AbadiaEnv(gym.Env):
                     self.prevPantalla = int(ob['numPantalla'])
                     self.save_game_checkpoint()
 
+        # If there is an obsequium change, it will be rewarded pos/neg
         if len(self.prev_ob) > 0 and int(self.prev_ob['obsequium']) > 0:
             # reward for incrementing the obsequium: > 0 +50 / < 0 -30
             incr_obsequium = self.obsequium - int(self.prev_ob['obsequium'])
@@ -233,11 +235,20 @@ class AbadiaEnv(gym.Env):
                 reward += (30 * incr_obsequium)
                 self.add_event("DecrObsequium", "Obsequium {} Decr {}".format(self.prev_ob['obsequium'], incr_obsequium),-30*incr_obsequium)
 
-            # reward for incrementing the bonus: >0 +500
+        # reward for incrementing the bonus: >0 +500
+        if len(self.prev_ob) > 0 and int(self.prev_ob['bonus']) > 0:
             incr_bonus = self.bonus - int(self.prev_ob['bonus'])
             if incr_bonus > 0:
                 reward += (500 * incr_bonus)
                 self.add_event("Bonus", "prev {} curr {}".format(self.bonus, int(self.prev_ob['bonus'])), 500 * incr_bonus)
+
+        # we check if Guillermo change his position. Positive reward if yes, negative if no
+        if action >= 0 and action <= 3:
+            if len(self.prev_ob) > 0 and int(self.prev_ob['Personajes']) > 0:
+                prev = dataPersonaje(self.prev_ob, "Guillermo")
+                curr = dataPersonaje(self.ob, "Guillermo")
+                if (prev['posX'] != curr['posY'] or prev['posX'] != curr['posY']):
+                    reward += 0.2
 
         self.eventsGame.extend(self.eventsAction)
         # if the game is over, we just finish the game and reward is -1000
@@ -245,8 +256,9 @@ class AbadiaEnv(gym.Env):
         # the percentage must be variable to help the AI to learn
         # with variable explanatory/explotation
 
-        if (self.haFracasado == True):
+        if (self.haFracasado == True)
             print("GAME OVER")
+            self.sendCmd(self.url, "_")
             self.game_is_done = True
             reward = -1000
 
@@ -483,6 +495,12 @@ class AbadiaEnv(gym.Env):
         # TODO JT: we need to check that there are values for this personaje
         return int(self.Personajes[name]['posX']), int(self.Personajes[name]['posY']), int(self.Personajes[name]['orientacion'])
 
+    def dataPersonaje(self, ob, name):
+       for persona in ob['Personajes']:
+           if (persona['nombre'] == name):
+               return persona
+        return {}
+
     def pintaRejilla(self, width, height):
         w = int(width / 2)
         h = int(height / 2)
@@ -505,7 +523,14 @@ class AbadiaEnv(gym.Env):
             print("|", end="")
             for xx in range(x - w, x + w):
                 if (xx == x and yy == y):
-                    print("G", end="")
+                    if ori == 0:
+                        print(">", end="")
+                    if ori == 3:
+                        print("V", end="")
+                    if ori == 1:
+                        print("^", end="")
+                    if ori == 2:
+                        print("<", end="")
                 else:
                     if (xx == adsoX and yy == adsoY):
                         print("A", end="")
