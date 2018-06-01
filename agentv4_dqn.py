@@ -143,6 +143,7 @@ def mainLoop():
             if (t % 10 == 0 or reward > 0):
                 env.pintaRejilla(40, 20)
 
+            x, y, ori = env.personajeByName('Guillermo')
             rAll += reward
             state = newState
             if done == True:

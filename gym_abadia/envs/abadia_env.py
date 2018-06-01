@@ -244,10 +244,12 @@ class AbadiaEnv(gym.Env):
 
         # we check if Guillermo change his position. Positive reward if yes, negative if no
         if action >= 0 and action <= 3:
-            if len(self.prev_ob) > 0 and int(self.prev_ob['Personajes']) > 0:
-                prev = dataPersonaje(self.prev_ob, "Guillermo")
-                curr = dataPersonaje(self.ob, "Guillermo")
-                if (prev['posX'] != curr['posY'] or prev['posX'] != curr['posY']):
+            if len(self.prev_ob) > 0 and len(self.prev_ob['Personajes']) > 0:
+                prev = self.dataPersonaje(self.prev_ob, "Guillermo")
+                curr = self.dataPersonaje(ob, "Guillermo")
+                if (prev['posX'] != curr['posX']) or (prev['posY'] != curr['posY']):
+                    print("se ha movido: {},{} -> {},{}".format(prev['posX'], prev['posY'],
+                                                            curr['posX'], curr['posY']))
                     reward += 0.2
 
         self.eventsGame.extend(self.eventsAction)
@@ -256,7 +258,7 @@ class AbadiaEnv(gym.Env):
         # the percentage must be variable to help the AI to learn
         # with variable explanatory/explotation
 
-        if (self.haFracasado == True)
+        if (self.haFracasado == True):
             print("GAME OVER")
             self.sendCmd(self.url, "_")
             self.game_is_done = True
@@ -496,10 +498,11 @@ class AbadiaEnv(gym.Env):
         return int(self.Personajes[name]['posX']), int(self.Personajes[name]['posY']), int(self.Personajes[name]['orientacion'])
 
     def dataPersonaje(self, ob, name):
-       for persona in ob['Personajes']:
-           if (persona['nombre'] == name):
-               return persona
-        return {}
+        notfound = {}
+        for persona in ob['Personajes']:
+            if (persona['nombre'] == name):
+                return persona
+        return notfound
 
     def pintaRejilla(self, width, height):
         w = int(width / 2)
