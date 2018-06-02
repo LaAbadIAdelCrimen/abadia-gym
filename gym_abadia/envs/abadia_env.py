@@ -133,7 +133,12 @@ class AbadiaEnv(gym.Env):
         # print("cmd {} -> {}".format(cmd, r.text))
         # print("cmd {} -> {}".format(cmd, r.json))
         if (type == "json"):
-            return r.json()
+            if r.status_code == 599:
+                tmp = r.json()
+                tmp['haFracasado'] = True
+                return tmp
+            else:
+                return r.json()
         else:
             return r.text
 
@@ -258,6 +263,8 @@ class AbadiaEnv(gym.Env):
         if (self.haFracasado == True):
             print("GAME OVER")
             self.sendCmd(self.url, "_")
+            time.sleep(4)
+            self.sendCmd(self.url, "_")
             self.game_is_done = True
             reward = -1000
 
@@ -315,7 +322,7 @@ class AbadiaEnv(gym.Env):
                     bordes.append(1)
                 else:
                     bordes.append(0)
-        print("bordes {}".format(bordes))
+        # print("bordes {}".format(bordes))
         return bordes
 
     def stateVector(self):
@@ -323,7 +330,7 @@ class AbadiaEnv(gym.Env):
         ax, ay, aori = self.personajeByName('Adso')
 
         vector = np.append([x, y, ori, ax, ay, aori],self.normalizaVisited(x,y))
-        print("vector {}".format(vector))
+        # print("vector {}".format(vector))
         return vector.reshape(1,15)
 
     def _take_action(self, action):
