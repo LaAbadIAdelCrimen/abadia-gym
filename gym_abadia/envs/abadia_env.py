@@ -127,7 +127,7 @@ class AbadiaEnv(gym.Env):
 
     def sendCmd(self, url, command, type="json"):
         cmd = "{}/{}".format(url, command)
-        requests.get(cmd)
+        r = requests.get(cmd)
         if (type == "json"):
             cmdDump = "{}/dump".format(url)
             r = requests.get(cmdDump)
@@ -260,7 +260,7 @@ class AbadiaEnv(gym.Env):
 
         if (self.haFracasado == True):
             print("GAME OVER")
-            self.sendCmd(self.url, "_")
+            self.sendCmd(self.url, "cmd/_")
             time.sleep(4)
             self.sendCmd(self.url, "fin")
             self.game_is_done = True
