@@ -86,6 +86,8 @@ def mainLoop():
 
         for t in range(env.num_steps):
 
+            if t == 10:
+                env.save_game_checkpoint()
             # TODO JT, crear dos funciones: una para sacar la posición de un personsaje y
             # y otra para sacar un array con todas las posiciones
 
@@ -114,6 +116,7 @@ def mainLoop():
                     env.reset_fin_partida()
                     break
 
+            # TODO JT must be refactorized like updateRejilla/Grid
             newX, newY, _ = env.personajeByName('Guillermo')
 
             if (x != newX or y != newY):

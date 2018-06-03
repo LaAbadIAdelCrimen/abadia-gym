@@ -128,11 +128,9 @@ class AbadiaEnv(gym.Env):
     def sendCmd(self, url, command, type="json"):
         cmd = "{}/{}".format(url, command)
         requests.get(cmd)
-        cmdDump = "{}/dump".format(url)
-        r = requests.get(cmdDump)
-        # print("cmd {} -> {}".format(cmd, r.text))
-        # print("cmd {} -> {}".format(cmd, r.json))
         if (type == "json"):
+            cmdDump = "{}/dump".format(url)
+            r = requests.get(cmdDump)
             if r.status_code == 599:
                 tmp = r.json()
                 tmp['haFracasado'] = True
@@ -264,7 +262,7 @@ class AbadiaEnv(gym.Env):
             print("GAME OVER")
             self.sendCmd(self.url, "_")
             time.sleep(4)
-            self.sendCmd(self.url, "_")
+            self.sendCmd(self.url, "fin")
             self.game_is_done = True
             reward = -1000
 
@@ -508,7 +506,7 @@ class AbadiaEnv(gym.Env):
         print("voy a abrir el fichero ({})".format(name))
         self.fdCheckpoint = open(name, "r")
         checkpoint = self.fdCheckpoint.read()
-        requests.post(self.url+"/load", data=checkpoint[:-6 ])
+        requests.post(self.url+"/load", data=checkpoint) # [:-6 ])
         time.sleep(2)
         return self._get_state()
 
