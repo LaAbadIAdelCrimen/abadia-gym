@@ -260,9 +260,9 @@ class AbadiaEnv(gym.Env):
 
         if (self.haFracasado == True):
             print("GAME OVER")
-            self.sendCmd(self.url, "cmd/_")
-            time.sleep(4)
-            self.sendCmd(self.url, "fin")
+            self.sendCmd(self.url, "start")
+            # time.sleep(4)
+            # self.sendCmd(self.url, "fin")
             self.game_is_done = True
             reward = -1000
 
@@ -410,7 +410,7 @@ class AbadiaEnv(gym.Env):
                 if tooboring % 10 == 0:
                     print("Getting Boring ...")
                     if tooboring <= 10:
-                        self.sendCmd(self.url, "cmd/_")
+                        self.sendCmd(self.url, "start")
                     else:
                         self.sendCmd(self.url, "fin")
                     # self.sendCmd(self.url, "cmd/B")
@@ -468,7 +468,7 @@ class AbadiaEnv(gym.Env):
         self.fdActions.flush()
 
     def reset_fin_partida(self):
-        ob = self.sendCmd(self.url, "cmd/_")
+        ob = self.sendCmd(self.url, "start")
 
     def init_dumps_files(self):
 
