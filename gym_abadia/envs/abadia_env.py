@@ -538,7 +538,7 @@ class AbadiaEnv(gym.Env):
         adsoX, adsoY, adsoO = self.personajeByName('Adso')
 
         print("Guillermo {},{} Adso {},{}".format(x, y, adsoX, adsoY))
-        print("+" + "-" * (w * 2) + "+" + "-" * 22 + "+")
+        print("+" + "-" * (w * 2) + "+" + "-" * 24 + "+" + "-" * 48 + "+")
         for yy in range(y - h, y + h):
             print("|", end="")
             for xx in range(x - w, x + w):
@@ -565,7 +565,7 @@ class AbadiaEnv(gym.Env):
 
             print("|", end="")
             if yRejilla < 24:
-                for xx in range(0, 23):
+                for xx in range(0, 24):
                     if (self.rejilla[yRejilla][xx] == 0):
                         print(" ", end="")
                     else:
@@ -576,7 +576,7 @@ class AbadiaEnv(gym.Env):
 
             print("|", end="")
             if yRejilla < 24:
-                for xx in range(0, 23):
+                for xx in range(0, 24):
                     if (self.rejilla[yRejilla][xx] == 0):
                         print("  ", end="")
                     else:
@@ -584,6 +584,6 @@ class AbadiaEnv(gym.Env):
             yRejilla += 1
             print("|")
 
-        print("+" + "-" * (w * 2) + "+" + "-" * 22 + "+")
+        print("+" + "-" * (w * 2) + "+" + "-" * 24 + "+" + "-" * 48 + "+")
 
 
