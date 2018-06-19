@@ -538,9 +538,9 @@ class AbadiaEnv(gym.Env):
         adsoX, adsoY, adsoO = self.personajeByName('Adso')
 
         print("Guillermo {},{} Adso {},{}".format(x, y, adsoX, adsoY))
-        print("+" + "-" * (w * 2) + "+" + "-" * 24 + "+" + "-" * 48 + "+")
+        print("+---+" + "-" * (w * 2) + "+" + "-" * 24 + "+" + "-" * 48 + "+")
         for yy in range(y - h, y + h):
-            print("|", end="")
+            print("|%3d|" % yy, end="")
             for xx in range(x - w, x + w):
                 if (xx == x and yy == y):
                     if ori == 0:
