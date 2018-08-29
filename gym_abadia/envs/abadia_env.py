@@ -491,6 +491,11 @@ class AbadiaEnv(gym.Env):
         self.fdActions.write("{}{}\"action\":{}\"state\":{},\"action\":{},\"reward\":{},\"nextstate\":{}{}{}\n"
                              .format("[", "{", "{", json.dumps(s1), action, reward, json.dumps(s2), "}", "}]"))
         self.fdActions.flush()
+        if (self.gsBucket != None):
+            print("Uploading {} to GCP".format(self.dump_path + "/" + self.gameName))
+            self.upload_blob(self.gsBucket, self.dump_path + "/" + self.gameName,
+                             self.dump_path + "/" + self.gameName)
+
 
     def visited_snap_load(self):
         nameVisitedSnap = "snapshoots/current-visited"
@@ -502,9 +507,8 @@ class AbadiaEnv(gym.Env):
                 print("File {} not exist at bucket {}".format(nameVisitedSnap, self.gsBucket))
 
         if os.path.exists(nameVisitedSnap) and os.path.getsize(nameVisitedSnap) > 0:
-
-                fvisitedsnap = open(nameVisitedSnap, "rb+")
-                self.Visited = np.load(fvisitedsnap)
+            fvisitedsnap = open(nameVisitedSnap, "rb+")
+            self.Visited = np.load(fvisitedsnap)
         else:
             fvisitedsnap = open(nameVisitedSnap, "wb+")
             self.Visited = np.zeros([512, 512])
@@ -562,6 +566,11 @@ class AbadiaEnv(gym.Env):
         self.fdCheckpoint = open(self.dump_path + "/" + self.checkpointTmpName, "w")
         self.fdCheckpoint.write(checkpoint)
         self.fdCheckpoint.flush()
+
+        if (self.gsBucket != None):
+            print("Uploading {} to GCP".format(self.dump_path + '/' + self.checkpointTmpName))
+            self.upload_blob(self.gsBucket, self.dump_path + '/' + self.checkpointTmpName,
+                             self.dump_path + '/' + self.checkpointTmpName)
 
     def load_game_checkpoint(self, name):
         # name = "games/20180425/abadia_checkpoint_18-04-25_23:13:57:264379_1_4_27_23_0.checkpoint"
