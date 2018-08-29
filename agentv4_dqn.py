@@ -160,10 +160,7 @@ def mainLoop():
         #   dqn_agent.save_model("models/success.model")
         #   break
 
-        fvisitedsnap = open(nameVisitedSnap, "wb+")
-        np.save(fvisitedsnap, env.Visited)
-        fvisitedsnap.flush()
-        fvisitedsnap.close()
+        env.visited_snap()
 
     print("Score over time: " + str(sum(rList)/env.num_episodes))
 
