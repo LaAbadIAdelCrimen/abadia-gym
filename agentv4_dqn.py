@@ -14,6 +14,7 @@ from keras.optimizers import Adam
 
 from collections import deque
 
+
 from DQN import DQN
 
 def init_env(env):

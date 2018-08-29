@@ -20,7 +20,7 @@ from pathlib import Path
 import gym
 import numpy as np
 from gym import spaces
-
+from google.cloud import storage
 
 
 # AbadIA dependencies
@@ -438,6 +438,29 @@ class AbadiaEnv(gym.Env):
         commons.update({'bonus': int(self.ob['bonus']), 'porcentaje': int(self.ob['porcentaje'])})
         return commons
 
+    def download_blob(self, bucket_name, source_blob_name, destination_file_name):
+        storage_client = storage.Client()
+        bucket = storage_client.get_bucket(bucket_name)
+        blob = bucket.blob(source_blob_name)
+
+        blob.download_to_filename(destination_file_name)
+
+        print('Blob {} downloaded to {}.'.format(
+            source_blob_name,
+            destination_file_name))
+
+    def upload_blob(self, bucket_name, source_file_name, destination_blob_name):
+        """Uploads a file to the bucket."""
+        storage_client = storage.Client()
+        bucket = storage_client.get_bucket(bucket_name)
+        blob = bucket.blob(destination_blob_name)
+
+        blob.upload_from_filename(source_file_name)
+
+        print('File {} uploaded to {}.'.format(
+            source_file_name,
+            destination_blob_name))
+
     def add_event(self, name, des, reward):
         data = {'name': name, 'des': des, 'reward': reward, 'totalReward': self.totalReward}
         data.update(self.get_commons())
@@ -472,15 +495,28 @@ class AbadiaEnv(gym.Env):
     def visited_snap(self):
         nameVisitedSnap = "snapshoots/current-visited"
 
+        if (self.gsBucket != None):
+            print("Downloading from GCP")
+            try:
+                self.download_blob(self.gsBucket, nameVisitedSnap, nameVisitedSnap)
+            except:
+                print("File {} not exist at bucket {}".format(nameVisitedSnap, self.gsBucket))
+
         if os.path.exists(nameVisitedSnap) and os.path.getsize(nameVisitedSnap) > 0:
             fvisitedsnap = open(nameVisitedSnap, "rb+")
             self.Visited = np.load(fvisitedsnap)
+
         else:
             fvisitedsnap = open(nameVisitedSnap, "wb+")
             self.Visited = np.zeros([512, 512])
             np.save(fvisitedsnap, self.Visited)
             fvisitedsnap.flush()
             fvisitedsnap.close()
+
+            if (self.gsBucket != None):
+                print("Uploading to GCP")
+                self.upload_blob(self.gsBucket, nameVisitedSnap, nameVisitedSnap)
+
 
     def reset_fin_partida(self):
         ob = self.sendCmd(self.url, "start")
