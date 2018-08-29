@@ -481,6 +481,10 @@ class AbadiaEnv(gym.Env):
         self.fdGame.write("{}\n".format("}]"))
         self.fdGame.flush()
         # self.fdGame.close()
+        if (self.gsBucket != None):
+            print("Uploading Game {} to GCP".format(self.dump_path + "/" + self.gameName))
+            self.upload_blob(self.gsBucket, self.dump_path + "/" + self.gameName,
+                             self.dump_path + "/" + self.gameName)
 
     def save_action(self, state, action, reward, nextstate):
         s1 = state.copy()
@@ -491,10 +495,6 @@ class AbadiaEnv(gym.Env):
         self.fdActions.write("{}{}\"action\":{}\"state\":{},\"action\":{},\"reward\":{},\"nextstate\":{}{}{}\n"
                              .format("[", "{", "{", json.dumps(s1), action, reward, json.dumps(s2), "}", "}]"))
         self.fdActions.flush()
-        if (self.gsBucket != None):
-            print("Uploading {} to GCP".format(self.dump_path + "/" + self.gameName))
-            self.upload_blob(self.gsBucket, self.dump_path + "/" + self.gameName,
-                             self.dump_path + "/" + self.gameName)
 
 
     def visited_snap_load(self):
