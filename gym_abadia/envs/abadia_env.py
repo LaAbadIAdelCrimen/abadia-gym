@@ -13,6 +13,7 @@ import math
 import json
 import time
 import datetime
+import os
 from pathlib import Path
 
 # 3rd party modules
@@ -55,9 +56,10 @@ class AbadiaEnv(gym.Env):
         self.actionsName    = ""
         self.checkpointName = None
         self.modelName      = None
-        self.dump_path      = "partidas/now/"
+        self.dump_path      = "games/now/"
         self.gameId = datetime.datetime.now().strftime('%y%m%d_%H%M%S_%f')
         self.checkpointSec  = 1
+        self.gsBucket       = None
         self.eventsGame     = []
         self.eventsAction   = []
         self.totalReward    = 0.0
@@ -467,6 +469,19 @@ class AbadiaEnv(gym.Env):
                              .format("[", "{", "{", json.dumps(s1), action, reward, json.dumps(s2), "}", "}]"))
         self.fdActions.flush()
 
+    def visited_snap(self):
+        nameVisitedSnap = "snapshoots/current-visited"
+
+        if os.path.exists(nameVisitedSnap) and os.path.getsize(nameVisitedSnap) > 0:
+            fvisitedsnap = open(nameVisitedSnap, "rb+")
+            self.Visited = np.load(fvisitedsnap)
+        else:
+            fvisitedsnap = open(nameVisitedSnap, "wb+")
+            self.Visited = np.zeros([512, 512])
+            np.save(fvisitedsnap, self.Visited)
+            fvisitedsnap.flush()
+            fvisitedsnap.close()
+
     def reset_fin_partida(self):
         ob = self.sendCmd(self.url, "start")
 
@@ -474,7 +489,7 @@ class AbadiaEnv(gym.Env):
 
         # check is directory exist, if not we will create it
         now = datetime.datetime.now()
-        self.dump_path = now.strftime('partidas/%Y%m%d')
+        self.dump_path = now.strftime('games/%Y%m%d')
         path = Path(self.dump_path)
         path.mkdir(parents=True, exist_ok=True)
 
@@ -487,7 +502,7 @@ class AbadiaEnv(gym.Env):
         checkpoint = self.sendCmd(self.url, "save", type="raw")
 
         now = datetime.datetime.now()
-        self.dump_path = now.strftime('partidas/%Y%m%d')
+        self.dump_path = now.strftime('games/%Y%m%d')
         path = Path(self.dump_path)
         path.mkdir(parents=True, exist_ok=True)
 
@@ -502,7 +517,7 @@ class AbadiaEnv(gym.Env):
         self.fdCheckpoint.flush()
 
     def load_game_checkpoint(self, name):
-        # name = "partidas/20180425/abadia_checkpoint_18-04-25_23:13:57:264379_1_4_27_23_0.checkpoint"
+        # name = "games/20180425/abadia_checkpoint_18-04-25_23:13:57:264379_1_4_27_23_0.checkpoint"
         print("voy a abrir el fichero ({})".format(name))
         self.fdCheckpoint = open(name, "r")
         checkpoint = self.fdCheckpoint.read()

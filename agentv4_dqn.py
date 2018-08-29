@@ -16,7 +16,6 @@ from collections import deque
 
 from DQN import DQN
 
-
 def init_env(env):
     argparser = argparse.ArgumentParser()
     argparser.add_argument('-s', '--server', help='server name')
@@ -25,6 +24,7 @@ def init_env(env):
     argparser.add_argument('-m', '--model', help='model file')
     argparser.add_argument('-e', '--episodes', help='number of episodes')
     argparser.add_argument('-n', '--steps', help='total steps of the episode')
+    argparser.add_argument('-g', '--gcs', help='Google storage bucket')
 
     args = argparser.parse_args()
     print("args {}".format(args))
@@ -49,21 +49,14 @@ def init_env(env):
     if args.steps != None:
         env.num_steps = int(args.steps)
 
+    if args.gcs != None:
+        env.gsBucket = args.gcs
+
 
 
 def mainLoop():
 
-    nameVisitedSnap = "snapshoots/current-visited"
-
-    if os.path.exists(nameVisitedSnap) and os.path.getsize(nameVisitedSnap) > 0:
-        fvisitedsnap = open(nameVisitedSnap, "rb+")
-        env.Visited = np.load(fvisitedsnap)
-    else:
-        fvisitedsnap = open(nameVisitedSnap, "wb+")
-        env.Visited = np.zeros([512, 512])
-        np.save(fvisitedsnap, env.Visited)
-        fvisitedsnap.flush()
-        fvisitedsnap.close()
+    env.visited_snap()
 
     rList = []
     bucle = 0
