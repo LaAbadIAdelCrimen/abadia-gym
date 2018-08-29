@@ -492,9 +492,8 @@ class AbadiaEnv(gym.Env):
                              .format("[", "{", "{", json.dumps(s1), action, reward, json.dumps(s2), "}", "}]"))
         self.fdActions.flush()
 
-    def visited_snap(self):
+    def visited_snap_load(self):
         nameVisitedSnap = "snapshoots/current-visited"
-
         if (self.gsBucket != None):
             print("Downloading from GCP")
             try:
@@ -503,9 +502,9 @@ class AbadiaEnv(gym.Env):
                 print("File {} not exist at bucket {}".format(nameVisitedSnap, self.gsBucket))
 
         if os.path.exists(nameVisitedSnap) and os.path.getsize(nameVisitedSnap) > 0:
-            fvisitedsnap = open(nameVisitedSnap, "rb+")
-            self.Visited = np.load(fvisitedsnap)
 
+                fvisitedsnap = open(nameVisitedSnap, "rb+")
+                self.Visited = np.load(fvisitedsnap)
         else:
             fvisitedsnap = open(nameVisitedSnap, "wb+")
             self.Visited = np.zeros([512, 512])
@@ -516,6 +515,18 @@ class AbadiaEnv(gym.Env):
             if (self.gsBucket != None):
                 print("Uploading to GCP")
                 self.upload_blob(self.gsBucket, nameVisitedSnap, nameVisitedSnap)
+
+    def visited_snap_save(self):
+        nameVisitedSnap = "snapshoots/current-visited"
+
+        fvisitedsnap = open(nameVisitedSnap, "wb+")
+        np.save(fvisitedsnap, self.Visited)
+        fvisitedsnap.flush()
+        fvisitedsnap.close()
+
+        if (self.gsBucket != None):
+            print("Uploading to GCP")
+            self.upload_blob(self.gsBucket, nameVisitedSnap, nameVisitedSnap)
 
 
     def reset_fin_partida(self):

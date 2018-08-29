@@ -57,7 +57,7 @@ def init_env(env):
 
 def mainLoop():
 
-    env.visited_snap()
+    env.visited_snap_load()
 
     rList = []
     bucle = 0
@@ -161,7 +161,7 @@ def mainLoop():
         #   dqn_agent.save_model("models/success.model")
         #   break
 
-        env.visited_snap()
+        env.visited_snap_save()
 
     print("Score over time: " + str(sum(rList)/env.num_episodes))
 
