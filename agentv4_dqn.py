@@ -131,8 +131,8 @@ def mainLoop():
             #      .format(i_episode, t, action, x, y, ori, env.numPantalla, newX, newY, np.round(reward,2),
             #              np.round(rAll,2), np.round(Q[x,y],2)), end="\r")
 
-            print("Episode({}:{}) A({})XYOP {},{},{},{} -> {},{} r:{} tr:{} V:{}"
-                .format(i_episode, t, action, x, y, ori, env.numPantalla, newX, newY, np.round(reward,2),
+            print("E {}:{} {}-{}:XYOP {},{},{},{} -> {},{} r:{} tr:{} V:{}"
+                .format(i_episode, t, action, env.actions_list[action], x, y, ori, env.numPantalla, newX, newY, np.round(reward,2),
                 np.round(rAll,2), np.round(env.predictions,3), end="\r"))
 
             if (t % 10 == 0 or reward > 0):
