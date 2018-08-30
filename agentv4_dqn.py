@@ -156,15 +156,15 @@ def mainLoop():
 
         dqn_agent.save_model(nameModel)
 
-        if (self.gsBucket != None):
+        if (env.gsBucket != None):
             print("Uploading model to GCP")
-            self.upload_blob(self.gsBucket, nameModel, nameModel)
+            env.upload_blob(env.gsBucket, nameModel, nameModel)
 
         nameModel ="models/model_v1_lastest.model".format(env.gameId)
         dqn_agent.save_model(nameModel)
-        if (self.gsBucket != None):
+        if (env.gsBucket != None):
             print("Uploading modeli lastest to GCP")
-            self.upload_blob(self.gsBucket, nameModel, nameModel)
+            env.upload_blob(env.gsBucket, nameModel, nameModel)
 
 
         rList.append(rAll)
