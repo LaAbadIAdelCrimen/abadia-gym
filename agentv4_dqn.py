@@ -11,7 +11,7 @@ import random
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
 from keras.optimizers import Adam
-
+from google.cloud import storage
 from collections import deque
 
 
@@ -52,8 +52,7 @@ def init_env(env):
 
     if args.gcs != None:
         env.gsBucket = args.gcs
-
-
+        env.init_google_store_bucket()
 
 def mainLoop():
 
@@ -158,13 +157,13 @@ def mainLoop():
 
         if (env.gsBucket != None):
             print("Uploading model to GCP")
-            env.upload_blob(env.gsBucket, nameModel, nameModel)
+            env.upload_blob(nameModel, nameModel)
 
         nameModel ="models/model_v1_lastest.model".format(env.gameId)
         dqn_agent.save_model(nameModel)
         if (env.gsBucket != None):
             print("Uploading modeli lastest to GCP")
-            env.upload_blob(env.gsBucket, nameModel, nameModel)
+            env.upload_blob(nameModel, nameModel)
 
 
         rList.append(rAll)

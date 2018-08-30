@@ -59,7 +59,8 @@ class AbadiaEnv(gym.Env):
         self.dump_path      = "games/now/"
         self.gameId = datetime.datetime.now().strftime('%y%m%d_%H%M%S_%f')
         self.checkpointSec  = 1
-        self.gsBucket       = None
+        self.storage_client = None
+        self.storage_client = None
         self.eventsGame     = []
         self.eventsAction   = []
         self.totalReward    = 0.0
@@ -438,23 +439,21 @@ class AbadiaEnv(gym.Env):
         commons.update({'bonus': int(self.ob['bonus']), 'porcentaje': int(self.ob['porcentaje'])})
         return commons
 
-    def download_blob(self, bucket_name, source_blob_name, destination_file_name):
+    def init_google_store_bucket(self):
         storage_client = storage.Client()
-        bucket = storage_client.get_bucket(bucket_name)
-        blob = bucket.blob(source_blob_name)
+        self.google_storage_bucket = storage_client.get_bucket(self.gsBucket)
 
+    def download_blob(self, source_blob_name, destination_file_name):
+        blob = self.google_storage_bucket.blob(source_blob_name)
         blob.download_to_filename(destination_file_name)
 
         print('Blob {} downloaded to {}.'.format(
             source_blob_name,
             destination_file_name))
 
-    def upload_blob(self, bucket_name, source_file_name, destination_blob_name):
+    def upload_blob(self, source_file_name, destination_blob_name):
         """Uploads a file to the bucket."""
-        storage_client = storage.Client()
-        bucket = storage_client.get_bucket(bucket_name)
-        blob = bucket.blob(destination_blob_name)
-
+        blob = self.google_storage_bucket.blob(destination_blob_name)
         blob.upload_from_filename(source_file_name)
 
         print('File {} uploaded to {}.'.format(
@@ -483,10 +482,10 @@ class AbadiaEnv(gym.Env):
         # self.fdGame.close()
         if (self.gsBucket != None):
             print("Uploading Game: {} to GCP".format(self.dump_path + "/" + self.gameName))
-            self.upload_blob(self.gsBucket, self.dump_path + "/" + self.gameName,
+            self.upload_blob(self.dump_path + "/" + self.gameName,
                              self.dump_path + "/" + self.gameName)
             print("Uploading Actions: {} to GCP".format(self.dump_path + "/" + self.actionsName))
-            self.upload_blob(self.gsBucket, self.dump_path + "/" + self.actionsName,
+            self.upload_blob(self.dump_path + "/" + self.actionsName,
                              self.dump_path + "/" + self.actionsName)
 
     def save_action(self, state, action, reward, nextstate):
@@ -505,7 +504,7 @@ class AbadiaEnv(gym.Env):
         if (self.gsBucket != None):
             print("Downloading Visited from GCP")
             try:
-                self.download_blob(self.gsBucket, nameVisitedSnap, nameVisitedSnap)
+                self.download_blob(nameVisitedSnap, nameVisitedSnap)
             except:
                 print("File {} not exist at bucket {}".format(nameVisitedSnap, self.gsBucket))
 
@@ -521,7 +520,7 @@ class AbadiaEnv(gym.Env):
 
             if (self.gsBucket != None):
                 print("Uploading to GCP")
-                self.upload_blob(self.gsBucket, nameVisitedSnap, nameVisitedSnap)
+                self.upload_blob(nameVisitedSnap, nameVisitedSnap)
 
     def visited_snap_save(self):
         nameVisitedSnap = "snapshoots/current-visited"
@@ -533,7 +532,7 @@ class AbadiaEnv(gym.Env):
 
         if (self.gsBucket != None):
             print("Uploading visited to GCP")
-            self.upload_blob(self.gsBucket, nameVisitedSnap, nameVisitedSnap)
+            self.upload_blob(nameVisitedSnap, nameVisitedSnap)
 
 
     def reset_fin_partida(self):
@@ -572,7 +571,7 @@ class AbadiaEnv(gym.Env):
 
         if (self.gsBucket != None):
             print("Uploading {} to GCP".format(self.dump_path + '/' + self.checkpointTmpName))
-            self.upload_blob(self.gsBucket, self.dump_path + '/' + self.checkpointTmpName,
+            self.upload_blob(self.dump_path + '/' + self.checkpointTmpName,
                              self.dump_path + '/' + self.checkpointTmpName)
 
     def load_game_checkpoint(self, name):
