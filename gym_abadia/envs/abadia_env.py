@@ -503,7 +503,7 @@ class AbadiaEnv(gym.Env):
     def visited_snap_load(self):
         nameVisitedSnap = "snapshoots/current-visited"
         if (self.gsBucket != None):
-            print("Downloading from GCP")
+            print("Downloading Visited from GCP")
             try:
                 self.download_blob(self.gsBucket, nameVisitedSnap, nameVisitedSnap)
             except:
@@ -532,7 +532,7 @@ class AbadiaEnv(gym.Env):
         fvisitedsnap.close()
 
         if (self.gsBucket != None):
-            print("Uploading to GCP")
+            print("Uploading visited to GCP")
             self.upload_blob(self.gsBucket, nameVisitedSnap, nameVisitedSnap)
 
 
