@@ -162,7 +162,7 @@ def mainLoop():
         nameModel ="models/model_v1_lastest.model".format(env.gameId)
         dqn_agent.save_model(nameModel)
         if (env.gsBucket != None):
-            print("Uploading modeli lastest to GCP")
+            print("Uploading lastest model to GCP")
             env.upload_blob(nameModel, nameModel)
 
 
