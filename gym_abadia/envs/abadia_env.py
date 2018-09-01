@@ -50,6 +50,7 @@ class AbadiaEnv(gym.Env):
         self.port   = "4477"
         self.num_episodes   = 100
         self.num_steps      = 1500
+        self.gsBucket       = None
 
 
         self.gameName       = ""
