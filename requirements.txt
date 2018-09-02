@@ -1,4 +1,4 @@
--e git+git@github.com:LaAbadIAdelCrimen/AbadIA.git@13b100cd383fece338977e8ad8ed2ca1feef14c2#egg=abadia_DQN
+-e git+https://github.com/LaAbadIAdelCrimen/AbadIA.git@master#egg=abadia_DQN
 absl-py==0.1.12
 appnope==0.1.0
 astor==0.6.2
