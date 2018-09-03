@@ -1,0 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: abadia
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: abadia
+    spec:
+      containers:
+      - name: game
+        image: gcr.io/abadiadelcrimen-pmoncada/github-pmoncadaisla-vigasocosdl:4ad89c98a8a84e2b443c228a73d01391bc71c6a6
+        ports:
+        - containerPort: 4477
+        imagePullPolicy: Always
+      # - name: gym
+      #   image: gcr.io/abadiadelcrimen-pmoncada/github-pmoncadaisla-abadia-gym:17a6a16287541e0c735a3bb235dffe5d4875ca45
+      #   imagePullPolicy: Always

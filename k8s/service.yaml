@@ -1,0 +1,12 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: abadia
+spec:
+  selector:
+    name: abadia
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 4477
+  type: LoadBalancer
