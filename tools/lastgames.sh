@@ -4,4 +4,4 @@
 # you need to pass a pattern to filter
 # need to have jq installed
 
-find . -name "*_game_*" | sort -rn | xargs grep -h $1 | jq . -C | less -r
+find games -name "*_game_*" | sort -rn | xargs grep -h $1 | jq . -C | less -r
