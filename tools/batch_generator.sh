@@ -6,6 +6,6 @@
 (find games -name "*.checkpoint" | sort -r | grep $1 | head -500) |
 while read -r line
 do
-  gcloud beta pubsub topics publish myTopic --message "--episodes=1 --steps=200 --model=models/model_v1_lastest.model -g abadia-data -s http://35.241.222.173 -p 80 -c $line "
+  gcloud beta pubsub topics publish agent-batches "--episodes=1 --steps=200 --model=models/model_v1_lastest.model -g abadia-data -s http://35.241.222.173 -p 80 -c $line "
 done
 
