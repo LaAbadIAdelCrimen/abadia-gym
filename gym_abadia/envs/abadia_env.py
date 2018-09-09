@@ -611,7 +611,7 @@ class AbadiaEnv(gym.Env):
         x, y, ori           = self.personajeByName('Guillermo')
         adsoX, adsoY, adsoO = self.personajeByName('Adso')
 
-        print("Guillermo {},{} Adso {},{}".format(x, y, adsoX, adsoY))
+        print("\x1b[HGuillermo {},{} Adso {},{}".format(x, y, adsoX, adsoY))
         print("+---+" + "-" * (w * 2) + "+" + "-" * 24 + "+" + "-" * 48 + "+")
         for yy in range(y - h, y + h):
             print("|%3d|" % yy, end="")
