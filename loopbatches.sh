@@ -1,7 +1,7 @@
 #!/bin/bash
 while true
 do
-  options=`gcloud beta pubsub subscriptions pull agent-batch --limit=1 --format="value(DATA)"`
+  options=`gcloud beta pubsub subscriptions pull agent-batch --auto-ack --limit=1 --format="value(DATA)"`
   echo "I will execute $options"
   case $options in
     "exit")
