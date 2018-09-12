@@ -134,8 +134,9 @@ def mainLoop():
                 .format(i_episode, t, action, env.actions_list[action], x, y, ori, env.numPantalla, newX, newY, np.round(reward,2),
                 np.round(rAll,2), np.round(env.predictions,3), end="\r"))
 
-            if (t % 10 == 0 or reward > 0):
-                env.pintaRejilla(40, 20)
+            # TODO JT: we need to create an option for this
+            # if (t % 10 == 0 or reward > 0):
+            env.pintaRejilla(40, 20)
 
             x, y, ori = env.personajeByName('Guillermo')
             rAll += reward
