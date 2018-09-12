@@ -51,7 +51,7 @@ spec:
                 memory: "1024Mi"
                 cpu: "940m"
       restartPolicy: OnFailure
-      volumes:en
+      volumes:
         - name: tmp-pod
           emptyDir: {}
   backoffLimit: 4
