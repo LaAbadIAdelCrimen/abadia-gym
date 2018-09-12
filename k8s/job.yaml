@@ -1,0 +1,57 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: abadia-short
+spec:
+  template:
+    spec:
+      containers:
+      - name: engine
+        image: gcr.io/abadiadelcrimen-pmoncada/github-pmoncadaisla-vigasocosdl:latest
+        command: ["/bin/bash", "-c"]
+        args:
+          - |
+            (while true; do VigasocoSDL abadia; done) &
+            CHILD_PID=$!
+            (while true; do if [[ -f "/tmp/pod/main-terminated" ]]; then kill $CHILD_PID; echo "Killed $CHILD_PID as the main container terminated."; fi; sleep 1; done) &
+            wait $CHILD_PID
+            if [[ -f "/tmp/pod/main-terminated" ]]; then exit 0; echo "Job completed. Exiting..."; fi
+        volumeMounts:                 
+          - mountPath: /tmp/pod
+            name: tmp-pod
+            readOnly: true
+        resources:
+              requests:
+                memory: "50Mi"
+                cpu: "400m"
+              limits:
+                memory: "1024Mi"
+                cpu: "940m"
+      - name: agent
+        image: gcr.io/abadiadelcrimen-pmoncada/github-pmoncadaisla-abadia-gym:latest
+        command: ["/bin/bash", "-c"]
+        args:
+          - |
+            export DOCKERIZE_VERSION=v0.6.1
+            wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+            && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+            && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+            dockerize -wait tcp://localhost:4477 -timeout 2m
+            trap "touch /tmp/pod/main-terminated" EXIT
+            mkdir -p models
+            python3 agentv4_dqn.py --episodes=1 --steps=10 -g abadia-data -s http://localhost -p 4477
+        volumeMounts:                 
+          - mountPath: /tmp/pod
+            name: tmp-pod
+        resources:
+              requests:
+                memory: "50Mi"
+                cpu: "400m"
+              limits:
+                memory: "1024Mi"
+                cpu: "940m"
+      restartPolicy: OnFailure
+      volumes:en
+        - name: tmp-pod
+          emptyDir: {}
+  backoffLimit: 4
