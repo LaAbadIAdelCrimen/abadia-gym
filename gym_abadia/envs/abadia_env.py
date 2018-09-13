@@ -446,6 +446,9 @@ class AbadiaEnv(gym.Env):
 
     def download_blob(self, source_blob_name, destination_file_name):
         blob = self.google_storage_bucket.blob(source_blob_name)
+        directory = os.path.dirname(destination_file_name)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
         blob.download_to_filename(destination_file_name)
 
         print('Blob {} downloaded to {}.'.format(
@@ -576,7 +579,7 @@ class AbadiaEnv(gym.Env):
                              self.dump_path + '/' + self.checkpointTmpName)
 
     def load_game_checkpoint(self, name):
-        # name = "games/20180425/abadia_checkpoint_18-04-25_23:13:57:264379_1_4_27_23_0.checkpoint"
+        # name = "games/20181212/pp"
         print("voy a abrir el fichero ({})".format(name))
 
         if (self.gsBucket != None):
