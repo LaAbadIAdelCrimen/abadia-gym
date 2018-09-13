@@ -38,7 +38,7 @@ spec:
             && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
             dockerize -wait tcp://localhost:4477 -timeout 2m
             trap "touch /tmp/pod/main-terminated" EXIT
-            mkdir -p models
+            mkdir -p models games
             while true
                 do
                 options=`gcloud pubsub subscriptions pull agent-batch --auto-ack --limit=1 --format="value(DATA)"`
