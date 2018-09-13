@@ -6,7 +6,7 @@
 (find games -name "*.checkpoint" | sort -r | grep $1 | grep -v "*_0_0.*" | head -500) |
 while read -r line
 do
-  options="--episodes=4 --steps=2000 --model=models/model_v1_lastest.model -g abadia-data -s http://localhost -p 4477 -c $line "
+  options="--episodes=1 --steps=2000 --model=models/model_v1_lastest.model -g abadia-data -s http://localhost -p 4477 -c $line "
   echo "Queuing -> ($options) into the topic agent-batches"
   gcloud beta pubsub topics publish agent-batches "$options"
 done
