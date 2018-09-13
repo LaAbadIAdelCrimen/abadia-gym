@@ -578,6 +578,14 @@ class AbadiaEnv(gym.Env):
     def load_game_checkpoint(self, name):
         # name = "games/20180425/abadia_checkpoint_18-04-25_23:13:57:264379_1_4_27_23_0.checkpoint"
         print("voy a abrir el fichero ({})".format(name))
+
+        if (self.gsBucket != None):
+            print("Downloading Checkpoint {} from GCP".format(name))
+            try:
+                self.download_blob(name, name)
+            except:
+                print("File {} not exist at bucket {}".format(name, self.gsBucket))
+
         self.fdCheckpoint = open(name, "r")
         checkpoint = self.fdCheckpoint.read()
         requests.post(self.url+"/load", data=checkpoint) # [:-6 ])
