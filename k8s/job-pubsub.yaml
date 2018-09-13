@@ -2,8 +2,13 @@ apiVersion: batch/v1
 kind: Job
 metadata:
   name: abadia-pubsub
+  labels:
+    name: abadia-pubsub
 spec:
   template:
+    metadata:
+        labels:
+            name: abadia-pubsub
     spec:
       containers:
       - name: engine
