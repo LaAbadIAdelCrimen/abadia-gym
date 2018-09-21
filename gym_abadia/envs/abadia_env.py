@@ -446,7 +446,7 @@ class AbadiaEnv(gym.Env):
 
     def download_blob(self, source_blob_name, destination_file_name):
         blob = self.google_storage_bucket.blob(source_blob_name)
-        directory = os.path.dirname(destination_file_name)
+        directory = os.path.dirname(destination_file_nameg)
         if not os.path.exists(directory):
             os.makedirs(directory)
         blob.download_to_filename(destination_file_name)
