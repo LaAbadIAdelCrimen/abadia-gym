@@ -446,7 +446,7 @@ class AbadiaEnv(gym.Env):
 
     def download_blob(self, source_blob_name, destination_file_name):
         blob = self.google_storage_bucket.blob(source_blob_name)
-        directory = os.path.dirname(destination_file_nameg)
+        directory = os.path.dirname(destination_file_name)
         if not os.path.exists(directory):
             os.makedirs(directory)
         blob.download_to_filename(destination_file_name)
@@ -586,12 +586,12 @@ class AbadiaEnv(gym.Env):
             print("Downloading Checkpoint {} from GCP".format(name))
             try:
                 self.download_blob(name, name)
+                self.fdCheckpoint = open(name, "r")
+                checkpoint = self.fdCheckpoint.read()
+                requests.post(self.url+"/load", data=checkpoint)
             except:
-                print("File {} not exist at bucket {}".format(name, self.gsBucket))
+                print("*** ErrorFile: {} not exist at bucket {}".format(name, self.gsBucket))
 
-        self.fdCheckpoint = open(name, "r")
-        checkpoint = self.fdCheckpoint.read()
-        requests.post(self.url+"/load", data=checkpoint) # [:-6 ])
         time.sleep(2)
         return self._get_state()
 
