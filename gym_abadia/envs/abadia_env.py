@@ -264,7 +264,7 @@ class AbadiaEnv(gym.Env):
 
         if (self.haFracasado == True):
             print("GAME OVER")
-            self.sendCmd(self.url, "start")
+            self.sendCmd(self.url, "start", type='raw')
             # time.sleep(4)
             # self.sendCmd(self.url, "fin")
             self.game_is_done = True
