@@ -28,7 +28,7 @@ spec:
                 memory: "1024Mi"
                 cpu: "940m"
       - name: agent
-        image: gcr.io/abadiadelcrimen-pmoncada/github-pmoncadaisla-abadia-gym:latest
+        image: gcr.io/abadia-1/github-laabadiadelcrimen-abadia-gym:latest
         command: ["/bin/bash", "-c"]
         args:
           - |
