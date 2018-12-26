@@ -14,6 +14,7 @@ from keras.optimizers import Adam
 from google.cloud import storage
 from collections import deque
 
+import logging
 
 from DQN import DQN
 
@@ -53,9 +54,11 @@ def init_env(env):
     if args.gcs != None:
         env.gsBucket = args.gcs
         env.init_google_store_bucket()
+    logging.basicConfig(format='%(asctime)s:%(levelname):%(message)s', datefmt='%d-%b-%y %H:%M:%S')
 
 def mainLoop():
 
+    logging.info("loading visited spap file")
     env.visited_snap_load()
 
     rList = []
@@ -70,6 +73,7 @@ def mainLoop():
     steps = []
 
     for i_episode in range(env.num_episodes):
+        logging.info(f'runnig {i_episode} episode')
         state = env.reset()
         if(env.checkpointName != None):
             state = env.load_game_checkpoint(env.checkpointName)
@@ -101,9 +105,10 @@ def mainLoop():
             dqn_agent.remember(env.prev_vector, action, reward, env.vector, done)
 
             if done:
-                print("Episode finished after {} timesteps".format(t+1))
+                logging.info(f'Episode finished after {t+1} steps')
                 env.save_game()
                 if (env.haFracasado):
+                    logging.info(f'Episode finished with a FAIL')
                     env.reset_fin_partida()
                     break
 
@@ -130,9 +135,9 @@ def mainLoop():
             #      .format(i_episode, t, action, x, y, ori, env.numPantalla, newX, newY, np.round(reward,2),
             #              np.round(rAll,2), np.round(Q[x,y],2)), end="\r")
 
-            print("E {}:{} {}-{}:XYOP {},{},{},{} -> {},{} r:{} tr:{} V:{}"
+            logging.debug("E {}:{} {}-{}:XYOP {},{},{},{} -> {},{} r:{} tr:{} V:{}"
                 .format(i_episode, t, action, env.actions_list[action], x, y, ori, env.numPantalla, newX, newY, np.round(reward,2),
-                np.round(rAll,2), np.round(env.predictions,3), end="\r"))
+                np.round(rAll,2), np.round(env.predictions,3)))
 
             # TODO JT: we need to create an option for this
             # if (t % 10 == 0 or reward > 0):
@@ -157,20 +162,20 @@ def mainLoop():
         dqn_agent.save_model(nameModel)
 
         if (env.gsBucket != None):
-            print("Uploading model to GCP")
+            logging.info("Uploading model to GCP")
             env.upload_blob(nameModel, nameModel)
 
         nameModel ="models/model_v1_lastest.model".format(env.gameId)
         dqn_agent.save_model(nameModel)
         if (env.gsBucket != None):
-            print("Uploading lastest model to GCP")
+            logging.info("Uploading lastest model to GCP")
             env.upload_blob(nameModel, nameModel)
 
 
         rList.append(rAll)
 
         if t >= env.num_steps:
-            print("Failed to complete in trial {}".format(env.num_episodes))
+            logging.debug("Failed to complete in trial {}".format(env.num_episodes))
         # else:
         #   print("Completed in {} trials".format(i_episode))
         #   dqn_agent.save_model("models/success.model")
@@ -178,7 +183,7 @@ def mainLoop():
 
         env.visited_snap_save()
 
-    print("Score over time: " + str(sum(rList)/env.num_episodes))
+    logging.info("Score over time: " + str(sum(rList)/env.num_episodes))
 
 if __name__ == '__main__':
     env = gym.make('Abadia-v0')

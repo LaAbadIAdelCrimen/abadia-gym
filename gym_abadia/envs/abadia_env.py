@@ -22,6 +22,7 @@ import numpy as np
 from gym import spaces
 from google.cloud import storage
 
+import logging
 
 # AbadIA dependencies
 import requests
