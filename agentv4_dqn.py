@@ -137,7 +137,7 @@ def mainLoop():
             #      .format(i_episode, t, action, x, y, ori, env.numPantalla, newX, newY, np.round(reward,2),
             #              np.round(rAll,2), np.round(Q[x,y],2)), end="\r")
 
-            logging.debug("E {}:{} {}-{}:XYOP {},{},{},{} -> {},{} r:{} tr:{} V:{}"
+            logging.info("E {}:{} {}-{}:XYOP {},{},{},{} -> {},{} r:{} tr:{} V:{}"
                 .format(i_episode, t, action, env.actions_list[action], x, y, ori, env.numPantalla, newX, newY, np.round(reward,2),
                 np.round(rAll,2), np.round(env.predictions,3)))
 
@@ -177,7 +177,7 @@ def mainLoop():
         rList.append(rAll)
 
         if t >= env.num_steps:
-            logging.debug("Failed to complete in trial {}".format(env.num_episodes))
+            logging.info("Failed to complete in trial {}".format(env.num_episodes))
         # else:
         #   print("Completed in {} trials".format(i_episode))
         #   dqn_agent.save_model("models/success.model")

@@ -123,7 +123,7 @@ class AbadiaEnv(gym.Env):
 
         now = datetime.datetime.now()
         self._seed(time.mktime(now.timetuple()))
-        logging.basicConfig(level=logging.DEBUG)
+        logging.basicConfig(level=logging.INFO)
 
     def set_url(self):
         self.url = self.server + ":" + self.port
