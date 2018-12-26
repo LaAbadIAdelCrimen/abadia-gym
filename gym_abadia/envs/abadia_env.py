@@ -123,6 +123,7 @@ class AbadiaEnv(gym.Env):
 
         now = datetime.datetime.now()
         self._seed(time.mktime(now.timetuple()))
+        logging.basicConfig(level=logging.DEBUG)
 
     def set_url(self):
         self.url = self.server + ":" + self.port
@@ -219,11 +220,11 @@ class AbadiaEnv(gym.Env):
             else:
                 if (self.prevPantalla != int(ob['numPantalla'])):
                     reward += 50
-                    print("----------")
-                    print("reward by screen change !!!!! {} !=  {}".format(self.prevPantalla, int(ob['numPantalla'])))
-                    print("Personajes: {}".format(self.Personajes))
-                    print("ob: {}".format(ob))
-                    print("----------")
+                    logging.debug("----------")
+                    logging.debug("reward by screen change !!!!! {} !=  {}".format(self.prevPantalla, int(ob['numPantalla'])))
+                    logging.debug("Personajes: {}".format(self.Personajes))
+                    logging.debug("ob: {}".format(ob))
+                    logging.debug("----------")
                     self.add_event("NewRoom", "prev {} curr {}".format(self.prevPantalla, int(ob['numPantalla'])), 50)
                     self.prevPantalla = int(ob['numPantalla'])
                     self.save_game_checkpoint()
@@ -253,7 +254,7 @@ class AbadiaEnv(gym.Env):
                 prev = self.dataPersonaje(self.prev_ob, "Guillermo")
                 curr = self.dataPersonaje(ob, "Guillermo")
                 if (prev['posX'] != curr['posX']) or (prev['posY'] != curr['posY']):
-                    print("se ha movido: {},{} -> {},{}".format(prev['posX'], prev['posY'],
+                    logging.debug("se ha movido: {},{} -> {},{}".format(prev['posX'], prev['posY'],
                                                             curr['posX'], curr['posY']))
                     reward += 0.5
 
@@ -264,7 +265,7 @@ class AbadiaEnv(gym.Env):
         # with variable explanatory/explotation
 
         if (self.haFracasado == True):
-            print("GAME OVER")
+            logging.debug("GAME OVER")
             self.sendCmd(self.url, "start", type='raw')
             # time.sleep(4)
             # self.sendCmd(self.url, "fin")
@@ -273,11 +274,11 @@ class AbadiaEnv(gym.Env):
 
         if (self.porcentaje >= 90):
             self.game_is_done = True
-            print("FACKING YEAH GAME DONE")
-            print("FACKING YEAH GAME DONE")
-            print("FACKING YEAH GAME DONE")
-            print("FACKING YEAH GAME DONE")
-            print("FACKING YEAH GAME DONE")
+            logging.info("FACKING YEAH GAME DONE")
+            logging.info("FACKING YEAH GAME DONE")
+            logging.info("FACKING YEAH GAME DONE")
+            logging.info("FACKING YEAH GAME DONE")
+            logging.info("FACKING YEAH GAME DONE")
             reward = 5000
 
 
@@ -379,41 +380,41 @@ class AbadiaEnv(gym.Env):
         # self.is_game_done = False
         self.game_is_done = False
 
-        print("-----> RESET the GAME")
+        logging.debug("-----> RESET the GAME")
         ob = self.sendReset()
-        print("reset status {}".format(ob))
-        print("-----> DONE")
-        print("-----> INIT dumps files: START ...")
+        logging.debug("reset status {}".format(ob))
+        logging.debug("-----> DONE")
+        logging.debug("-----> INIT dumps files: START ...")
         self.init_dumps_files()
-        print("-----> INIT dumps files: DONE")
+        logging.debug("-----> INIT dumps files: DONE")
         # time.sleep(5)
         if self._get_personajes_info(ob):
-            print("Esta Guillermo")
+            logging.debug("Esta Guillermo")
         return ob
 
     def render(self, mode='human', close=False):
-        print("state info: {}\n".format(self))
+        logging.debug("state info: {}\n".format(self))
         return
 
     def _get_state(self):
         """Get the observation."""
         # ob = [self.TOTAL_TIME_STEPS - self.curr_step]
-        print("--------> I wil got the initial state with Guillermo")
+        logging.debug("--------> I wil got the initial state with Guillermo")
         tooboring = 0
         while True:
             ob = self.sendCmd(self.url, "dump")
-            print("{}".format(ob))
+            logging.debug("{}".format(ob))
             tooboring += 1
             if self._get_personajes_info(ob):
-                print("getting the characters from ob:{}".format(ob))
-                print("DONE")
+                logging.debug("getting the characters from ob:{}".format(ob))
+                logging.debug("DONE")
                 break
             else:
-                print("getting the characters from ob:{}".format(ob))
-                print("Guillermo is not present yet, waiting")
+                logging.debug("getting the characters from ob:{}".format(ob))
+                logging.debug("Guillermo is not present yet, waiting")
                 # self.sendCmd(self.url, "cmd/_")
                 if tooboring % 10 == 0:
-                    print("Getting Boring ...")
+                    logging.debug("Getting Boring ...")
                     if tooboring <= 10:
                         self.sendCmd(self.url, "start")
                     else:
@@ -452,7 +453,7 @@ class AbadiaEnv(gym.Env):
             os.makedirs(directory)
         blob.download_to_filename(destination_file_name)
 
-        print('Blob {} downloaded to {}.'.format(
+        logging.debug('Blob {} downloaded to {}.'.format(
             source_blob_name,
             destination_file_name))
 
@@ -461,7 +462,7 @@ class AbadiaEnv(gym.Env):
         blob = self.google_storage_bucket.blob(destination_blob_name)
         blob.upload_from_filename(source_file_name)
 
-        print('File {} uploaded to {}.'.format(
+        logging.debug('File {} uploaded to {}.'.format(
             source_file_name,
             destination_blob_name))
 
@@ -470,7 +471,7 @@ class AbadiaEnv(gym.Env):
         data.update(self.get_commons())
 
         self.eventsAction.append(data)
-        print("events {}".format(self.eventsAction))
+        logging.debug("events {}".format(self.eventsAction))
 
     def save_game(self):
         self.fdGame.write("{}{}\"gameId\":\"{}\", \"totalSteps\":{}, \"obsequium\":{}, \"porcentaje\":{}, \"bonus\":{}, "
@@ -486,10 +487,10 @@ class AbadiaEnv(gym.Env):
         self.fdGame.flush()
         # self.fdGame.close()
         if (self.gsBucket != None):
-            print("Uploading Game: {} to GCP".format(self.dump_path + "/" + self.gameName))
+            logging.debug("Uploading Game: {} to GCP".format(self.dump_path + "/" + self.gameName))
             self.upload_blob(self.dump_path + "/" + self.gameName,
                              self.dump_path + "/" + self.gameName)
-            print("Uploading Actions: {} to GCP".format(self.dump_path + "/" + self.actionsName))
+            logging.debug("Uploading Actions: {} to GCP".format(self.dump_path + "/" + self.actionsName))
             self.upload_blob(self.dump_path + "/" + self.actionsName,
                              self.dump_path + "/" + self.actionsName)
 
@@ -507,11 +508,11 @@ class AbadiaEnv(gym.Env):
     def visited_snap_load(self):
         nameVisitedSnap = "snapshoots/current-visited"
         if (self.gsBucket != None):
-            print("Downloading Visited from GCP")
+            logging.debug("Downloading Visited from GCP")
             try:
                 self.download_blob(nameVisitedSnap, nameVisitedSnap)
             except:
-                print("File {} not exist at bucket {}".format(nameVisitedSnap, self.gsBucket))
+                logging.debug("File {} not exist at bucket {}".format(nameVisitedSnap, self.gsBucket))
 
         if os.path.exists(nameVisitedSnap) and os.path.getsize(nameVisitedSnap) > 0:
             fvisitedsnap = open(nameVisitedSnap, "rb+")
@@ -524,7 +525,7 @@ class AbadiaEnv(gym.Env):
             fvisitedsnap.close()
 
             if (self.gsBucket != None):
-                print("Uploading to GCP")
+                logging.debug("Uploading to GCP")
                 self.upload_blob(nameVisitedSnap, nameVisitedSnap)
 
     def visited_snap_save(self):
@@ -536,7 +537,7 @@ class AbadiaEnv(gym.Env):
         fvisitedsnap.close()
 
         if (self.gsBucket != None):
-            print("Uploading visited to GCP")
+            logging.debug("Uploading visited to GCP")
             self.upload_blob(nameVisitedSnap, nameVisitedSnap)
 
 
@@ -575,23 +576,23 @@ class AbadiaEnv(gym.Env):
         self.fdCheckpoint.flush()
 
         if (self.gsBucket != None):
-            print("Uploading {} to GCP".format(self.dump_path + '/' + self.checkpointTmpName))
+            logging.debug("Uploading {} to GCP".format(self.dump_path + '/' + self.checkpointTmpName))
             self.upload_blob(self.dump_path + '/' + self.checkpointTmpName,
                              self.dump_path + '/' + self.checkpointTmpName)
 
     def load_game_checkpoint(self, name):
         # name = "games/20181212/pp"
-        print("voy a abrir el fichero ({})".format(name))
+        logging.debug("voy a abrir el fichero ({})".format(name))
 
         if (self.gsBucket != None):
-            print("Downloading Checkpoint {} from GCP".format(name))
+            logging.debug("Downloading Checkpoint {} from GCP".format(name))
             try:
                 self.download_blob(name, name)
                 self.fdCheckpoint = open(name, "r")
                 checkpoint = self.fdCheckpoint.read()
                 requests.post(self.url+"/load", data=checkpoint)
             except:
-                print("*** ErrorFile: {} not exist at bucket {}".format(name, self.gsBucket))
+                logging.error("*** ErrorFile: {} not exist at bucket {}".format(name, self.gsBucket))
 
         time.sleep(2)
         return self._get_state()

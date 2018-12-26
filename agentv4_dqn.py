@@ -54,7 +54,9 @@ def init_env(env):
     if args.gcs != None:
         env.gsBucket = args.gcs
         env.init_google_store_bucket()
+
     logging.basicConfig(format='%(asctime)s:%(levelname):%(message)s', datefmt='%d-%b-%y %H:%M:%S')
+    logging.basicConfig(level=logging.DEBUG)
 
 def mainLoop():
 
