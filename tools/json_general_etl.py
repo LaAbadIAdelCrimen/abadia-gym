@@ -5,8 +5,11 @@ def load_game(name):
 
     print(name);
     with open(name) as json_data:
-        d = json.load(json_data)
-        print(d)
+        line = json_data.readline()
+        print("Data:" + line)
+        if (len(line) > 0 and line.startswith("[")):
+            d = json.loads(line)
+            print(d)
 
 
 folders = []
