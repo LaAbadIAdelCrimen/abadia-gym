@@ -2,15 +2,17 @@ import os
 import json
 
 def load_game(name):
-
+    print("-----------------------")
     print(name);
     with open(name) as json_data:
-        line = json_data.readline()
-        print("Data:" + line)
-        if (len(line) > 0 and line.startswith("[")):
-            d = json.loads(line)
-            print(d)
-
+        lines = json_data.readlines()
+        if lines:
+            line = lines[-1]
+            print("line:"+line)
+            if (len(line) > 0 and line.startswith("[")):
+                d = json.loads(line)
+                print("json{}".format(d))
+    print("-----------------------")
 
 folders = []
 files = []
@@ -29,8 +31,7 @@ for entry in os.scandir('games'):
 print('Files:')
 print(files)
 for file in files:
-    if file.endswith("point") == False:
+    if  "abadia_game" in file:
         load_game(file)
 
-"pp.json".endswith("json")
 
