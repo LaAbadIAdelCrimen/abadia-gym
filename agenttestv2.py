@@ -2,7 +2,7 @@
 # this agent is a very simple agent using Qlearning
 
 import gym
-import gym_abadia
+import gym_abadia2
 import numpy as np
 import os
 import argparse
@@ -60,22 +60,12 @@ def init_env(env):
 
 def mainLoop():
 
-    logging.info("loading visited spap file")
-    env.visited_snap_load()
-
     rList = []
     bucle = 0
-
-    # DQN parameters
-
-    gamma = 0.9
-    epsilon = .95
-
-    dqn_agent = DQN(env=env)
     steps = []
 
     for i_episode in range(env.num_episodes):
-        logging.info(f'runnig {i_episode} episode')
+        logging.info(f'Runnig {i_episode} episode')
         state = env.reset()
         if(env.checkpointName != None):
             state = env.load_game_checkpoint(env.checkpointName)
@@ -85,26 +75,15 @@ def mainLoop():
 
         for t in range(env.num_steps):
 
-            # TODO JT, crear dos funciones: una para sacar la posición de un personsaje y
-            # y otra para sacar un array con todas las posiciones
-
-            x, y, ori       = env.personajeByName('Guillermo')
-            adsoX, adsoY, _ = env.personajeByName('Adso')
-
-            # Get new state and reward from environment and check if
-            # in the state of the game is Guillermo
-
-            action = dqn_agent.act(state)
+            action = 0 # dqn_agent.act(state)
             env.prev_vector = env.vector
             while True:
                 newState, reward, done, info = env.step(action)
                 # we also save the non Guillermo status because there is a lot
                 # of clues like monks location, objects, etc
                 env.save_action(state, action, reward, newState)
-                if env.estaGuillermo:
-                    break
 
-            dqn_agent.remember(env.prev_vector, action, reward, env.vector, done)
+            #  dqn_agent.remember(env.prev_vector, action, reward, env.vector, done)
 
             if done:
                 logging.info(f'Episode finished after {t+1} steps')
@@ -113,29 +92,6 @@ def mainLoop():
                     logging.info(f'Episode finished with a FAIL')
                     env.reset_fin_partida()
                     break
-
-            # TODO JT must be refactorized like updateRejilla/Grid
-            newX, newY, _ = env.personajeByName('Guillermo')
-
-            if (x != newX or y != newY):
-                env.Visited[newX, newY] += 1
-
-            if (x == newX and y == newY):
-                if (ori == 0):
-                    env.Visited[x + 1, y] += -0.01
-                if (ori == 1):
-                    env.Visited[x, y - 1] += -0.01
-                if (ori == 2):
-                    env.Visited[x - 1, y] += -0.01
-                if (ori == 3):
-                    env.Visited[x, y + 1] += -0.01
-
-            dqn_agent.replay()        # internally iterates default (prediction) model
-            dqn_agent.target_train()  # iterates target model
-
-            # print("Episode({}:{}) A({})XYOP {},{},{},{} -> {},{} r:{} tr:{} Q(s,a)= {}"
-            #      .format(i_episode, t, action, x, y, ori, env.numPantalla, newX, newY, np.round(reward,2),
-            #              np.round(rAll,2), np.round(Q[x,y],2)), end="\r")
 
             logging.info("E {}:{} {}-{}:XYOP {},{},{},{} -> {},{} r:{} tr:{} V:{}"
                 .format(i_episode, t, action, env.actions_list[action], x, y, ori, env.numPantalla, newX, newY, np.round(reward,2),
@@ -188,7 +144,7 @@ def mainLoop():
     logging.info("Score over time: " + str(sum(rList)/env.num_episodes))
 
 if __name__ == '__main__':
-    env = gym.make('Abadia-v0')
+    env = gym.make('Abadia-v2')
     init_env(env)
     mainLoop()
 
