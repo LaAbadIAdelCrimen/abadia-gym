@@ -24,7 +24,7 @@ from google.cloud import storage
 
 import logging
 
-# AbadIA dependencies
+# AbadIA2 dependencies
 import requests
 
 def get_chance(x):
@@ -33,17 +33,17 @@ def get_chance(x):
     return (1.0 + e) / (1. + math.exp(x + 1))
 
 
-class AbadiaEnv(gym.Env):
+class AbadiaEnv2(gym.Env):
     """
-    Define a Abadia environment.
+    Define a Abadia2 environment.
 
     The environment defines which actions can be taken at which point and
     when the agent receives which reward.
     """
 
     def __init__(self):
-        self.__version__ = "0.0.6"
-        print("AbadiaEnv - Version {}".format(self.__version__))
+        self.__version__ = "0.0.7"
+        print("AbadiaEnv2 - Version {}".format(self.__version__))
 
 
         self.url    = "http://localhost:4477"
@@ -80,7 +80,8 @@ class AbadiaEnv(gym.Env):
 
         self.json_dump = {}
 
-        self.actions_list = ("cmd/A", "cmd/D", "cmd/I", "cmd/B", "cmd/N", "cmd/_")
+        self.actions_list = ("game/current/UP", "game/current/RIGHT",
+                             "game/current/LEFT", "game/current/DOWN", "cmd/N", "cmd/_")
         self.obsequium = -1
         self.porcentaje = -1
         self.haFracasado = False
@@ -194,7 +195,6 @@ class AbadiaEnv(gym.Env):
         self.momentoDia   = int(ob['momentoDia'])
         self.haFracasado  = ob['haFracasado']
         self.rejilla      = ob['Rejilla']
-
 
 
         # print(self.rejilla)
