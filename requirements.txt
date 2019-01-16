@@ -1,3 +1,4 @@
+-e "git+https://github.com/LaAbadIAdelCrimen/abadia-gym.git@master#egg=gym_abadia&subdirectory=gym_abadia"
 -e git+https://github.com/LaAbadIAdelCrimen/AbadIA.git@master#egg=abadia_DQN
 absl-py==0.1.12
 appnope==0.1.0
