@@ -66,7 +66,9 @@ def mainLoop():
 
     for i_episode in range(env.num_episodes):
         logging.info(f'Runnig {i_episode} episode')
+        logging.info("RESET: starting")
         state = env.reset()
+        logging.info("RESET: done")
         if(env.checkpointName != None):
             state = env.load_game_checkpoint(env.checkpointName)
 
@@ -75,9 +77,10 @@ def mainLoop():
 
         for t in range(env.num_steps):
 
-            action = 0 # dqn_agent.act(state)
-            env.prev_vector = env.vector
+            action = np.random.randint(0, 3) # dqn_agent.act(state)
+            # env.prev_vector = env.vector
             while True:
+                action = np.random.randint(0, 3) # dqn_agent.act(state)
                 newState, reward, done, info = env.step(action)
                 # we also save the non Guillermo status because there is a lot
                 # of clues like monks location, objects, etc

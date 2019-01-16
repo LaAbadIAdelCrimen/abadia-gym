@@ -80,8 +80,13 @@ class AbadiaEnv2(gym.Env):
 
         self.json_dump = {}
 
-        self.actions_list = ("game/current/UP", "game/current/RIGHT",
-                             "game/current/LEFT", "game/current/DOWN", "cmd/N", "cmd/_")
+        self.actions_list = ("abadIA/game/current/actions/UP",
+                             "abadIA/game/current/actions/RIGHT",
+                             "abadIA/game/current/actions/LEFT",
+                             "abadIA/game/current/actions/DOWN",
+                             "cmd/N",
+                             "cmd/_"
+                             )
         self.obsequium = -1
         self.porcentaje = -1
         self.haFracasado = False
@@ -187,7 +192,7 @@ class AbadiaEnv2(gym.Env):
                  use this for learning.
         """
 
-        ob = self.sendCmd(self.url, self.actions_list[action])
+        ob = self.sendCmd(self.url, self.actions_list[action], mode="POST")
         # print("ob -> {}".format(ob)) # ['obsequium']))
 
         # extracting all the values from the json
