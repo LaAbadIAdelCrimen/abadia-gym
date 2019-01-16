@@ -10,5 +10,5 @@ register(
 
 register(
     id='Abadia-v2',
-    entry_point='gym_abadia.envs:AbadiaEnv2'
+    entry_point='gym_abadia.envs:AbadiaEnv'
 )

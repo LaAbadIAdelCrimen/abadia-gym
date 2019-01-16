@@ -2,17 +2,17 @@
 # this agent is a very simple agent using Qlearning
 
 import gym
-import gym_abadia2
+import gym_abadia
 import numpy as np
 import os
 import argparse
 import random
 
-from keras.models import Sequential
-from keras.layers import Dense, Dropout
-from keras.optimizers import Adam
-from google.cloud import storage
-from collections import deque
+# from keras.models import Sequential
+# from keras.layers import Dense, Dropout
+# from keras.optimizers import Adam
+# from google.cloud import storage
+#from collections import deque
 
 import logging
 
@@ -65,7 +65,7 @@ def mainLoop():
     steps = []
 
     for i_episode in range(env.num_episodes):
-        logging.info(f'Runnig {i_episode} episode')
+        # logging.info(f'Runnig {i_episode} episode')
         state = env.reset()
         if(env.checkpointName != None):
             state = env.load_game_checkpoint(env.checkpointName)
@@ -86,10 +86,10 @@ def mainLoop():
             #  dqn_agent.remember(env.prev_vector, action, reward, env.vector, done)
 
             if done:
-                logging.info(f'Episode finished after {t+1} steps')
+                # logging.info(f'Episode finished after {t+1} steps')
                 env.save_game()
                 if (env.haFracasado):
-                    logging.info(f'Episode finished with a FAIL')
+                    # logging.info(f'Episode finished with a FAIL')
                     env.reset_fin_partida()
                     break
 
