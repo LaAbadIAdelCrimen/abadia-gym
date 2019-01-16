@@ -80,12 +80,12 @@ def mainLoop():
             action = np.random.randint(0, 3) # dqn_agent.act(state)
             # env.prev_vector = env.vector
             while True:
-                action = np.random.randint(0, 3) # dqn_agent.act(state)
                 newState, reward, done, info = env.step(action)
                 # we also save the non Guillermo status because there is a lot
                 # of clues like monks location, objects, etc
                 env.save_action(state, action, reward, newState)
-
+                if env.estaGuillermo:
+                    break
             #  dqn_agent.remember(env.prev_vector, action, reward, env.vector, done)
 
             if done:
@@ -95,10 +95,6 @@ def mainLoop():
                     # logging.info(f'Episode finished with a FAIL')
                     env.reset_fin_partida()
                     break
-
-            logging.info("E {}:{} {}-{}:XYOP {},{},{},{} -> {},{} r:{} tr:{} V:{}"
-                .format(i_episode, t, action, env.actions_list[action], x, y, ori, env.numPantalla, newX, newY, np.round(reward,2),
-                np.round(rAll,2), np.round(env.predictions,3)))
 
             # TODO JT: we need to create an option for this
             # if (t % 10 == 0 or reward > 0):
