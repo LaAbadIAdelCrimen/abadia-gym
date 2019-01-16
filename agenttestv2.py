@@ -65,7 +65,7 @@ def mainLoop():
     steps = []
 
     for i_episode in range(env.num_episodes):
-        # logging.info(f'Runnig {i_episode} episode')
+        logging.info(f'Runnig {i_episode} episode')
         state = env.reset()
         if(env.checkpointName != None):
             state = env.load_game_checkpoint(env.checkpointName)

@@ -131,11 +131,14 @@ class AbadiaEnv2(gym.Env):
         self.url = self.server + ":" + self.port
     # TODO JT refactoring and eliminate this function
     def sendReset(self):
-        return self.sendCmd(self.url, "reset")
+        return self.sendCmd(self.url, "abadIA/game", mode="POST")
 
-    def sendCmd(self, url, command, type="json"):
+    def sendCmd(self, url, command, type="json", mode="GET"):
         cmd = "{}/{}".format(url, command)
-        r = requests.get(cmd)
+        if mode == "GET":
+            r = requests.get(cmd)
+        if mode == "POST":
+            r = requests.post(cmd)
         if (type == "json"):
             cmdDump = "{}/dump".format(url)
             r = requests.get(cmdDump)
