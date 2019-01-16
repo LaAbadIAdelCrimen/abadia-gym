@@ -140,14 +140,19 @@ class AbadiaEnv2(gym.Env):
         if mode == "POST":
             r = requests.post(cmd)
         if (type == "json"):
-            cmdDump = "{}/dump".format(url)
-            r = requests.get(cmdDump)
-            if r.status_code == 599:
-                tmp = r.json()
-                tmp['haFracasado'] = True
-                return tmp
-            else:
-                return r.json()
+            headers = {'accept': 'application/json'}
+        else:
+            headers = {'accept': 'text/x.abadIA+plain'}
+
+        cmdDump = "{}/abadIA/game/current".format(url)
+        r = requests.get(cmdDump, headers= headers)
+        if r.status_code == 599:
+            tmp = r.json()
+            tmp['haFracasado'] = True
+            return tmp
+
+        if (type == "json"):
+            return r.json()
         else:
             return r.text
 
