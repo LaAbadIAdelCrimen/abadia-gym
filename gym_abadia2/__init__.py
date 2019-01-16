@@ -6,4 +6,4 @@ logger = logging.getLogger(__name__)
 register(
     id='Abadia-v2',
     entry_point='gym_abadia.envs:AbadiaEnv2',
-)
+

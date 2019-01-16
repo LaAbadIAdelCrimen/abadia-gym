@@ -1,1 +1,1 @@
-from gym_abadia.envs.abadia_env import AbadiaEnv2
+from gym_abadia.envs.abadia_envs import AbadiaEnv2

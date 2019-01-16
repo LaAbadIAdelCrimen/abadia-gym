@@ -5,5 +5,10 @@ logger = logging.getLogger(__name__)
 
 register(
     id='Abadia-v0',
-    entry_point='gym_abadia.envs:AbadiaEnv',
+    entry_point='gym_abadia.envs:AbadiaEnv'
+)
+
+register(
+    id='Abadia-v2',
+    entry_point='gym_abadia.envs:AbadiaEnv2'
 )
