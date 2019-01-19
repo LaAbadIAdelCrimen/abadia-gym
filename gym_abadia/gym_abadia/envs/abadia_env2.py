@@ -570,7 +570,7 @@ class AbadiaEnv2(gym.Env):
 
     def save_game_checkpoint(self):
 
-        checkpoint = self.sendCmd(self.url, "save", type="raw")
+        checkpoint = self.sendCmd(self.url, "/abadIA/game/current", mode='GET', type="raw")
 
         now = datetime.datetime.now()
         self.dump_path = now.strftime('games/%Y%m%d')
@@ -602,7 +602,7 @@ class AbadiaEnv2(gym.Env):
                 self.download_blob(name, name)
                 self.fdCheckpoint = open(name, "r")
                 checkpoint = self.fdCheckpoint.read()
-                requests.post(self.url+"/load", data=checkpoint)
+                requests.put(self.url+"/abadIA/game/current", data=checkpoint)
             except:
                 logging.error("*** ErrorFile: {} not exist at bucket {}".format(name, self.gsBucket))
 
