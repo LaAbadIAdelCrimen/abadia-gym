@@ -61,7 +61,7 @@ spec:
                     echo "game over checkpoint"
                     ;;
                     *)
-                    python3 agentv4_dqn.py $options
+                    python3 $options
                     ;;
                 esac
                 done

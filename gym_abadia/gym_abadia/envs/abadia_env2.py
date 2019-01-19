@@ -280,9 +280,8 @@ class AbadiaEnv2(gym.Env):
 
         if (self.haFracasado == True):
             logging.info("GAME OVER")
-            self.sendCmd(self.url, "start", type='raw')
-            # time.sleep(4)
-            # self.sendCmd(self.url, "fin")
+            self.sendCmd(self.url, "/abadIA/game", mode='POST', type='raw')
+
             self.game_is_done = True
             reward = -1000
 
@@ -416,7 +415,7 @@ class AbadiaEnv2(gym.Env):
         logging.info("--------> I wil got the initial state with Guillermo")
         tooboring = 0
         while True:
-            ob = self.sendCmd(self.url, "dump")
+            ob = self.sendCmd(self.url, "/abadIA/current/game", mode='GET', type='json')
             logging.info("{}".format(ob))
             tooboring += 1
             if self._get_personajes_info(ob):
@@ -426,7 +425,6 @@ class AbadiaEnv2(gym.Env):
             else:
                 logging.info("getting the characters from ob:{}".format(ob))
                 logging.info("Guillermo is not present yet, waiting")
-                # self.sendCmd(self.url, "cmd/_")
                 if tooboring % 10 == 0:
                     logging.info("Getting Boring ...")
                     if tooboring <= 10:
