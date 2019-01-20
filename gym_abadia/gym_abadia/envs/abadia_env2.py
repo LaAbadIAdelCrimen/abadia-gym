@@ -74,19 +74,23 @@ class AbadiaEnv2(gym.Env):
         # 3 -> DOWN
         # 4 -> GET
 
-        self.action_space = spaces.Discrete(5)
+        self.action_space = spaces.Discrete(9)
 
         # json from the dump state of the episode
 
         self.json_dump = {}
 
-        self.actions_list = ("abadIA/game/current/actions/UP",
+        self.action_mode = 1
+
+        self.actions_list_2 = ("abadIA/game/current/actions/UP",
                              "abadIA/game/current/actions/RIGHT",
                              "abadIA/game/current/actions/LEFT",
                              "abadIA/game/current/actions/DOWN",
                              "cmd/N",
                              "cmd/_"
                              )
+        self.actions_list = ("N", "NE", "E", "SE", "S", "SW", "W", "NW", "NOP")
+
         self.obsequium = -1
         self.porcentaje = -1
         self.haFracasado = False
@@ -116,9 +120,9 @@ class AbadiaEnv2(gym.Env):
         self.Visited = np.zeros([512, 512])
 
         # Observation is the position of Guillermo and the information of the room
-        X = np.array([0,256])
+        X = np.array([0, 256])
         Y = np.array([0, 256])
-        O = np.array([0,4])
+        O = np.array([0,   4])
 
         high = np.array([np.inf] * 15)  # useful range is -1 .. +1, but spikes can be higher
         self.observation_space = spaces.Box(-high, high)
@@ -252,7 +256,12 @@ class AbadiaEnv2(gym.Env):
                  use this for learning.
         """
 
-        ob = self.sendCmd(self.url, self.actions_list[action], mode="POST")
+        if (action >=8 ):
+            ob = self.sendCmd(self.url, self.actions_list[action], mode="POST")
+        else:
+            ori = str(self.Personajes['Guillermo']['orientacion'])
+            ob = self.sendMultiCmd(ori + self.actions_list[action])
+
         # print("ob -> {}".format(ob)) # ['obsequium']))
 
         # extracting all the values from the json
