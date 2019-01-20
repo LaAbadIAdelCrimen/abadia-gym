@@ -112,22 +112,9 @@ def mainLoop():
 
         env.save_game()
 
-        # TODO JT: refactoring this: the way we storage models and add info to game json
-
-        nameModel = "models/model_v1_{}_trial_{}.model".format(env.gameId, i_episode)
-
-        dqn_agent.save_model(nameModel)
-
         if (env.gsBucket != None):
             logging.info("Uploading model to GCP")
             env.upload_blob(nameModel, nameModel)
-
-        nameModel ="models/model_v1_lastest.model".format(env.gameId)
-        dqn_agent.save_model(nameModel)
-        if (env.gsBucket != None):
-            logging.info("Uploading lastest model to GCP")
-            env.upload_blob(nameModel, nameModel)
-
 
         rList.append(rAll)
 

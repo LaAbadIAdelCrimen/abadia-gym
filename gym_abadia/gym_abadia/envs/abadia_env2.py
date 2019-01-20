@@ -132,6 +132,51 @@ class AbadiaEnv2(gym.Env):
         logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', datefmt='%d-%m-%y %H:%M:%S',
                             level=logging.INFO)
 
+        # helper to normalize paths to positions
+
+        path2Pos = {
+            "0N": "UP:UP",
+            "1N": "LEFT:UP:UP",
+            "2N": "RIGHT:UP:UP",
+            "3N": "RIGHT:RIGHT:UP:UP",
+
+            "0NE": "UP:UP:LEFT:UP:UP",
+            "1NE": "UP:UP:RIGHT:UP:UP",
+            "2NE": "RIGHT:UP:UP:RIGHT:UP:UP",
+            "3NE": "RIGHT:RIGHT:UP:UP:RIGHT:UP:UP",
+
+            "0E": "UP:UP",
+            "1E": "RIGHT:UP:UP",
+            "2E": "RIGHT:RIGHT:UP:UP",
+            "3E": "LEFT:UP:UP",
+
+            "0SE": "UP:UP:RIGHT:UP:UP",
+            "1SE": "RIGHT:UP:UP:RIGHT:UP:UP",
+            "2SE": "RIGHT:RIGHT:UP:UP:RIGHT:UP:UP",
+            "3SE": "UP:UP:LEFT:UP:UP",
+
+            "0S": "RIGHT:UP:UP",
+            "1S": "RIGHT:RIGHT:UP:UP",
+            "2S": "LEFT:UP:UP",
+            "3S": "UP:UP",
+
+            "0SW": "RIGHT:UP:UP:RIGHT:UP:UP",
+            "1SW": "RIGHT:RIGHT:UP:UP:RIGHT:UP:UP",
+            "2SW": "UP:UP:LEFT:UP:UP",
+            "3SW": "UP:UP:RIGHT:UP:UP",
+
+            "0W": "RIGHT:RIGHT:UP:UP",
+            "1W": "LEFT:UP:UP",
+            "2W": "UP:UP",
+            "3W": "RIGHT:UP:UP",
+
+            "0NW": "LEFT:UP:UP:LEFT:UP:UP",
+            "1NW": "UP:UP:LEFT:UP:UP",
+            "2NW": "UP:UP:RIGHT:UP:UP",
+            "3NW": "RIGHT:RIGHT:UP:UP:RIGHT:UP:UP"
+
+        }
+
     def set_url(self):
         self.url = self.server + ":" + self.port
     # TODO JT refactoring and eliminate this function
@@ -577,7 +622,7 @@ class AbadiaEnv2(gym.Env):
         path = Path(self.dump_path)
         path.mkdir(parents=True, exist_ok=True)
 
-        # create the game and actions files
+        # create the checkpoint file
         self.checkpointTmpName  = "abadia_checkpoint_{}_{}".format(self.gameId, self.checkpointSec)
         self.checkpointSec     += 1
         self.checkpointTmpName += "_{}_{}_{}_{}_{}.checkpoint".format(self.dia, self.momentoDia,
@@ -591,9 +636,10 @@ class AbadiaEnv2(gym.Env):
             logging.info("Uploading {} to GCP".format(self.dump_path + '/' + self.checkpointTmpName))
             self.upload_blob(self.dump_path + '/' + self.checkpointTmpName,
                              self.dump_path + '/' + self.checkpointTmpName)
+        else:
+            logging.error("Not saving it to the local filesystem")
 
     def load_game_checkpoint(self, name):
-        # name = "games/20181212/pp"
         logging.info("voy a abrir el fichero ({})".format(name))
 
         if (self.gsBucket != None):
@@ -605,6 +651,8 @@ class AbadiaEnv2(gym.Env):
                 requests.put(self.url+"/abadIA/game/current", data=checkpoint)
             except:
                 logging.error("*** ErrorFile: {} not exist at bucket {}".format(name, self.gsBucket))
+        else:
+            logging.error("Not Loading {} from local filesystem.".format(name))
 
         time.sleep(2)
         return self._get_state()
