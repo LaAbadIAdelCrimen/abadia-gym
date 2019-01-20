@@ -75,6 +75,8 @@ def mainLoop():
         rAll = 0
         done = False
 
+        env.sendMultiCmd("0N")
+
         for t in range(env.num_steps):
 
             action = np.random.randint(0, 3) # dqn_agent.act(state)

@@ -134,9 +134,9 @@ class AbadiaEnv2(gym.Env):
 
         # helper to normalize paths to positions
 
-        path2Pos = {
-            "0N": "UP:UP",
-            "1N": "LEFT:UP:UP",
+        self.path2Pos = {
+            "0N": "LEFT:UP:UP",
+            "1N": "UP:UP",
             "2N": "RIGHT:UP:UP",
             "3N": "RIGHT:RIGHT:UP:UP",
 
@@ -205,6 +205,21 @@ class AbadiaEnv2(gym.Env):
             return r.json()
         else:
             return r.text
+
+    def sendMultiCmd(self, path):
+        cmds = self.path2Pos[path].split(":")
+        for step in cmds:
+            self.sendCmd(self.url, "abadIA/game/current/actions/{}".format(step), mode='POST')
+
+        headers = {'accept': 'application/json'}
+        cmdDump = "{}/abadIA/game/current".format(self.url)
+        r = requests.get(cmdDump, headers=headers)
+        if r.status_code == 599:
+            tmp = r.json()
+            tmp['haFracasado'] = True
+            return tmp
+
+        return r.json()
 
     def step(self, action):
         """
