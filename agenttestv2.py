@@ -79,7 +79,7 @@ def mainLoop():
 
         for t in range(env.num_steps):
 
-            action = np.random.randint(0, 3) # dqn_agent.act(state)
+            action = np.random.randint(0, 8) # dqn_agent.act(state)
             # env.prev_vector = env.vector
             while True:
                 newState, reward, done, info = env.step(action)
