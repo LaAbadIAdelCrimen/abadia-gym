@@ -302,13 +302,13 @@ class AbadiaEnv2(gym.Env):
                 self.prevPantalla = int(ob['numPantalla'])
             else:
                 if (self.prevPantalla != int(ob['numPantalla'])):
-                    reward += 50
+                    reward += 0.001
                     logging.info("----------")
                     logging.info("reward by screen change !!!!! {} !=  {}".format(self.prevPantalla, int(ob['numPantalla'])))
                     logging.info("Personajes: {}".format(self.Personajes))
                     logging.info("ob: {}".format(ob))
                     logging.info("----------")
-                    self.add_event("NewRoom", "prev {} curr {}".format(self.prevPantalla, int(ob['numPantalla'])), 50)
+                    self.add_event("NewRoom", "prev {} curr {}".format(self.prevPantalla, int(ob['numPantalla'])), 0.001)
                     self.prevPantalla = int(ob['numPantalla'])
                     self.save_game_checkpoint()
 
@@ -317,19 +317,19 @@ class AbadiaEnv2(gym.Env):
             # reward for incrementing the obsequium: > 0 +50 / < 0 -30
             incr_obsequium = self.obsequium - int(self.prev_ob['obsequium'])
             if incr_obsequium > 0:
-                reward += (50 * incr_obsequium)
-                self.add_event("IncrObsequium", "Obsequium {} Incr {}".format(self.prev_ob['obsequium'],incr_obsequium), 50*incr_obsequium)
+                reward += (50 * incr_obsequium) / 10000
+                self.add_event("IncrObsequium", "Obsequium {} Incr {}".format(self.prev_ob['obsequium'],incr_obsequium), (50 * incr_obsequium) / 10000)
 
             if incr_obsequium < 0:
-                reward += (30 * incr_obsequium)
-                self.add_event("DecrObsequium", "Obsequium {} Decr {}".format(self.prev_ob['obsequium'], incr_obsequium),-30*incr_obsequium)
+                reward += (30 * incr_obsequium) / 10000
+                self.add_event("DecrObsequium", "Obsequium {} Decr {}".format(self.prev_ob['obsequium'], incr_obsequium),(30 * incr_obsequium) / 10000)
 
         # reward for incrementing the bonus: >0 +500
         if len(self.prev_ob) > 0 and int(self.prev_ob['bonus']) > 0:
             incr_bonus = self.bonus - int(self.prev_ob['bonus'])
             if incr_bonus > 0:
-                reward += (500 * incr_bonus)
-                self.add_event("Bonus", "prev {} curr {}".format(self.bonus, int(self.prev_ob['bonus'])), 500 * incr_bonus)
+                reward += (500 * incr_bonus) / 10000
+                self.add_event("Bonus", "prev {} curr {}".format(self.bonus, int(self.prev_ob['bonus'])), (500 * incr_bonus) / 10000)
 
         # we check if Guillermo change his position. Positive reward if yes, negative if no
         if action == 0:
@@ -339,7 +339,7 @@ class AbadiaEnv2(gym.Env):
                 if (prev['posX'] != curr['posX']) or (prev['posY'] != curr['posY']):
                     logging.info("se ha movido: {},{} -> {},{}".format(prev['posX'], prev['posY'],
                                                             curr['posX'], curr['posY']))
-                    reward += 0.5
+                    reward += 0.001
 
         self.eventsGame.extend(self.eventsAction)
         # if the game is over, we just finish the game and reward is -1000
@@ -352,20 +352,20 @@ class AbadiaEnv2(gym.Env):
             self.sendCmd(self.url, "/abadIA/game", mode='POST', type='raw')
 
             self.game_is_done = True
-            reward = -1000
+            reward = -1
 
         if (self.porcentaje >= 90):
             self.game_is_done = True
-            logging.info("FACKING YEAH GAME DONE")
-            logging.info("FACKING YEAH GAME DONE")
-            logging.info("FACKING YEAH GAME DONE")
-            logging.info("FACKING YEAH GAME DONE")
-            logging.info("FACKING YEAH GAME DONE")
-            reward = 5000
+            logging.info("FUCKING YEAH GAME ALMOST DONE")
+            logging.info("FUCKING YEAH GAME ALMOST DONE")
+            logging.info("FUCKING YEAH GAME ALMOST DONE")
+            logging.info("FUCKING YEAH GAME ALMOST DONE")
+            logging.info("FUCKING YEAH GAME ALMOST DONE")
+            reward = 1
 
-
+        # if no reward we penalized it
         if reward == 0:
-            reward = -0.5
+            reward = -0.0001
 
         self.totalReward += reward
         ob['reward'] = reward
@@ -548,7 +548,7 @@ class AbadiaEnv2(gym.Env):
             destination_blob_name))
 
     def add_event(self, name, des, reward):
-        data = {'name': name, 'des': des, 'reward': reward, 'totalReward': self.totalReward}
+        data = {'name': name, 'des': des, 'reward': reward, 'totalReward': self.totalReward, 'version': 1}
         data.update(self.get_commons())
 
         self.eventsAction.append(data)
