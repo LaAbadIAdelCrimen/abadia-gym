@@ -51,7 +51,7 @@ graphviz==0.10.1
 grpc-google-iam-v1==0.11.4
 grpcio==1.10.0
 gym==0.10.5
--e git+git@github.com:LaAbadIAdelCrimen/abadia-gym.git@b07108b7143f70d59df08c2eefb7942244405012#egg=gym_abadia&subdirectory=gym_abadia
+-e git+git@github.com:LaAbadIAdelCrimen/abadia-gym.git@440b7697c328a70c2f6e03ad889b3d7592d917c7#egg=gym_abadia&subdirectory=gym_abadia
 h5py==2.7.1
 html5lib==0.9999999
 httplib2==0.11.3
