@@ -302,7 +302,7 @@ class AbadiaEnv2(gym.Env):
                 self.prevPantalla = int(ob['numPantalla'])
             else:
                 if (self.prevPantalla != int(ob['numPantalla'])):
-                    reward += 0.001
+                    reward += 0.004
                     logging.info("----------")
                     logging.info("reward by screen change !!!!! {} !=  {}".format(self.prevPantalla, int(ob['numPantalla'])))
                     logging.info("Personajes: {}".format(self.Personajes))
