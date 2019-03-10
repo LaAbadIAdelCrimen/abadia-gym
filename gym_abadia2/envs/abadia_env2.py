@@ -220,13 +220,13 @@ class AbadiaEnv2(gym.Env):
                 self.prevPantalla = int(ob['numPantalla'])
             else:
                 if (self.prevPantalla != int(ob['numPantalla'])):
-                    reward += 50
+                    reward += 0.03
                     logging.info("----------")
                     logging.info("reward by screen change !!!!! {} !=  {}".format(self.prevPantalla, int(ob['numPantalla'])))
                     logging.info("Personajes: {}".format(self.Personajes))
                     logging.info("ob: {}".format(ob))
                     logging.info("----------")
-                    self.add_event("NewRoom", "prev {} curr {}".format(self.prevPantalla, int(ob['numPantalla'])), 50)
+                    self.add_event("NewRoom", "prev {} curr {}".format(self.prevPantalla, int(ob['numPantalla'])), 0.03)
                     self.prevPantalla = int(ob['numPantalla'])
                     self.save_game_checkpoint()
 
@@ -235,19 +235,19 @@ class AbadiaEnv2(gym.Env):
             # reward for incrementing the obsequium: > 0 +50 / < 0 -30
             incr_obsequium = self.obsequium - int(self.prev_ob['obsequium'])
             if incr_obsequium > 0:
-                reward += (50 * incr_obsequium)
-                self.add_event("IncrObsequium", "Obsequium {} Incr {}".format(self.prev_ob['obsequium'],incr_obsequium), 50*incr_obsequium)
+                reward += (0.03 * incr_obsequium)
+                self.add_event("IncrObsequium", "Obsequium {} Incr {}".format(self.prev_ob['obsequium'],incr_obsequium), 0.03*incr_obsequium)
 
             if incr_obsequium < 0:
-                reward += (30 * incr_obsequium)
-                self.add_event("DecrObsequium", "Obsequium {} Decr {}".format(self.prev_ob['obsequium'], incr_obsequium),-30*incr_obsequium)
+                reward += (0.02 * incr_obsequium)
+                self.add_event("DecrObsequium", "Obsequium {} Decr {}".format(self.prev_ob['obsequium'], incr_obsequium),-0.02*incr_obsequium)
 
         # reward for incrementing the bonus: >0 +500
         if len(self.prev_ob) > 0 and int(self.prev_ob['bonus']) > 0:
             incr_bonus = self.bonus - int(self.prev_ob['bonus'])
             if incr_bonus > 0:
-                reward += (500 * incr_bonus)
-                self.add_event("Bonus", "prev {} curr {}".format(self.bonus, int(self.prev_ob['bonus'])), 500 * incr_bonus)
+                reward += (0.05 * incr_bonus)
+                self.add_event("Bonus", "prev {} curr {}".format(self.bonus, int(self.prev_ob['bonus'])), 0.05 * incr_bonus)
 
         # we check if Guillermo change his position. Positive reward if yes, negative if no
         if action == 0:
@@ -257,11 +257,11 @@ class AbadiaEnv2(gym.Env):
                 if (prev['posX'] != curr['posX']) or (prev['posY'] != curr['posY']):
                     logging.info("se ha movido: {},{} -> {},{}".format(prev['posX'], prev['posY'],
                                                             curr['posX'], curr['posY']))
-                    reward += 0.5
+                    reward += 0.005
 
         self.eventsGame.extend(self.eventsAction)
-        # if the game is over, we just finish the game and reward is -1000
-        # if we completed the game, we finish and the reward is 5000
+        # if the game is over, we just finish the game and reward is -1
+        # if we completed the game, we finish and the reward is 1
         # the percentage must be variable to help the AI to learn
         # with variable explanatory/explotation
 
@@ -271,7 +271,7 @@ class AbadiaEnv2(gym.Env):
             # time.sleep(4)
             # self.sendCmd(self.url, "fin")
             self.game_is_done = True
-            reward = -1000
+            reward = -1
 
         if (self.porcentaje >= 90):
             self.game_is_done = True
@@ -280,11 +280,11 @@ class AbadiaEnv2(gym.Env):
             logging.info("FACKING YEAH GAME DONE")
             logging.info("FACKING YEAH GAME DONE")
             logging.info("FACKING YEAH GAME DONE")
-            reward = 5000
+            reward = 1
 
 
         if reward == 0:
-            reward = -0.5
+            reward = -0.001
 
         self.totalReward += reward
         ob['reward'] = reward

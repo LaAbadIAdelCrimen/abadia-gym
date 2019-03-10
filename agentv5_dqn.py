@@ -188,7 +188,7 @@ def mainLoop():
     logging.info("Score over time: " + str(sum(rList)/env.num_episodes))
 
 if __name__ == '__main__':
-    env = gym.make('Abadia-v0')
+    env = gym.make('Abadia-v2')
     init_env(env)
     mainLoop()
 
