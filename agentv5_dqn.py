@@ -1,4 +1,4 @@
-# Agent v2 a.k.a. Simple Qlearning
+# Agent v5 a.k.a. Simple Qlearning with v2 gym_abadia
 # this agent is a very simple agent using Qlearning
 
 import gym
@@ -58,6 +58,54 @@ def init_env(env):
     logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', datefmt='%d-%m-%y %H:%M:%S',
                         level=logging.INFO)
 
+def check(env):
+    valMovs = np.zeros(9)
+    room = np.zeros([24, 24, 2], np.int)
+    chkM = np.array([
+        [0, 0, 0, -1, 0],
+        [0, 0, 1, -1, 0],
+        [2, 0, 1, 0, 2],
+        [2, 1, 1, 1, 2],
+        [4, 1, 0, 2, 0],
+        [4, 1, 1, 2, 1],
+        [6, 0, 0, 0, -1],
+        [6, 1, 0, 1, -1]],
+        np.int)
+
+
+    yPos = -1
+    xPos = -1
+
+    for yy in range(0, 24):
+        for xx in range(0, 24):
+            per = int(env.rejilla[yy][xx]) >> 4
+            alt = env.rejilla[yy][xx] % 16
+            # print(per)
+
+            # we found Guillermo
+            if (per == 1 and xPos == -1 and yPos == -1):
+                yPos = yy
+                xPos = xx
+
+            room[yy, xx, 0] = per
+            room[yy, xx, 1] = alt
+
+    for ii in range(0, 8):
+        y1 = yPos+chkM[ii, 1]
+        x1 = xPos+chkM[ii, 2]
+        y2 = yPos+chkM[ii, 3]
+        x2 = xPos+chkM[ii, 4]
+        if ((y1 >= 0 and y1 <= 23) and (x1 >= 0 and x1 <= 23) and (y2 >= 0 and y2 <= 23) and (x2 >= 0 and x2 <= 23)):
+            diff = room[y1, x1, 1] - room[y2, x2, 1]
+            if (diff >= -1 and diff <= 1):
+                valMovs[chkM[ii, 0]] = 1
+            if (room[y1, x1, 0] != room[y2, x2, 0] and room[y2, x2, 0] != 0):
+                print("Adso or some monk block Guillermo!!")
+                valMovs[chkM[ii, 0]] = 0
+
+    print("Valid Movements:", valMovs)
+    return
+
 def mainLoop():
 
     logging.info("loading visited spap file")
@@ -95,6 +143,9 @@ def mainLoop():
             # in the state of the game is Guillermo
 
             action = dqn_agent.act(state)
+
+
+
             env.prev_vector = env.vector
             while True:
                 newState, reward, done, info = env.step(action)
@@ -103,6 +154,8 @@ def mainLoop():
                 env.save_action(state, action, reward, newState)
                 if env.estaGuillermo:
                     break
+                    # test valid movements
+
 
             dqn_agent.remember(env.prev_vector, action, reward, env.vector, done)
 
@@ -145,6 +198,7 @@ def mainLoop():
             # if (t % 10 == 0 or reward > 0):
             env.pintaRejilla(40, 20)
 
+            check(env)
             x, y, ori = env.personajeByName('Guillermo')
             rAll += reward
             state = newState
@@ -159,7 +213,7 @@ def mainLoop():
 
         # TODO JT: refactoring this: the way we storage models and add info to game json
 
-        nameModel = "models/model_v1_{}_trial_{}.model".format(env.gameId, i_episode)
+        nameModel = "models/model_v2_{}_trial_{}.model".format(env.gameId, i_episode)
 
         dqn_agent.save_model(nameModel)
 
@@ -167,7 +221,7 @@ def mainLoop():
             logging.info("Uploading model to GCP")
             env.upload_blob(nameModel, nameModel)
 
-        nameModel ="models/model_v1_lastest.model".format(env.gameId)
+        nameModel ="models/model_v2_lastest.model".format(env.gameId)
         dqn_agent.save_model(nameModel)
         if (env.gsBucket != None):
             logging.info("Uploading lastest model to GCP")

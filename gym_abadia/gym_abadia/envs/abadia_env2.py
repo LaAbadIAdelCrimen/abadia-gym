@@ -98,6 +98,7 @@ class AbadiaEnv2(gym.Env):
         self.rejilla = []
         self.prev_ob = dict()
         self.estaGuillermo= False
+        self.room = np.zeros(20,20,3)
 
 
         self.curr_step = -1
@@ -698,6 +699,7 @@ class AbadiaEnv2(gym.Env):
         yRejilla = 0
         xRejilla = 0
 
+
         # TODO: to display all the characters, now only Guillermo and Adso
         # pers = {}
         # for per in env.Personajes:
@@ -756,5 +758,4 @@ class AbadiaEnv2(gym.Env):
             print("|")
 
         print("+" + "-" * (w * 2) + "+" + "-" * 24 + "+" + "-" * 48 + "+")
-
 
