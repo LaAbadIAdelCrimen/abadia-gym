@@ -138,6 +138,9 @@ class AbadiaEnv2(gym.Env):
                             level=logging.INFO)
 
         # helper to normalize paths to positions
+        #   1
+        # 2   0
+        #   3
 
         self.path2Pos = {
             "0N": "LEFT:UP:UP",
@@ -186,6 +189,9 @@ class AbadiaEnv2(gym.Env):
         self.url = self.server + ":" + self.port
     # TODO JT refactoring and eliminate this function
     def sendReset(self):
+        self.sendCmd(self.url, "abadIA/game/current/actions/SPACE", mode='POST')
+        sleep(1)
+        self.sendCmd(self.url, "abadIA/game/current/actions/SPACE", mode='POST')
         return self.sendCmd(self.url, "abadIA/game", mode="POST")
 
     def sendCmd(self, url, command, type="json", mode="GET"):
@@ -212,6 +218,7 @@ class AbadiaEnv2(gym.Env):
             return r.text
 
     def sendMultiCmd(self, path):
+        print("Path: %s Cmds: %s" % (path,  self.path2Pos[path]))
         cmds = self.path2Pos[path].split(":")
         for step in cmds:
             self.sendCmd(self.url, "abadIA/game/current/actions/{}".format(step), mode='POST')
@@ -624,7 +631,8 @@ class AbadiaEnv2(gym.Env):
 
 
     def reset_fin_partida(self):
-        ob = self.sendCmd(self.url, "start")
+        self.sendCmd(self.url, "abadIA/game/current/actions/SPACE", mode='POST')
+        ob = self.sendCmd(self.url, "abadIA/game", mode="POST")
 
     def init_dumps_files(self):
 

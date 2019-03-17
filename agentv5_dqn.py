@@ -58,8 +58,8 @@ def init_env(env):
     logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', datefmt='%d-%m-%y %H:%M:%S',
                         level=logging.INFO)
 
-def check(env):
-    valMovs = np.zeros(9)
+def checkValidMovs(env):
+    env.valMovs = np.zeros(9, np.int)
     room = np.zeros([24, 24, 2], np.int)
     chkM = np.array([
         [0, 0, 0, -1, 0],
@@ -98,13 +98,18 @@ def check(env):
         if ((y1 >= 0 and y1 <= 23) and (x1 >= 0 and x1 <= 23) and (y2 >= 0 and y2 <= 23) and (x2 >= 0 and x2 <= 23)):
             diff = room[y1, x1, 1] - room[y2, x2, 1]
             if (diff >= -1 and diff <= 1):
-                valMovs[chkM[ii, 0]] = 1
+                print("Wall Blocks G {} ".format(ii), end="")
+                env.valMovs[chkM[ii, 0]] += 1
             if (room[y1, x1, 0] != room[y2, x2, 0] and room[y2, x2, 0] != 0):
-                print("Adso or some monk block Guillermo!!")
-                valMovs[chkM[ii, 0]] = 0
+                print("Adso/* block G {}".format(ii), end="")
+                env.valMovs[chkM[ii, 0]] = 0
 
-    print("Valid Movements:", valMovs)
-    return
+    print("Valid Movements:", end="")
+    for ii in range(9):
+        print("%s:%s " % (env.actions_list[ii], env.valMovs[ii]) , end="")
+    print("<--                                                            ")
+
+    return env.valMovs
 
 def mainLoop():
 
@@ -198,7 +203,7 @@ def mainLoop():
             # if (t % 10 == 0 or reward > 0):
             env.pintaRejilla(40, 20)
 
-            check(env)
+            checkValidMovs(env)
             x, y, ori = env.personajeByName('Guillermo')
             rAll += reward
             state = newState
