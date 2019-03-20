@@ -64,12 +64,23 @@ def checkValidMovs(env):
     chkM = np.array([
         [0, 0, 0, -1, 0],
         [0, 0, 1, -1, 0],
+        [1, 0, 0, -1, 0],
+        [1, 0,-1, -1, 0],
+        [1, 0, 0, 0, -1],
         [2, 0, 1, 0, 2],
         [2, 1, 1, 1, 2],
+        [3, 1, 0, 2, 0],
+        [3, 1,-1, 2,-1],
         [4, 1, 0, 2, 0],
-        [4, 1, 1, 2, 1],
-        [6, 0, 0, 0, -1],
-        [6, 1, 0, 1, -1]],
+        [4, 1,-1, 2,-1],
+        [5, 0,-1, 0,-2],
+        [5, 1,-1, 1,-2],
+        [5, 1,-1, 2,-1],
+        [6, 0,-1, 0,-2],
+        [6, 1,-1, 1,-2],
+        [7, 0, 0,-1, 0],
+        [7, 0,-1,-1,-1],
+        [7, 0,-1, 0,-2]],
         np.int)
 
 
@@ -90,7 +101,7 @@ def checkValidMovs(env):
             room[yy, xx, 0] = per
             room[yy, xx, 1] = alt
 
-    for ii in range(0, 8):
+    for ii in range(0,len(chkM)):
         y1 = yPos+chkM[ii, 1]
         x1 = xPos+chkM[ii, 2]
         y2 = yPos+chkM[ii, 3]
@@ -103,8 +114,8 @@ def checkValidMovs(env):
             if (room[y1, x1, 0] != room[y2, x2, 0] and room[y2, x2, 0] != 0):
                 print("Adso/* block G {}".format(ii), end="")
                 env.valMovs[chkM[ii, 0]] = 0
-
-    print("Valid Movements:", end="")
+    env.valMovs[8] = 1
+    print("\nValid Movements:", end="")
     for ii in range(9):
         print("%s:%s " % (env.actions_list[ii], env.valMovs[ii]) , end="")
     print("<--                                                            ")
