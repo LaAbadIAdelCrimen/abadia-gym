@@ -5,7 +5,7 @@
 
 while true
 do
-(find games -name "*.checkpoint" | grep 2019 | grep _24_ | grep  -v "_0_" | sort -r | head -50) |
+(find games -name "*.checkpoint" | grep 2019 | grep _21_3 | grep  -v "_0_" | sort -r | head -50) |
 while read -r line
 do
 
