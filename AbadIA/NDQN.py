@@ -6,10 +6,12 @@ from keras.layers import Dense, Dropout
 from keras.optimizers import Adam
 from collections import deque
 
-class DQN:
+class NDQN:
     def __init__(self, env):
         self.env     = env
         self.memory  = deque(maxlen=2000)
+        # Exploring or playing
+        self.playing = False
 
         self.gamma = 0.85
         self.epsilon = 1.0
@@ -30,7 +32,7 @@ class DQN:
             self.target_model = self.load_model(env.modelName)
 
     def create_model(self):
-        print("Creating a new model")
+        print("Creating a new model v3")
         model   = Sequential()
         state_shape  = self.env.observation_space.shape
         model.add(Dense(24, input_dim=state_shape[0], activation="relu"))
@@ -52,18 +54,20 @@ class DQN:
         vector = self.env.stateVector()
         self.env.vector = vector
 
-        if np.random.random() < self.epsilon:
+        if (self.playing is False) and (np.random.random() < self.epsilon):
             action = self.env.action_space.sample()
             print("e-greedy: {}  epsilon: {}<----               ".format(action, self.epsilon))
         else:
             predictions = self.model.predict(vector)[0]
             self.env.predictions = predictions
             final = np.zeros(9)
+            # TODO if predictions are softmaxed perhaps this is not the best way to update it.
+            #
             for ii in range(0,9):
                 if (self.env.valMovs[ii] >= 1):
-                    final[ii] = predictions[ii]*1.5
+                    final[ii] = predictions[ii]*1.1
                 else:
-                    final[ii] = predictions[ii]*0.5
+                    final[ii] = predictions[ii]*0.9
 
             action = np.argmax(final)
             print("vector: {}                   ".format(vector))

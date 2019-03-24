@@ -1,5 +1,4 @@
-# Agent v5 a.k.a. Simple Qlearning with v2 gym_abadia
-# this agent is a very simple agent using Qlearning
+# Agent v5 a.k.a. Simple DQN that will grow with CNN and mixed models with gym_abadia version 2
 
 import gym
 import gym_abadia
@@ -16,7 +15,7 @@ from collections import deque
 
 import logging
 
-from DQN import DQN
+from AbadIA.NDQN import NDQN as NDQN
 
 def init_env(env):
     argparser = argparse.ArgumentParser()
@@ -135,7 +134,7 @@ def mainLoop():
     gamma = 0.9
     epsilon = .95
 
-    dqn_agent = DQN(env=env)
+    dqn_agent = NDQN(env=env)
     steps = []
 
     for i_episode in range(env.num_episodes):
@@ -229,7 +228,7 @@ def mainLoop():
 
         # TODO JT: refactoring this: the way we storage models and add info to game json
 
-        nameModel = "models/model_v2_{}_trial_{}.model".format(env.gameId, i_episode)
+        nameModel = "models/model_v3_{}_trial_{}.model".format(env.gameId, i_episode)
 
         dqn_agent.save_model(nameModel)
 
@@ -237,7 +236,7 @@ def mainLoop():
             logging.info("Uploading model to GCP")
             env.upload_blob(nameModel, nameModel)
 
-        nameModel ="models/model_v2_lastest.model".format(env.gameId)
+        nameModel ="models/model_v3_lastest.model".format(env.gameId)
         dqn_agent.save_model(nameModel)
         if (env.gsBucket != None):
             logging.info("Uploading lastest model to GCP")
