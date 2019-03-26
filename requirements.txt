@@ -103,10 +103,10 @@ Pygments==2.3.1
 pyparsing==2.3.1
 python-dateutil==2.7.1
 pytz==2018.3
-PyYAML==3.12
+PyYAML
 pyzmq==17.1.2
 qtconsole==4.4.3
-requests==2.18.4
+requests
 rsa==3.4.2
 scipy==1.0.1
 Send2Trash==1.5.0
@@ -120,7 +120,7 @@ testpath==0.4.2
 tornado==5.1.1
 traitlets==4.3.2
 uritemplate==3.0.0
-urllib3==1.22
+urllib3
 wcwidth==0.1.7
 webencodings==0.5.1
 Werkzeug==0.14.1
