@@ -75,6 +75,69 @@ def checkValidMovs(env):
         return env.valMovs
 
     room = np.zeros([24, 24, 2], np.int)
+    chkM2 = [
+        [0, [
+                [0,1,1,0],
+                [0,0,0,0],
+                [0,0,0,0],
+                [0,0,0,0]
+            ],
+        ],
+        [1,[
+                [0, 1, 1, 1],
+                [0, 0, 0, 1],
+                [0, 0, 0, 1],
+                [0, 0, 0, 0]
+            ],
+         ],
+        [2, [
+            [0, 0, 0, 0],
+            [0, 0, 0, 1],
+            [0, 0, 0, 1],
+            [0, 0, 0, 0]
+        ],
+         ],
+        [3, [
+            [0, 0, 0, 0],
+            [0, 0, 0, 1],
+            [0, 0, 0, 1],
+            [0, 1, 1, 1]
+        ],
+         ],
+        [4, [
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 0, 0, 0],
+            [0, 1, 1, 0]
+        ],
+
+         ],
+        [5, [
+            [0, 0, 0, 0],
+            [1, 0, 0, 0],
+            [1, 0, 0, 0],
+            [1, 1, 1, 0]
+        ],
+
+         ],
+        [6, [
+            [0, 0, 0, 0],
+            [1, 0, 0, 0],
+            [1, 0, 0, 0],
+            [0, 0, 0, 0]
+        ],
+
+         ],
+        [7, [
+            [1, 1, 1, 0],
+            [1, 0, 0, 0],
+            [1, 0, 0, 0],
+            [0, 0, 0, 0]
+        ],
+
+         ],
+    ]
+
     chkM = np.array([
         [0, 0, 0, -1, 0],
         [0, 0, 1, -1, 0],
@@ -134,6 +197,34 @@ def checkValidMovs(env):
         print("%s:%s " % (env.actions_list[ii], env.valMovs[ii]) , end="")
     print("<--                                                            ")
 
+    env.valMovs2 = np.zeros(9, np.int)
+    for action in range(0, 8):
+        print ("checking action {} room at {},{}".format(action, yPos, xPos))
+        for yy in range(0, 4):
+            for xx in range(0, 4):
+                print("{}".format(chkM2[action][1][yy][xx]), end="")
+            print("|".format(yy), end="")
+            for xx in range(0, 4):
+                print("{}".format(room[yPos+yy-1][xPos+xx-1][0]), end="")
+            print("|%3d|" % (yPos+yy-1), end="")
+            for xx in range(0, 4):
+                print("{}".format(room[yPos+yy-1][xPos+xx-1][1]), end="")
+            print("| {}".format(yPos+yy-1))
+        env.valMovs2[action] = 1
+        for yy in range(0, 4):
+            for xx in range(0, 4):
+                if (chkM2[action][1][yy][xx] == 1):
+                    diff = room[yPos+yy-1, xPos+xx-1, 1] - room[yPos, xPos, 1]
+                    if (not(diff >= -1 and diff <= 1)):
+                        env.valMovs[chkM[ii, 0]] = 0
+                        print("Wall Blocks G {},{} ".format(yy,xx))
+                if (chkM2[action][1][yy][xx] == 1 and room[yPos+yy-1, xPos+xx-1, 0] != 0):
+                    print("Adso/* block {},{} ".format(yy,xx))
+                    env.valMovs2[action] = 0
+    env.valMovs2[8] = 1
+    print ("new valMovs2: {}".format(env.valMovs2))
+    print ("old valMovs:  {}".format(env.valMovs))
+    env.valMovs = env.valMovs2
     return env.valMovs
 
 def mainLoop():

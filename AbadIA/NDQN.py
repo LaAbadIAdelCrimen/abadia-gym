@@ -63,7 +63,7 @@ class NDQN:
             # TODO if predictions are softmaxed perhaps this is not the best way to update it.
             #
             for ii in range(0,self.env.action_space.n):
-                if (self.env.valMovs[ii] >= 2):
+                if (self.env.valMovs[ii] >= 1):
                     final[ii] = predictions[ii]
                 else:
                     final[ii] = predictions[ii]*0.9
