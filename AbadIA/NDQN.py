@@ -11,7 +11,6 @@ class NDQN:
         self.env     = env
         self.memory  = deque(maxlen=2000)
         # Exploring or playing
-        self.playing = False
 
         self.gamma = 0.85
         self.epsilon = 1.0
@@ -54,24 +53,25 @@ class NDQN:
         vector = self.env.stateVector()
         self.env.vector = vector
 
-        if (self.playing is False) and (np.random.random() < self.epsilon):
+        if (self.env.playing is False) and (np.random.random() < self.epsilon):
             action = self.env.action_space.sample()
             print("e-greedy: {}  epsilon: {}<----               ".format(action, self.epsilon))
         else:
             predictions = self.model.predict(vector)[0]
             self.env.predictions = predictions
-            final = np.zeros(9)
+            final = np.zeros(self.env.action_space.n)
             # TODO if predictions are softmaxed perhaps this is not the best way to update it.
             #
-            for ii in range(0,9):
-                if (self.env.valMovs[ii] >= 1):
-                    final[ii] = predictions[ii]*1.1
+            for ii in range(0,self.env.action_space.n):
+                if (self.env.valMovs[ii] >= 2):
+                    final[ii] = predictions[ii]
                 else:
                     final[ii] = predictions[ii]*0.9
 
             action = np.argmax(final)
             print("vector: {}                   ".format(vector))
             print("predictions: {}              ".format(predictions))
+            print("final:       {}              ".format(final))
             print("action: {}                   ".format(action))
 
         return action

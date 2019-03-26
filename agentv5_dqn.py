@@ -26,6 +26,7 @@ def init_env(env):
     argparser.add_argument('-e', '--episodes', help='number of episodes')
     argparser.add_argument('-n', '--steps', help='total steps of the episode')
     argparser.add_argument('-g', '--gcs', help='Google storage bucket')
+    argparser.add_argument('-l', '--learning', help='Learning mode (True/False)')
 
     args = argparser.parse_args()
     print("args {}".format(args))
@@ -54,11 +55,25 @@ def init_env(env):
         env.gsBucket = args.gcs
         env.init_google_store_bucket()
 
+    if args.learning != None:
+        if (args.learning == "True"):
+            env.playing = False
+        else:
+            env.playing = True
+
+        env.init_google_store_bucket()
+
     logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', datefmt='%d-%m-%y %H:%M:%S',
                         level=logging.INFO)
 
 def checkValidMovs(env):
     env.valMovs = np.zeros(9, np.int)
+
+    if(env.rejilla == []):
+        for ii in range(0,9):
+            env.valMovs[ii] = 1
+        return env.valMovs
+
     room = np.zeros([24, 24, 2], np.int)
     chkM = np.array([
         [0, 0, 0, -1, 0],
@@ -156,11 +171,8 @@ def mainLoop():
 
             # Get new state and reward from environment and check if
             # in the state of the game is Guillermo
-
+            checkValidMovs(env)
             action = dqn_agent.act(state)
-
-
-
             env.prev_vector = env.vector
             while True:
                 newState, reward, done, info = env.step(action)
@@ -170,7 +182,6 @@ def mainLoop():
                 if env.estaGuillermo:
                     break
                     # test valid movements
-
 
             dqn_agent.remember(env.prev_vector, action, reward, env.vector, done)
 
