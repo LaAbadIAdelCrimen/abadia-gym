@@ -178,24 +178,20 @@ def checkValidMovs(env):
             room[yy, xx, 0] = per
             room[yy, xx, 1] = alt
 
-    for ii in range(0,len(chkM)):
-        y1 = yPos+chkM[ii, 1]
-        x1 = xPos+chkM[ii, 2]
-        y2 = yPos+chkM[ii, 3]
-        x2 = xPos+chkM[ii, 4]
-        if ((y1 >= 0 and y1 <= 23) and (x1 >= 0 and x1 <= 23) and (y2 >= 0 and y2 <= 23) and (x2 >= 0 and x2 <= 23)):
-            diff = room[y1, x1, 1] - room[y2, x2, 1]
-            if (diff >= -1 and diff <= 1):
-                print("Wall Blocks G {} ".format(ii), end="")
-                env.valMovs[chkM[ii, 0]] += 1
-            if (room[y1, x1, 0] != room[y2, x2, 0] and room[y2, x2, 0] != 0):
-                print("Adso/* block G {}".format(ii), end="")
-                env.valMovs[chkM[ii, 0]] = 0
-    env.valMovs[8] = 1
-    print("\nValid Movements:", end="")
-    for ii in range(9):
-        print("%s:%s " % (env.actions_list[ii], env.valMovs[ii]) , end="")
-    print("<--                                                            ")
+    # for ii in range(0,len(chkM)):
+        # y1 = yPos+chkM[ii, 1]
+        # x1 = xPos+chkM[ii, 2]
+        # y2 = yPos+chkM[ii, 3]
+        # x2 = xPos+chkM[ii, 4]
+        # if ((y1 >= 0 and y1 <= 23) and (x1 >= 0 and x1 <= 23) and (y2 >= 0 and y2 <= 23) and (x2 >= 0 and x2 <= 23)):
+            # diff = room[y1, x1, 1] - room[y2, x2, 1]
+            # if (diff >= -1 and diff <= 1):
+                # print("Wall Blocks G {} ".format(ii), end="")
+                # env.valMovs[chkM[ii, 0]] += 1
+            # if (room[y1, x1, 0] != room[y2, x2, 0] and room[y2, x2, 0] != 0):
+                # print("Adso/* block G {}".format(ii), end="")
+                # env.valMovs[chkM[ii, 0]] = 0
+    # env.valMovs[8] = 1
 
     env.valMovs2 = np.zeros(9, np.int)
     for action in range(0, 8):
@@ -216,7 +212,7 @@ def checkValidMovs(env):
                 if (chkM2[action][1][yy][xx] == 1):
                     diff = room[yPos+yy-1, xPos+xx-1, 1] - room[yPos, xPos, 1]
                     if (not(diff >= -1 and diff <= 1)):
-                        env.valMovs[chkM[ii, 0]] = 0
+                        env.valMovs2[action] = 0
                         print("Wall Blocks G {},{} ".format(yy,xx))
                 if (chkM2[action][1][yy][xx] == 1 and room[yPos+yy-1, xPos+xx-1, 0] != 0):
                     print("Adso/* block {},{} ".format(yy,xx))
@@ -225,6 +221,10 @@ def checkValidMovs(env):
     print ("new valMovs2: {}".format(env.valMovs2))
     print ("old valMovs:  {}".format(env.valMovs))
     env.valMovs = env.valMovs2
+    print("\nValid Movements:", end="")
+    for ii in range(9):
+        print("%s:%s " % (env.actions_list[ii], env.valMovs[ii]) , end="")
+    print("<--                                                            ")
     return env.valMovs
 
 def mainLoop():
