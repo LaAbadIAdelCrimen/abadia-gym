@@ -66,13 +66,13 @@ class NDQN:
                 if (self.env.valMovs[ii] >= 1):
                     final[ii] = predictions[ii]
                 else:
-                    final[ii] = predictions[ii]*0.9
+                    final[ii] = -99 # predictions[ii]*0.9
 
             action = np.argmax(final)
             print("vector: {}                   ".format(vector))
             print("predictions: {}              ".format(predictions))
             print("final:       {}              ".format(final))
-            print("action: {}                   ".format(action))
+            print("Action: {} Prediction: {}    ".format(action, final[action]))
 
         return action
 

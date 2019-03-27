@@ -27,6 +27,7 @@ def init_env(env):
     argparser.add_argument('-n', '--steps', help='total steps of the episode')
     argparser.add_argument('-g', '--gcs', help='Google storage bucket')
     argparser.add_argument('-l', '--learning', help='Learning mode (True/False)')
+    argparser.add_argument('-v', '--verbose', help='Verbose output')
 
     args = argparser.parse_args()
     print("args {}".format(args))
@@ -61,7 +62,9 @@ def init_env(env):
         else:
             env.playing = True
 
-        env.init_google_store_bucket()
+    if args.verbose != None:
+        env.verbose = int(args.verbose)
+
 
     logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', datefmt='%d-%m-%y %H:%M:%S',
                         level=logging.INFO)
@@ -195,17 +198,18 @@ def checkValidMovs(env):
 
     env.valMovs2 = np.zeros(9, np.int)
     for action in range(0, 8):
-        print ("checking action {} room at {},{}".format(action, yPos, xPos))
-        for yy in range(0, 4):
-            for xx in range(0, 4):
-                print("{}".format(chkM2[action][1][yy][xx]), end="")
-            print("|".format(yy), end="")
-            for xx in range(0, 4):
-                print("{}".format(room[yPos+yy-1][xPos+xx-1][0]), end="")
-            print("|%3d|" % (yPos+yy-1), end="")
-            for xx in range(0, 4):
-                print("{}".format(room[yPos+yy-1][xPos+xx-1][1]), end="")
-            print("| {}".format(yPos+yy-1))
+        if (env.verbose > 1):
+            print ("checking action {} room at {},{}".format(action, yPos, xPos))
+            for yy in range(0, 4):
+                for xx in range(0, 4):
+                    print("{}".format(chkM2[action][1][yy][xx]), end="")
+                print("|".format(yy), end="")
+                for xx in range(0, 4):
+                    print("{}".format(room[yPos+yy-1][xPos+xx-1][0]), end="")
+                print("|%3d|" % (yPos+yy-1), end="")
+                for xx in range(0, 4):
+                    print("{}".format(room[yPos+yy-1][xPos+xx-1][1]), end="")
+                print("| {}".format(yPos+yy-1))
         env.valMovs2[action] = 1
         for yy in range(0, 4):
             for xx in range(0, 4):
@@ -213,13 +217,14 @@ def checkValidMovs(env):
                     diff = room[yPos+yy-1, xPos+xx-1, 1] - room[yPos, xPos, 1]
                     if (not(diff >= -1 and diff <= 1)):
                         env.valMovs2[action] = 0
-                        print("Wall Blocks G {},{} ".format(yy,xx))
+                        if (env.verbose > 1):
+                            print("Wall Blocks G {},{} ".format(yy,xx))
                 if (chkM2[action][1][yy][xx] == 1 and room[yPos+yy-1, xPos+xx-1, 0] != 0):
-                    print("Adso/* block {},{} ".format(yy,xx))
+                    if (env.verbose > 1):
+                        print("Adso/* block {},{} ".format(yy,xx))
                     env.valMovs2[action] = 0
     env.valMovs2[8] = 1
     print ("new valMovs2: {}".format(env.valMovs2))
-    print ("old valMovs:  {}".format(env.valMovs))
     env.valMovs = env.valMovs2
     print("\nValid Movements:", end="")
     for ii in range(9):
