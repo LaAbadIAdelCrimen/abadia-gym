@@ -313,7 +313,7 @@ class AbadiaEnv2(gym.Env):
                 self.prevPantalla = int(ob['numPantalla'])
             else:
                 if (self.prevPantalla != int(ob['numPantalla'])):
-                    reward += 0.004
+                    reward += 0.03
                     logging.info("----------")
                     logging.info("reward by screen change !!!!! {} !=  {}".format(self.prevPantalla, int(ob['numPantalla'])))
                     logging.info("Personajes: {}".format(self.Personajes))
@@ -387,11 +387,21 @@ class AbadiaEnv2(gym.Env):
         ob['reward'] = reward
         ob['totalReward'] = self.totalReward
         logging.info("reward: {} tr: {} action: {} ".format(reward, self.totalReward, action))
+
+        # adding more information for debugging: valid moves, vectors, predictions, etc.
+        ob['valMovs'] = self.valMovs
+        ob['predictions'] self.calculated_predictions
+        ob['final'] = self.final_predictions
+        ob['vector'] = self.vector_predictions
+        ob['action_predictions'] = self.action_predictions
+        ob['action_type'] = self.action_type
+
         # we make a copy for the current observation in order to calculate
         # the reward for the next state
+
         self.ob = ob
         self.prev_ob = ob
-
+        
         # JT chequear si esto está bien, no parece que este devolviendo bien el estado siguiente!!!
 
         return ob, reward, self.game_is_done, {}
