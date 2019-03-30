@@ -200,7 +200,7 @@ def checkValidMovs(env):
     env.valMovs2 = np.zeros(9, np.int)
     for action in range(0, 8):
         if (env.verbose > 1):
-            print ("checking action {} room at {},{}".format(action, yPos, xPos))
+            env.logging.info ("checking action {} room at {},{}".format(action, yPos, xPos))
             for yy in range(0, 4):
                 for xx in range(0, 4):
                     print("{}".format(chkM2[action][1][yy][xx]), end="")
@@ -225,12 +225,14 @@ def checkValidMovs(env):
                         print("Adso/* block {},{} ".format(yy,xx))
                     env.valMovs2[action] = 0
     env.valMovs2[8] = 1
-    print ("new valMovs2: {}".format(env.valMovs2))
+    env.logging.info ("new valMovs2: {}".format(env.valMovs2))
     env.valMovs = env.valMovs2
-    print("\nValid Movements:", end="")
+    ss = "Valid Movements:"
     for ii in range(9):
-        print("%s:%s " % (env.actions_list[ii], env.valMovs[ii]) , end="")
-    print("<--                                                            ")
+        ss += "%s:%s " % (env.actions_list[ii], env.valMovs[ii])
+    ss += "<--"
+    env.logging.info(ss)
+
     return env.valMovs
 
 def mainLoop():

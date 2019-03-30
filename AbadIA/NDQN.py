@@ -24,7 +24,7 @@ class NDQN:
             self.target_model = self.create_model()
         else:
             if (env.gsBucket != None):
-                self.env.logging.info(("I will download from {} the file {}".format(env.gsBucket, env.modelName))
+                self.env.logging.info("I will download from {} the file {}".format(env.gsBucket, env.modelName))
                 env.download_blob(env.modelName, env.modelName)
 
             self.model        = self.load_model(env.modelName)
@@ -70,9 +70,9 @@ class NDQN:
 
             action = np.argmax(final)
             self.env.logging.info("vector:      {}              ".format(vector))
-            self.env.logging.info(("predictions: {}              ".format(predictions))
-            self.env.logging.info(("final:       {}              ".format(final))
-            self.env.logging.info(("Action:      {} Prediction: {}    ".format(action, final[action]))
+            self.env.logging.info("predictions: {}              ".format(predictions))
+            self.env.logging.info("final:       {}              ".format(final))
+            self.env.logging.info("Action:      {} Prediction: {}    ".format(action, final[action]))
 
         return action
 
@@ -104,7 +104,7 @@ class NDQN:
             # print("loss:", history.history["loss"], "\n")
 
     def target_train(self):
-        self.env.logging.info(("training target ..")
+        self.env.logging.info("training target ..")
         weights = self.model.get_weights()
         target_weights = self.target_model.get_weights()
         for i in range(len(target_weights)):
