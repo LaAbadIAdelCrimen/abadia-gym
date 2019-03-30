@@ -69,6 +69,7 @@ class AbadiaEnv2(gym.Env):
         self.verbose        = 0
         self.playing        = False
 
+
         # Define what the agent can do
         # 0 -> STEP FORWARD
         # 1 -> RIGHT
@@ -594,8 +595,6 @@ class AbadiaEnv2(gym.Env):
     def save_action(self, state, action, reward, nextstate):
         s1 = state.copy()
         s2 = nextstate.copy()
-        # s1.pop('Rejilla')
-        # s2.pop('Rejilla')
 
         self.fdActions.write("{}{}\"action\":{}\"state\":{},\"action\":{},\"reward\":{},\"nextstate\":{}{}{}\n"
                              .format("[", "{", "{", json.dumps(s1), action, reward, json.dumps(s2), "}", "}]"))
