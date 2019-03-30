@@ -340,16 +340,16 @@ class AbadiaEnv2(gym.Env):
                 self.add_event("Bonus", "prev {} curr {}".format(self.bonus, int(self.prev_ob['bonus'])), (500 * incr_bonus) / 10000)
 
         # we check if Guillermo change his position. Positive reward if yes, negative if no
-        if action == 0:
-            if len(self.prev_ob) > 0 and len(self.prev_ob['Personajes']) > 0:
-                prev = self.dataPersonaje(self.prev_ob, "Guillermo")
-                curr = self.dataPersonaje(ob, "Guillermo")
-                if (prev['posX'] != curr['posX']) or (prev['posY'] != curr['posY']):
-                    logging.info("se ha movido: {},{} -> {},{}".format(prev['posX'], prev['posY'],
-                                                            curr['posX'], curr['posY']))
-                    reward += 0.001
+        # if action == 0:
+        if len(self.prev_ob) > 0 and len(self.prev_ob['Personajes']) > 0:
+            prev = self.dataPersonaje(self.prev_ob, "Guillermo")
+            curr = self.dataPersonaje(ob, "Guillermo")
+            if (prev['posX'] != curr['posX']) or (prev['posY'] != curr['posY']):
+                logging.info("se ha movido: {},{} -> {},{}".format(prev['posX'], prev['posY'],
+                                                        curr['posX'], curr['posY']))
+                reward += 0.001
 
-        self.eventsGame.extend(self.eventsAction)
+        # TODO: check this self.eventsGame.extend(self.eventsAction)
         # if the game is over, we just finish the game and reward is -1000
         # if we completed the game, we finish and the reward is 5000
         # the percentage must be variable to help the AI to learn
@@ -383,6 +383,7 @@ class AbadiaEnv2(gym.Env):
         self.totalReward += reward
         ob['reward'] = reward
         ob['totalReward'] = self.totalReward
+        logging.info("reward: {} tr: {} action: {} ".format(reward, self.totalReward, action))
         # we make a copy for the current observation in order to calculate
         # the reward for the next state
         self.ob = ob

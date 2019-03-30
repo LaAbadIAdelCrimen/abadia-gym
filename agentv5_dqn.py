@@ -316,7 +316,7 @@ def mainLoop():
             #      .format(i_episode, t, action, x, y, ori, env.numPantalla, newX, newY, np.round(reward,2),
             #              np.round(rAll,2), np.round(Q[x,y],2)), end="\r")
 
-            logging.info("E {}:{} {}-{}:XYOP {},{},{},{} -> {},{} r:{} tr:{} V:{}"
+            logging.info("Epi {}:{} {}-{}:XYOP {},{},{},{} -> {},{} reward:{} tr:{} V:{}"
                 .format(i_episode, t, action, env.actions_list[action], x, y, ori, env.numPantalla, newX, newY, np.round(reward,8),
                 np.round(rAll,8), np.round(env.predictions,4)))
 
