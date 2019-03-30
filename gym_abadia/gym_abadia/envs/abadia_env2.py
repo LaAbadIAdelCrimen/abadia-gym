@@ -66,6 +66,8 @@ class AbadiaEnv2(gym.Env):
         self.eventsGame     = []
         self.eventsAction   = []
         self.totalReward    = 0.0
+        self.verbose        = 0
+        self.playing        = False
 
         # Define what the agent can do
         # 0 -> STEP FORWARD
@@ -98,7 +100,7 @@ class AbadiaEnv2(gym.Env):
         self.rejilla = []
         self.prev_ob = dict()
         self.estaGuillermo= False
-        self.room = np.zeros(20,20,3)
+        self.room = np.zeros([20,20,3], np.int)
 
 
         self.curr_step = -1
@@ -190,7 +192,7 @@ class AbadiaEnv2(gym.Env):
     # TODO JT refactoring and eliminate this function
     def sendReset(self):
         self.sendCmd(self.url, "abadIA/game/current/actions/SPACE", mode='POST')
-        sleep(1)
+        # sleep(1)
         self.sendCmd(self.url, "abadIA/game/current/actions/SPACE", mode='POST')
         return self.sendCmd(self.url, "abadIA/game", mode="POST")
 

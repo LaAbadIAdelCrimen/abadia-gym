@@ -2,6 +2,8 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/python3/src/abadia-dqn" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/python3/src/gym-abadia" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/abadia-dqn" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/gym-abadia" vcs="Git" />
   </component>
