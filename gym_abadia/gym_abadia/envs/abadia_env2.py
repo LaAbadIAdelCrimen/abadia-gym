@@ -371,9 +371,14 @@ class AbadiaEnv2(gym.Env):
             logging.info("FUCKING YEAH GAME ALMOST DONE")
             reward = 1
 
+        if (self.valMovs[action] < 1):
+            logging.info("***** Invalid move, penalizing it")
+            reward = -0.09
+
         # if no reward we penalized it
         if reward == 0:
-            reward = -0.0001
+            logging.info("***** No reward, penalizing it")
+            reward = -0.005
 
         self.totalReward += reward
         ob['reward'] = reward

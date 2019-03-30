@@ -68,6 +68,7 @@ def init_env(env):
 
     logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', datefmt='%d-%m-%y %H:%M:%S',
                         level=logging.INFO)
+    env.logging = logging
 
 def checkValidMovs(env):
     env.valMovs = np.zeros(9, np.int)
@@ -306,15 +307,16 @@ def mainLoop():
                     env.Visited[x, y + 1] += -0.01
 
             dqn_agent.replay()        # internally iterates default (prediction) model
-            dqn_agent.target_train()  # iterates target model
+            # if (t % 16 == 0 ):
+            dqn_agent.target_train()
 
             # print("Episode({}:{}) A({})XYOP {},{},{},{} -> {},{} r:{} tr:{} Q(s,a)= {}"
             #      .format(i_episode, t, action, x, y, ori, env.numPantalla, newX, newY, np.round(reward,2),
             #              np.round(rAll,2), np.round(Q[x,y],2)), end="\r")
 
             logging.info("E {}:{} {}-{}:XYOP {},{},{},{} -> {},{} r:{} tr:{} V:{}"
-                .format(i_episode, t, action, env.actions_list[action], x, y, ori, env.numPantalla, newX, newY, np.round(reward,2),
-                np.round(rAll,2), np.round(env.predictions,3)))
+                .format(i_episode, t, action, env.actions_list[action], x, y, ori, env.numPantalla, newX, newY, np.round(reward,8),
+                np.round(rAll,8), np.round(env.predictions,4)))
 
             # TODO JT: we need to create an option for this
             # if (t % 10 == 0 or reward > 0):
@@ -335,7 +337,7 @@ def mainLoop():
 
         # TODO JT: refactoring this: the way we storage models and add info to game json
 
-        nameModel = "models/model_v3_{}_trial_{}.model".format(env.gameId, i_episode)
+        nameModel = "models/model_v4_{}_trial_{}.model".format(env.gameId, i_episode)
 
         dqn_agent.save_model(nameModel)
 
@@ -343,7 +345,7 @@ def mainLoop():
             logging.info("Uploading model to GCP")
             env.upload_blob(nameModel, nameModel)
 
-        nameModel ="models/model_v3_lastest.model".format(env.gameId)
+        nameModel ="models/model_v4_lastest.model".format(env.gameId)
         dqn_agent.save_model(nameModel)
         if (env.gsBucket != None):
             logging.info("Uploading lastest model to GCP")

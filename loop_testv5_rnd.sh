@@ -15,7 +15,7 @@ do
   ls -lt $line
   sleep 1
   # python3 agenttestv2.py --episodes=1 --steps=9000 -c $line -g abadia-data  -p 4477
-  python3 agentv5_dqn.py --episodes=1 --steps=2000 -g abadia-data # --model=models/model_v3_lastest.model -g abadia-data  -c $line
+  python3 agentv5_dqn.py --episodes=5 --steps=500 -g abadia-data --model=models/model_v4_lastest.model -g abadia-data # -c $line
   # -s http://35.241.222.173 -p 80 # -c /tmp/check
 
 done

@@ -9,12 +9,12 @@ from collections import deque
 class NDQN:
     def __init__(self, env):
         self.env     = env
-        self.memory  = deque(maxlen=2000)
+        self.memory  = deque(maxlen=3000)
         # Exploring or playing
 
         self.gamma = 0.85
         self.epsilon = 1.0
-        self.epsilon_min = 0.0001 # previously 0.01
+        self.epsilon_min = 0.01 # previously 0.01
         self.epsilon_decay = 0.995
         self.learning_rate = 0.005
         self.tau = .125
@@ -24,14 +24,14 @@ class NDQN:
             self.target_model = self.create_model()
         else:
             if (env.gsBucket != None):
-                print("I will download from {} the file {}".format(env.gsBucket, env.modelName))
+                self.env.logging.info(("I will download from {} the file {}".format(env.gsBucket, env.modelName))
                 env.download_blob(env.modelName, env.modelName)
 
             self.model        = self.load_model(env.modelName)
             self.target_model = self.load_model(env.modelName)
 
     def create_model(self):
-        print("Creating a new model v3")
+        self.env.logging.info("Creating a new model v4")
         model   = Sequential()
         state_shape  = self.env.observation_space.shape
         model.add(Dense(24, input_dim=state_shape[0], activation="relu"))
@@ -43,7 +43,7 @@ class NDQN:
         return model
 
     def load_model(self, name):
-        print("Loading a model from: ({})".format(name))
+        self.env.logging.info("Loading a model from: ({})".format(name))
         return load_model(name)
 
     def act(self, state):
@@ -55,7 +55,7 @@ class NDQN:
 
         if (self.env.playing is False) and (np.random.random() < self.epsilon):
             action = self.env.action_space.sample()
-            print("e-greedy: {}  epsilon: {}<----               ".format(action, self.epsilon))
+            self.env.logging.info("e-greedy: {}  epsilon: {}<----               ".format(action, self.epsilon))
         else:
             predictions = self.model.predict(vector)[0]
             self.env.predictions = predictions
@@ -69,34 +69,42 @@ class NDQN:
                     final[ii] = -99 # predictions[ii]*0.9
 
             action = np.argmax(final)
-            print("vector: {}                   ".format(vector))
-            print("predictions: {}              ".format(predictions))
-            print("final:       {}              ".format(final))
-            print("Action: {} Prediction: {}    ".format(action, final[action]))
+            self.env.logging.info("vector:      {}              ".format(vector))
+            self.env.logging.info(("predictions: {}              ".format(predictions))
+            self.env.logging.info(("final:       {}              ".format(final))
+            self.env.logging.info(("Action:      {} Prediction: {}    ".format(action, final[action]))
 
         return action
 
     def remember(self, state, action, reward, new_state, done):
-        self.memory.append([state, action, reward, new_state, done])
+        self.memory.append([state, action, reward, new_state, done, 0])
 
     def replay(self):
         batch_size = 32
         if len(self.memory) < batch_size:
             return
 
-        samples = random.sample(self.memory, batch_size)
+        temp = self.memory
+        acu  = np.zeros(32)
+
+        for index in range(len(temp)-1, 0, -1):
+            acu[index % 32] = temp[index][2]
+            temp[index][5]  = acu.sum()
+
+        samples = random.sample(temp, batch_size)
         for sample in samples:
-            state, action, reward, new_state, done = sample
+            state, action, reward, new_state, done, future_reward = sample
             target = self.target_model.predict(state)
             if done:
-                target[0][action] = reward
+                target[0][action] = future_reward
             else:
                 Q_future = max(self.target_model.predict(new_state)[0])
-                target[0][action] = reward + Q_future * self.gamma
+                target[0][action] = future_reward # Q_future # reward + Q_future * self.gamma
             history = self.model.fit(state, target, epochs=1, verbose=0)
             # print("loss:", history.history["loss"], "\n")
 
     def target_train(self):
+        self.env.logging.info(("training target ..")
         weights = self.model.get_weights()
         target_weights = self.target_model.get_weights()
         for i in range(len(target_weights)):
