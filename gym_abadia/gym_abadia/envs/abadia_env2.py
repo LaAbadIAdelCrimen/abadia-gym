@@ -389,8 +389,8 @@ class AbadiaEnv2(gym.Env):
         logging.info("reward: {} tr: {} action: {} ".format(reward, self.totalReward, action))
 
         # adding more information for debugging: valid moves, vectors, predictions, etc.
-        ob['valMovs'] = self.valMovs
-        ob['predictions'] self.calculated_predictions
+        ob['valMovs'] = self.valMovs.tolist()
+        ob['predictions'] = self.calculated_predictions
         ob['final'] = self.final_predictions
         ob['vector'] = self.vector_predictions
         ob['action_predictions'] = self.action_predictions
@@ -401,7 +401,7 @@ class AbadiaEnv2(gym.Env):
 
         self.ob = ob
         self.prev_ob = ob
-        
+
         # JT chequear si esto está bien, no parece que este devolviendo bien el estado siguiente!!!
 
         return ob, reward, self.game_is_done, {}

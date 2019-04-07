@@ -5,7 +5,7 @@
 
 while true
 do
-(find games -name "*.checkpoint" | grep 2019 | grep _21_3 | grep  -v "_0_" | sort -r | head -50) |
+(find games -name "*.checkpoint" | grep 2019 | grep "$1" | grep  -v "_0_" | sort -r | head -50) |
 while read -r line
 do
 
@@ -15,7 +15,7 @@ do
   ls -lt $line
   sleep 1
   # python3 agenttestv2.py --episodes=1 --steps=9000 -c $line -g abadia-data  -p 4477
-  python3 agentv5_dqn.py --episodes=1 --steps=500 -g abadia-data --model=models/model_v4_lastest.model -g abadia-data # -c $line
+  python3 agentv5_dqn.py --episodes=1 --steps=500 -g abadia-data --model=models/model_v4_lastest.model -g abadia-data -c $line
   # -s http://35.241.222.173 -p 80 # -c /tmp/check
 
 done
