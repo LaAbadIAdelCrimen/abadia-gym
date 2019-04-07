@@ -6,7 +6,13 @@ from keras.layers import Dense, Dropout
 from keras.optimizers import Adam
 from collections import deque
 
-class NDQN:
+# TODO JT:
+# 1) Need a method to fill the memory with actions
+# 2) Need a method to training / validating out the agent
+# 3) A method to get the history of the training/validating
+# 4) a method to convert from the json format to the input vector
+
+class NGDQN:
     def __init__(self, env):
         self.env     = env
         self.memory  = deque(maxlen=3000)
@@ -31,9 +37,14 @@ class NDQN:
             self.target_model = self.load_model(env.modelName)
 
     def create_model(self):
-        self.env.logging.info("Creating a new model v4")
+        self.env.logging.info("Creating a new model v5")
         model   = Sequential()
+        # TODO JT we need to increment the input vector dim
+
         state_shape  = self.env.observation_space.shape
+
+        # TODO JT we need to redesign the internal lawyers
+
         model.add(Dense(24, input_dim=state_shape[0], activation="relu"))
         model.add(Dense(48, activation="relu"))
         model.add(Dense(24, activation="relu"))
