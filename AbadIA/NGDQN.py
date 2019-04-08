@@ -1,5 +1,6 @@
 import random
 import numpy as np
+import logging
 
 from keras.models import Sequential, load_model
 from keras.layers import Dense, Dropout
@@ -13,7 +14,7 @@ from collections import deque
 # 4) a method to convert from the json format to the input vector
 
 class NGDQN:
-    def __init__(self, env):
+    def __init__(self, env=None):
         self.env     = env
         self.memory  = deque(maxlen=3000)
         # Exploring or playing
@@ -25,19 +26,24 @@ class NGDQN:
         self.learning_rate = 0.005
         self.tau = .125
 
-        if env.modelName == None:
-            self.model        = self.create_model()
-            self.target_model = self.create_model()
-        else:
-            if (env.gsBucket != None):
-                self.env.logging.info("I will download from {} the file {}".format(env.gsBucket, env.modelName))
-                env.download_blob(env.modelName, env.modelName)
+        logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', datefmt='%d-%m-%y %H:%M:%S',
+                            level=logging.INFO)
+        self.logging = logging
 
-            self.model        = self.load_model(env.modelName)
-            self.target_model = self.load_model(env.modelName)
+        if env == None:
+            if env.modelName == None:
+                self.model        = self.create_model()
+                self.target_model = self.create_model()
+            else:
+                if (env.gsBucket != None):
+                    self.env.logging.info("I will download from {} the file {}".format(env.gsBucket, env.modelName))
+                    env.download_blob(env.modelName, env.modelName)
+
+                self.model        = self.load_model(env.modelName)
+                self.target_model = self.load_model(env.modelName)
 
     def create_model(self):
-        self.env.logging.info("Creating a new model v5")
+        self.logging.info("Creating a new model v5")
         model   = Sequential()
         # TODO JT we need to increment the input vector dim
 
@@ -54,12 +60,35 @@ class NGDQN:
         return model
 
     def load_model(self, name):
-        self.env.logging.info("Loading a model from: ({})".format(name))
+        self.logging.info("Loading a model from: ({})".format(name))
         return load_model(name)
 
-    def act(self, state):
+    def act(self, vector):
         self.epsilon *= self.epsilon_decay
         self.epsilon = max(self.epsilon_min, self.epsilon)
+        if (self.env == None):
+            return act_prediction(vector)
+        else:
+            return act_env(vector)
+
+    def act_prediction(self, vector):
+
+        # self.env.vector = vector
+
+        predictions = self.model.predict(vector)[0]
+        # self.env.predictions = predictions
+        # TODO JT: how to get the action_space
+        # final = np.zeros(self.env.action_space.n)
+
+        action = np.argmax(final)
+        self.logging.info("vector:      {}              ".format(vector))
+        self.logging.info("predictions: {}              ".format(predictions))
+        self.logging.info("final:       {}              ".format(final))
+        self.logging.info("Action:      {} Prediction: {}    ".format(action, final[action]))
+
+        return action
+
+    def act_env(self, vector):
 
         vector = self.env.stateVector()
         self.env.vector = vector
@@ -74,8 +103,7 @@ class NGDQN:
             predictions = self.model.predict(vector)[0]
             self.env.predictions = predictions
             final = np.zeros(self.env.action_space.n)
-            # TODO if predictions are softmaxed perhaps this is not the best way to update it.
-            #
+
             for ii in range(0,self.env.action_space.n):
                 if (self.env.valMovs[ii] >= 1):
                     final[ii] = predictions[ii]
@@ -136,4 +164,3 @@ class NGDQN:
 
     def save_model(self, fn):
         self.model.save(fn)
-
