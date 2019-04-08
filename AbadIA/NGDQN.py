@@ -223,6 +223,7 @@ class NGDQN:
         # vValidm the validmovs
         vValidm = np.zeros([9], np.float)
         if 'valMovs' in state:
+            print(state['valMovs'])
             for ii in range(8):
                 vValidm[ii] = float(state['valMovs'][ii])
 
