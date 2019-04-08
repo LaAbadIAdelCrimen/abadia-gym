@@ -42,19 +42,19 @@ class NGDQN:
                 self.model        = self.load_model(env.modelName)
                 self.target_model = self.load_model(env.modelName)
 
-    def create_model(self):
+    def create_model(self, input_dim=10, output_dim=9):
         self.logging.info("Creating a new model v5")
         model   = Sequential()
         # TODO JT we need to increment the input vector dim
 
-        state_shape  = self.env.observation_space.shape
+        state_shape  = input_dim # self.env.observation_space.shape
 
         # TODO JT we need to redesign the internal lawyers
 
-        model.add(Dense(24, input_dim=state_shape[0], activation="relu"))
+        model.add(Dense(24, input_dim=input_dim, activation="relu"))
         model.add(Dense(48, activation="relu"))
         model.add(Dense(24, activation="relu"))
-        model.add(Dense(self.env.action_space.n))
+        model.add(Dense(output_dim))
         model.compile(loss="mean_squared_error",
             optimizer=Adam(lr=self.learning_rate))
         return model
