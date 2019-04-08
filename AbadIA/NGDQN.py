@@ -221,9 +221,9 @@ class NGDQN:
         vector = np.append(vector, vFrases)
 
         # vValidm the validmovs
-        vValidm = np.zeros([10], np.float)
+        vValidm = np.zeros([9], np.float)
         if 'valMovs' in state:
-            for ii in range(9):
+            for ii in range(8):
                 vValidm[ii] = float(state['valMovs'][ii])
 
         vector = np.append(vector, vValidm)
