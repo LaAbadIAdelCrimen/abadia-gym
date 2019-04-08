@@ -1,6 +1,8 @@
 import random
 import numpy as np
 import logging
+from math import hypot
+from math import atan2
 
 from keras.models import Sequential, load_model
 from keras.layers import Dense, Dropout
@@ -165,3 +167,53 @@ class NGDQN:
 
     def save_model(self, fn):
         self.model.save(fn)
+
+    def state2vector(self, state):
+
+        chars  = state['Personajes']
+        print(chars)
+        vChars = np.zeros([4,7], np.float)
+        for ii in range(0, len(chars)):
+            print (ii, chars[ii]['nombre'], chars[ii]['posX'], chars[ii]['posY'])
+            vChars[ii][0] = float(chars[ii]['posX']/256)
+            vChars[ii][1] = float(chars[ii]['posY']/256)
+            vChars[ii][2] = float(chars[ii]['orientacion'] / 4)
+            vChars[ii][3] = float(chars[ii]['altura'] / 4)
+            if (ii >= 1):
+                vChars[ii][4] = hypot(vChars[ii][0] - vChars[0][0], vChars[ii][1] - vChars[0][1])
+                vChars[ii][5] = atan2(vChars[ii][0] - vChars[0][0], vChars[ii][1] - vChars[0][1]) / 3.14159
+            vChars[ii][6] = float(chars[ii]['objetos'] / 32)
+
+        # vEnv vector with the environment data
+        vEnv = np.zeros([10], np.float)
+        vEnv[0] = float(state['bonus']/100)
+        vEnv[1] = float(state['dia']/7)
+        vEnv[2] = float(state['momentoDia']/10)
+        vEnv[3] = float(state['numPantalla']/256)
+        vEnv[4] = float(state['numeroRomano']/10)
+        vEnv[5] = float(state['obsequium']/31)
+        vEnv[6] = float(state['planta']/3)
+        vEnv[7] = float(state['porcentaje']/100)
+        if len(state['Objetos']) >= 1:
+            vEnv[8] = float(state['Objetos'][0]/32)
+
+        print(vEnv)
+        vector = np.append(vChars.reshape([1, 28]), vEnv)
+
+        # vAudio the last sounds
+        vAudio = np.zeros([12], np.float)
+        for ii in range(0, len(state['sonidos'])):
+            vAudio[ii] = float(state['sonidos'][ii]/64)
+
+        vector = np.append(vector, vAudio)
+
+        # vFrases the last frases
+        vFrases = np.zeros([12], np.float)
+        for ii in range(0, len(state['frases'])):
+            vFrases[ii] = float(state['frases'][ii]/64)
+
+        vector = np.append(vector, vFrases)
+
+        print("vector {}".format(vector))
+        return vector
+
