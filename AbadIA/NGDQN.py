@@ -45,18 +45,20 @@ class NGDQN:
         #         self.model        = self.load_model(env.modelName)
         #         self.target_model = self.load_model(env.modelName)
 
-    def create_model(self, input_dim=10, output_dim=9):
+    def create_model(self, input_dim=69, output_dim=9):
         self.logging.info("Creating a new model v5")
         model   = Sequential()
         # TODO JT we need to increment the input vector dim
+        # for now the imput_dim is 69 with chars, env + validmods
 
         state_shape  = input_dim # self.env.observation_space.shape
 
         # TODO JT we need to redesign the internal lawyers
 
-        model.add(Dense(24, input_dim=input_dim, activation="relu"))
-        model.add(Dense(48, activation="relu"))
-        model.add(Dense(24, activation="relu"))
+        model.add(Dense(64, input_dim=input_dim, activation="relu"))
+        model.add(Dense(128, activation="relu"))
+        model.add(Dense(64, activation="relu"))
+        model.add(Dense(32, activation="relu"))
         model.add(Dense(output_dim))
         model.compile(loss="mean_squared_error",
             optimizer=Adam(lr=self.learning_rate))
@@ -198,6 +200,9 @@ class NGDQN:
         if len(state['Objetos']) >= 1:
             vEnv[8] = float(state['Objetos'][0]/32)
 
+        if 'jugada' in state:
+            vEnv[9] = float(state['jugada']/10000)
+
         print(vEnv)
         vector = np.append(vChars.reshape([1, 28]), vEnv)
 
@@ -214,6 +219,14 @@ class NGDQN:
             vFrases[ii] = float(state['frases'][ii]/64)
 
         vector = np.append(vector, vFrases)
+
+        # vValidm the validmovs
+        vValidm = np.zeros([10], np.float)
+        if 'valMovs' in state:
+            for ii in range(10):
+                vValidm[ii] = float(state['valMovs'][ii])
+
+        vector = np.append(vector, vValidm)
 
         print("vector {}".format(vector))
         return vector
