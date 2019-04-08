@@ -30,17 +30,18 @@ class NGDQN:
                             level=logging.INFO)
         self.logging = logging
 
-        if env != None:
-            if env.modelName == None:
-                self.model        = self.create_model()
-                self.target_model = self.create_model()
-            else:
-                if (env.gsBucket != None):
-                    self.logging.info("I will download from {} the file {}".format(env.gsBucket, env.modelName))
-                    env.download_blob(env.modelName, env.modelName)
-
-                self.model        = self.load_model(env.modelName)
-                self.target_model = self.load_model(env.modelName)
+        # TODO JT: we need to implement this when goes to production
+        # if env != None:
+        #     if env.modelName == None:
+        #         self.model        = self.create_model()
+        #         self.target_model = self.create_model()
+        #     else:
+        #         if (env.gsBucket != None):
+        #             self.logging.info("I will download from {} the file {}".format(env.gsBucket, env.modelName))
+        #             env.download_blob(env.modelName, env.modelName)
+        #
+        #         self.model        = self.load_model(env.modelName)
+        #         self.target_model = self.load_model(env.modelName)
 
     def create_model(self, input_dim=10, output_dim=9):
         self.logging.info("Creating a new model v5")
