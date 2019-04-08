@@ -182,7 +182,8 @@ class NGDQN:
             if (ii >= 1):
                 vChars[ii][4] = hypot(vChars[ii][0] - vChars[0][0], vChars[ii][1] - vChars[0][1])
                 vChars[ii][5] = atan2(vChars[ii][0] - vChars[0][0], vChars[ii][1] - vChars[0][1]) / 3.14159
-            vChars[ii][6] = float(chars[ii]['objetos'] / 32)
+            if (ii <= 1):
+                vChars[ii][6] = float(chars[ii]['objetos'] / 32)
 
         # vEnv vector with the environment data
         vEnv = np.zeros([10], np.float)
