@@ -30,13 +30,13 @@ class NGDQN:
                             level=logging.INFO)
         self.logging = logging
 
-        if env == None:
+        if env != None:
             if env.modelName == None:
                 self.model        = self.create_model()
                 self.target_model = self.create_model()
             else:
                 if (env.gsBucket != None):
-                    self.env.logging.info("I will download from {} the file {}".format(env.gsBucket, env.modelName))
+                    self.logging.info("I will download from {} the file {}".format(env.gsBucket, env.modelName))
                     env.download_blob(env.modelName, env.modelName)
 
                 self.model        = self.load_model(env.modelName)
