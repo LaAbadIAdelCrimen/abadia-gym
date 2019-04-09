@@ -45,7 +45,7 @@ class NGDQN:
         #         self.model        = self.load_model(env.modelName)
         #         self.target_model = self.load_model(env.modelName)
 
-    def create_model(self, input_dim=69, output_dim=9):
+    def create_model(self, input_dim=1, output_dim=9):
         self.logging.info("Creating a new model v5")
         model   = Sequential()
         # TODO JT we need to increment the input vector dim
@@ -156,7 +156,7 @@ class NGDQN:
             else:
                 Q_future = max(self.target_model.predict(new_state)[0])
                 target[0][action] = future_reward # Q_future # reward + Q_future * self.gamma
-            history = self.model.fit(state, target, epochs=1, verbose=0)
+            history = self.model.fit(state, target, epochs=1, verbose=1)
             # print("loss:", history.history["loss"], "\n")
 
     def target_train(self):
@@ -173,10 +173,10 @@ class NGDQN:
     def state2vector(self, state):
 
         chars  = state['Personajes']
-        print(chars)
+        # print(chars)
         vChars = np.zeros([4,7], np.float)
         for ii in range(0, len(chars)):
-            print (ii, chars[ii]['nombre'], chars[ii]['posX'], chars[ii]['posY'])
+            # print (ii, chars[ii]['nombre'], chars[ii]['posX'], chars[ii]['posY'])
             vChars[ii][0] = float(chars[ii]['posX']/256)
             vChars[ii][1] = float(chars[ii]['posY']/256)
             vChars[ii][2] = float(chars[ii]['orientacion'] / 4)
@@ -203,7 +203,7 @@ class NGDQN:
         if 'jugada' in state:
             vEnv[9] = float(state['jugada']/10000)
 
-        print(vEnv)
+        # print(vEnv)
         vector = np.append(vChars.reshape([1, 28]), vEnv)
 
         # vAudio the last sounds
@@ -223,12 +223,12 @@ class NGDQN:
         # vValidm the validmovs
         vValidm = np.zeros([9], np.float)
         if 'valMovs' in state:
-            print(state['valMovs'])
+            # print(state['valMovs'])
             for ii in range(8):
                 vValidm[ii] = float(state['valMovs'][ii])
 
         vector = np.append(vector, vValidm)
 
-        print("vector {}".format(vector))
+        # print("vector {}".format(vector))
         return vector
 
