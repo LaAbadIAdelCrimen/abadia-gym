@@ -21,14 +21,24 @@ print(state['action']['nextstate'])
 dqn_agent.state2vector(state['action']['state'])
 
 
-for t in range(5000):
+for t in range(33):
     current_state = dqn_agent.state2vector(state['action']['state'])
     new_state = dqn_agent.state2vector(state['action']['state'])
     action = state['action']['action']
     reward = state['action']['reward']
 
     dqn_agent.remember(current_state, action, reward, new_state, False)
-    if (t % 32 == 0):
-        dqn_agent.replay()
+#    if (t % 32 == 0):
 
+print("trainig it")
+print(current_state.shape[0])
+print(current_state.shape[1])
+print(current_state)
 
+dqn_agent.replay()
+
+print("get some predictions -------------------")
+print("new_state: {}".format(current_state))
+print("----------------------")
+prediction = dqn_agent.target_model.predict(current_state)
+print("prediction: {}".format(prediction))

@@ -16,9 +16,9 @@ from collections import deque
 # 4) a method to convert from the json format to the input vector
 
 class NGDQN:
-    def __init__(self, env=None):
+    def __init__(self, env=None, modelName=None, gsBucket=None):
         self.env     = env
-        self.memory  = deque(maxlen=3000)
+        self.memory  = deque(maxlen=10000)
         # Exploring or playing
 
         self.gamma = 0.85
@@ -27,25 +27,30 @@ class NGDQN:
         self.epsilon_decay = 0.995
         self.learning_rate = 0.005
         self.tau = .125
+        self.modelName = None
 
         logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', datefmt='%d-%m-%y %H:%M:%S',
                             level=logging.INFO)
+
         self.logging = logging
 
         # TODO JT: we need to implement this when goes to production
         # if env != None:
-        #     if env.modelName == None:
-        #         self.model        = self.create_model()
-        #         self.target_model = self.create_model()
-        #     else:
-        #         if (env.gsBucket != None):
-        #             self.logging.info("I will download from {} the file {}".format(env.gsBucket, env.modelName))
-        #             env.download_blob(env.modelName, env.modelName)
-        #
-        #         self.model        = self.load_model(env.modelName)
-        #         self.target_model = self.load_model(env.modelName)
+        if modelName == None:
+            self.model        = self.create_model()
+            self.target_model = self.create_model()
+        else:
+            self.modelName = modelName
+            if (env.gsBucket != None):
+                # TODO JT: we need to implement this when goes to production
+                # if env != None:
+                # self.logging.info("I will download from {} the file {}".format(env.gsBucket, env.modelName))
+                # env.download_blob(env.modelName, env.modelName)
 
-    def create_model(self, input_dim=1, output_dim=9):
+                self.model        = self.load_model(modelName)
+                self.target_model = self.load_model(modelName)
+
+    def create_model(self, input_dim=71, output_dim=9):
         self.logging.info("Creating a new model v5")
         model   = Sequential()
         # TODO JT we need to increment the input vector dim
@@ -55,7 +60,7 @@ class NGDQN:
 
         # TODO JT we need to redesign the internal lawyers
 
-        model.add(Dense(64, input_dim=input_dim, activation="relu"))
+        model.add(Dense(64, input_dim=71, activation="relu"))
         model.add(Dense(128, activation="relu"))
         model.add(Dense(64, activation="relu"))
         model.add(Dense(32, activation="relu"))
@@ -67,6 +72,11 @@ class NGDQN:
     def load_model(self, name):
         self.logging.info("Loading a model from: ({})".format(name))
         return load_model(name)
+
+    def create_empty(self, name="model_v5"):
+        model = self.create_model()
+        self.save_model(name)
+        return model
 
     def act(self, vector):
         self.epsilon *= self.epsilon_decay
@@ -143,6 +153,7 @@ class NGDQN:
         temp = self.memory
         acu  = np.zeros(32)
 
+        # adding the future reward 32 rewards ahead to the vector information
         for index in range(len(temp)-1, 0, -1):
             acu[index % 32] = temp[index][2]
             temp[index][5]  = acu.sum()
@@ -175,7 +186,7 @@ class NGDQN:
         chars  = state['Personajes']
         # print(chars)
         vChars = np.zeros([4,7], np.float)
-        for ii in range(0, len(chars)):
+        for ii in range(0, min(len(chars), 4)):
             # print (ii, chars[ii]['nombre'], chars[ii]['posX'], chars[ii]['posY'])
             vChars[ii][0] = float(chars[ii]['posX']/256)
             vChars[ii][1] = float(chars[ii]['posY']/256)
@@ -230,5 +241,5 @@ class NGDQN:
         vector = np.append(vector, vValidm)
 
         # print("vector {}".format(vector))
-        return vector
+        return vector.reshape(1,71)
 
