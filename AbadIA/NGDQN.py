@@ -28,6 +28,7 @@ class NGDQN:
         self.learning_rate = 0.005
         self.tau = .125
         self.modelName = None
+        self.gsBucket = None
 
         logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', datefmt='%d-%m-%y %H:%M:%S',
                             level=logging.INFO)
@@ -41,12 +42,12 @@ class NGDQN:
             self.target_model = self.create_model()
         else:
             self.modelName = modelName
-            if (env.gsBucket != None):
+            if (self.gsBucket != None):
                 # TODO JT: we need to implement this when goes to production
                 # if env != None:
                 # self.logging.info("I will download from {} the file {}".format(env.gsBucket, env.modelName))
                 # env.download_blob(env.modelName, env.modelName)
-
+                self.logging.info("Loading the model from: {}".format(modelName))
                 self.model        = self.load_model(modelName)
                 self.target_model = self.load_model(modelName)
 
@@ -179,6 +180,7 @@ class NGDQN:
         self.target_model.set_weights(target_weights)
 
     def save_model(self, fn):
+        self.logging.info("Saving the model to: {}".format(fn))
         self.model.save(fn)
 
     def state2vector(self, state):

@@ -8,7 +8,7 @@ import json
 import AbadIA.NGDQN
 AbadIA.NGDQN
 # env = gym.make('Abadia-v2')
-dqn_agent = AbadIA.NGDQN.NGDQN(env=None)
+dqn_agent = AbadIA.NGDQN.NGDQN(env=None, modelName="models/testv5.model")
 
 print("Creating a new model")
 dqn_agent.model = dqn_agent.create_model()
@@ -42,3 +42,6 @@ print("new_state: {}".format(current_state))
 print("----------------------")
 prediction = dqn_agent.target_model.predict(current_state)
 print("prediction: {}".format(prediction))
+
+dqn_agent.save_model(dqn_agent.modelName)
+
