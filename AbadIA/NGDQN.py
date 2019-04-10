@@ -146,7 +146,7 @@ class NGDQN:
     def remember(self, state, action, reward, new_state, done):
         self.memory.append([state, action, reward, new_state, done, 0])
 
-    def replay(self):
+    def replay(self, verbose=0):
         batch_size = 32
         if len(self.memory) < batch_size:
             return
@@ -168,7 +168,7 @@ class NGDQN:
             else:
                 Q_future = max(self.target_model.predict(new_state)[0])
                 target[0][action] = future_reward # Q_future # reward + Q_future * self.gamma
-            history = self.model.fit(state, target, epochs=1, verbose=1)
+            history = self.model.fit(state, target, epochs=1, verbose=verbose)
             # print("loss:", history.history["loss"], "\n")
 
     def target_train(self):
