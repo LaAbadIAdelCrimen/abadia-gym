@@ -63,18 +63,37 @@ class NGDQN:
 
             self.model        = self.load_model(fileName)
             self.target_model = self.load_model(fileName)
-
     def create_model(self, input_dim=71, output_dim=9):
         self.logging.info("Creating a new model v6")
         model   = Sequential()
         # TODO JT we need to increment the input vector dim
-        # for now the imput_dim is 71 with chars, env + validmods
+        # for now the input_dim is 71 with chars, env + validmods
 
         state_shape  = input_dim # self.env.observation_space.shape
 
         # TODO JT we need to redesign the internal lawyers
 
-        model.add(Dense(64, input_dim=input_dim, activation="relu"))
+        model.add(Dense(64, input_shape=(1,71), activation="relu"))
+        model.add(Dense(128, activation="relu"))
+        model.add(Dense(64, activation="relu"))
+        model.add(Dense(32, activation="relu"))
+        model.add(Dense(output_dim))
+        model.compile(loss="mean_squared_error",
+            optimizer=Adam(lr=self.learning_rate))
+        return model
+
+
+    def create_model2(self, input_dim=71, output_dim=9):
+        self.logging.info("Creating a new model2 v6")
+        model   = Sequential()
+        # TODO JT we need to increment the input vector dim
+        # for now the input_dim is 71 with chars, env + validmods
+
+        state_shape  = input_dim # self.env.observation_space.shape
+
+        # TODO JT we need to redesign the internal lawyers
+
+        model.add(Dense(64, input_shape=(1,71), activation="relu"))
         model.add(Dense(128, activation="relu"))
         model.add(Dense(64, activation="relu"))
         model.add(Dense(32, activation="relu"))
@@ -201,17 +220,25 @@ class NGDQN:
         # samples = random.sample(temp, batch_size)
         # TODO JT: we dont want to use the last 32 actions because we dont have the "future" score
 
+        states  = []
+        rewards = []
         for sample in temp:
             state, action, reward, new_state, done, future_reward = sample
-            target = self.target_model.predict(state)
+            target = self.target_model.predict(state.reshape(1,1,71))
+            # TODO JT: we need to fix this for the case done is True
             if done:
-                target[0][action] = future_reward
+                target[0][0][action] = future_reward
             else:
-                Q_future = max(self.target_model.predict(new_state)[0])
-                target[0][action] = future_reward # Q_future # reward + Q_future * self.gamma
-            history = self.model.fit(state, target, epochs=epochs, verbose=verbose)
-            print("loss:", history.history["loss"], "\n")
-            return history
+                target[0][0][action] = future_reward
+            states.append(state)
+            rewards.append(target)
+
+        X_training = np.array(states).reshape(len(states), 1, 71)
+        Y_training = np.array(rewards).reshape(len(rewards), 1, 9)
+        history = self.model.fit(X_training, Y_training, epochs=epochs, batch_size=32, verbose=verbose)
+
+        print("loss:", history.history["loss"], "\n")
+        return history
 
     def target_train(self):
         self.env.logging.info("training target ..")
