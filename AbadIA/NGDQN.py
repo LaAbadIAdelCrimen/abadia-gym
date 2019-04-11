@@ -16,7 +16,7 @@ from collections import deque
 # 4) a method to convert from the json format to the input vector
 
 class NGDQN:
-    def __init__(self, env=None, modelName=None, gsBucket=None):
+    def __init__(self, env=None, modelName=None, initModelName=None, gsBucket=None):
         self.env     = env
         self.memory  = deque(maxlen=10000)
         # Exploring or playing
@@ -27,6 +27,7 @@ class NGDQN:
         self.epsilon_decay = 0.995
         self.learning_rate = 0.005
         self.tau = .125
+        self.initModelName = None
         self.modelName = None
         self.gsBucket = None
 
@@ -37,31 +38,42 @@ class NGDQN:
 
         # TODO JT: we need to implement this when goes to production
         # if env != None:
-        if modelName == None:
+        if modelName == None and initModelName == None:
             self.model        = self.create_model()
             self.target_model = self.create_model()
         else:
+            self.initModelName = initModelName
             self.modelName = modelName
+
+            # initModelName will have priority over modelName on load if both are defined.
+            # on the save operation will use modelName
+            # with this we can load a model and save into a different file name
+
+            if (initModelName is not None):
+                fileName = initModelName
+            else:
+                fileName = modelName
+
             if (self.gsBucket != None):
                 # TODO JT: we need to implement this when goes to production
-                # if env != None:
-                # self.logging.info("I will download from {} the file {}".format(env.gsBucket, env.modelName))
-                # env.download_blob(env.modelName, env.modelName)
-                self.logging.info("Loading the model from: {}".format(modelName))
-                self.model        = self.load_model(modelName)
-                self.target_model = self.load_model(modelName)
+                if self.env != None:
+                    self.env.download_blob(fileName, fileName)
+                self.logging.info("Downloading the model from Bucket: {} file: {}".format(self.gsBucket, fileName))
+
+            self.model        = self.load_model(fileName)
+            self.target_model = self.load_model(fileName)
 
     def create_model(self, input_dim=71, output_dim=9):
-        self.logging.info("Creating a new model v5")
+        self.logging.info("Creating a new model v6")
         model   = Sequential()
         # TODO JT we need to increment the input vector dim
-        # for now the imput_dim is 69 with chars, env + validmods
+        # for now the imput_dim is 71 with chars, env + validmods
 
         state_shape  = input_dim # self.env.observation_space.shape
 
         # TODO JT we need to redesign the internal lawyers
 
-        model.add(Dense(64, input_dim=71, activation="relu"))
+        model.add(Dense(64, input_dim=input_dim, activation="relu"))
         model.add(Dense(128, activation="relu"))
         model.add(Dense(64, activation="relu"))
         model.add(Dense(32, activation="relu"))
@@ -71,10 +83,11 @@ class NGDQN:
         return model
 
     def load_model(self, name):
-        self.logging.info("Loading a model from: ({})".format(name))
+        self.logging.info("Loading a local model from: ({})".format(name))
+        # TODO JT: is that right?????
         return load_model(name)
 
-    def create_empty(self, name="model_v5"):
+    def create_empty(self, name="models/model_v6"):
         model = self.create_model()
         self.save_model(name)
         return model
@@ -171,6 +184,34 @@ class NGDQN:
             history = self.model.fit(state, target, epochs=1, verbose=verbose)
             # print("loss:", history.history["loss"], "\n")
 
+    def replay_game(self, epochs=4, verbose=0):
+        batch_size = 32
+        if len(self.memory) < batch_size:
+            return
+
+        temp = self.memory
+        acu  = np.zeros(32)
+
+        # adding the future reward 32 rewards ahead to the vector information
+        for index in range(len(temp)-1, 0, -1):
+            acu[index % 32] = temp[index][2]
+            temp[index][5]  = acu.sum()
+
+        # samples = random.sample(temp, batch_size)
+        # TODO JT: we dont want to use the last 32 actions because we dont have the "future" score
+
+        for sample in temp:
+            state, action, reward, new_state, done, future_reward = sample
+            target = self.target_model.predict(state)
+            if done:
+                target[0][action] = future_reward
+            else:
+                Q_future = max(self.target_model.predict(new_state)[0])
+                target[0][action] = future_reward # Q_future # reward + Q_future * self.gamma
+            history = self.model.fit(state, target, epochs=epochs, verbose=verbose)
+            print("loss:", history.history["loss"], "\n")
+            return history
+
     def target_train(self):
         self.env.logging.info("training target ..")
         weights = self.model.get_weights()
@@ -180,7 +221,7 @@ class NGDQN:
         self.target_model.set_weights(target_weights)
 
     def save_model(self, fn):
-        self.logging.info("Saving the model to: {}".format(fn))
+        self.logging.info("Saving the model to the local file: {}".format(fn))
         self.model.save(fn)
 
     def state2vector(self, state):

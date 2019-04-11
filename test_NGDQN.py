@@ -43,5 +43,30 @@ print("----------------------")
 prediction = dqn_agent.target_model.predict(current_state)
 print("prediction: {}".format(prediction))
 
+print("trainig it a game at time")
+print(current_state.shape[0])
+print(current_state.shape[1])
+print(current_state)
+
+history = dqn_agent.replay_game(verbose=1)
 dqn_agent.save_model(dqn_agent.modelName)
 
+with open("/tmp/actions.json") as json_data:
+    lines = json_data.readlines()
+    if lines:
+        rejilla = np.empty([24, 24])
+        for line in lines:
+            # print("line:"+line)
+            # if (len(line) > 0 and line.startswith("[")):
+            state = json.loads(line)[0]
+            print("{}".format(state))
+
+            current_state = dqn_agent.state2vector(state['action']['state'])
+            new_state = dqn_agent.state2vector(state['action']['state'])
+            action = state['action']['action']
+            reward = state['action']['reward']
+
+            dqn_agent.remember(current_state, action, reward, new_state, False)
+
+history = dqn_agent.replay_game(epochs=30, verbose=1)
+dqn_agent.save_model(dqn_agent.modelName)
