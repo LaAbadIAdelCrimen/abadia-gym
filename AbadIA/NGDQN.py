@@ -1,6 +1,7 @@
 import random
 import numpy as np
 import logging
+import json
 from math import hypot
 from math import atan2
 
@@ -223,6 +224,24 @@ class NGDQN:
     def save_model(self, fn):
         self.logging.info("Saving the model to the local file: {}".format(fn))
         self.model.save(fn)
+
+    def load_actions_from_a_file(self, fileName):
+        self.memory = deque(maxlen=10000)
+        with open(fileName) as json_data:
+            # TODO JT: we need to optimize this reading a line by a line
+            lines = json_data.readlines()
+            if lines:
+                for line in lines:
+                    # if (len(line) > 0 and line.startswith("[")):
+                    state = json.loads(line)[0]
+                    # print("{}".format(state))
+
+                    current_state = self.state2vector(state['action']['state'])
+                    new_state = self.state2vector(state['action']['state'])
+                    action = state['action']['action']
+                    reward = state['action']['reward']
+
+                    self.remember(current_state, action, reward, new_state, False)
 
     def state2vector(self, state):
 

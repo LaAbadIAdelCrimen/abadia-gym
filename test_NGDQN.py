@@ -50,23 +50,24 @@ print(current_state)
 
 history = dqn_agent.replay_game(verbose=1)
 dqn_agent.save_model(dqn_agent.modelName)
+dqn_agent.load_actions_from_a_file("/tmp/actions.json")
 
-with open("/tmp/actions.json") as json_data:
-    lines = json_data.readlines()
-    if lines:
-        rejilla = np.empty([24, 24])
-        for line in lines:
-            # print("line:"+line)
-            # if (len(line) > 0 and line.startswith("[")):
-            state = json.loads(line)[0]
-            print("{}".format(state))
+# with open("/tmp/actions.json") as json_data:
+#    lines = json_data.readlines()
+#    if lines:
+#        rejilla = np.empty([24, 24])
+#        for line in lines:
+#            # print("line:"+line)
+#            # if (len(line) > 0 and line.startswith("[")):
+#            state = json.loads(line)[0]
+#            print("{}".format(state))
 
-            current_state = dqn_agent.state2vector(state['action']['state'])
-            new_state = dqn_agent.state2vector(state['action']['state'])
-            action = state['action']['action']
-            reward = state['action']['reward']
+#            current_state = dqn_agent.state2vector(state['action']['state'])
+#            new_state = dqn_agent.state2vector(state['action']['state'])
+#            action = state['action']['action']
+#            reward = state['action']['reward']
 
-            dqn_agent.remember(current_state, action, reward, new_state, False)
+#            dqn_agent.remember(current_state, action, reward, new_state, False)
 
 history = dqn_agent.replay_game(epochs=30, verbose=1)
 dqn_agent.save_model(dqn_agent.modelName)
