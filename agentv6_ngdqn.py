@@ -23,6 +23,7 @@ def init_env(env):
     argparser.add_argument('-p', '--port', help='port number')
     argparser.add_argument('-c', '--checkpoint', help='checkpoint file')
     argparser.add_argument('-m', '--model', help='model file')
+    argparser.add_argument('-i', '--initmodel', help='init model file')
     argparser.add_argument('-e', '--episodes', help='number of episodes')
     argparser.add_argument('-n', '--steps', help='total steps of the episode')
     argparser.add_argument('-g', '--gcs', help='Google storage bucket')
@@ -45,6 +46,9 @@ def init_env(env):
 
     if args.model != None:
         env.modelName = args.model
+
+    if args.initmodel != None:
+        env.initModelName = args.initmodel
 
     if args.episodes != None:
         env.num_episodes = int(args.episodes)
@@ -248,7 +252,7 @@ def mainLoop():
     gamma = 0.9
     epsilon = .95
 
-    dqn_agent = NDQN(env=env)
+    dqn_agent = NGDQN(env=env)
     steps = []
 
     for i_episode in range(env.num_episodes):
