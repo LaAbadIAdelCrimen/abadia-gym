@@ -4,6 +4,7 @@ import logging
 import json
 from math import hypot
 from math import atan2
+import pickle
 
 from keras.models import Sequential, load_model
 from keras.layers import Dense, Dropout
@@ -278,6 +279,14 @@ class NGDQN:
                     reward = state['action']['reward']
 
                     self.remember(current_state, action, reward, new_state, False)
+
+    def save_actions_as_vectors(self, filename):
+        with open(filename, 'wb') as f:
+            pickle.dump(self.memory, f)
+
+    def load_vectors_into_actions(self, filename):
+        with open(filename, 'rb') as f:
+            return pickle.load(f)
 
     def state2vector(self, state):
 
