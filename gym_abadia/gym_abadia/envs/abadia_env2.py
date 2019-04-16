@@ -374,14 +374,23 @@ class AbadiaEnv2(gym.Env):
             logging.info("FUCKING YEAH GAME ALMOST DONE")
             reward = 1
 
-        if (self.valMovs[action] < 1):
-            logging.info("***** Invalid move, penalizing it")
-            reward = -0.09
-
         # if no reward we penalized it
         if reward == 0:
             logging.info("***** No reward, penalizing it")
             reward = -0.005
+
+        if self.obsequium > 0:
+            reward = reward * float((self.obsequium / self.obsequium)*0.5)
+        if self.porcentaje > 0:
+            reward = reward * float(((self.porcentaje * 0.5) / self.porcentaje)+1)
+
+        if (self.wallMovs[action] == 1):
+            logging.info("***** Invalid move against Wall, penalizing it")
+            reward = -0.0901
+
+        if (self.perMovs[action] == 1):
+            logging.info("***** Invalid move against a Character, penalizing it")
+            reward = -0.0902
 
         self.totalReward += reward
         ob['reward'] = reward
@@ -390,6 +399,8 @@ class AbadiaEnv2(gym.Env):
 
         # adding more information for debugging: valid moves, vectors, predictions, etc.
         ob['valMovs'] = self.valMovs.tolist()
+        ob['wallMovs'] = self.wallMovs.tolist()
+        ob['perMovs'] = self.perMovs.tolist()
         ob['predictions'] = self.calculated_predictions
         ob['final'] = self.final_predictions
         ob['vector'] = self.vector_predictions

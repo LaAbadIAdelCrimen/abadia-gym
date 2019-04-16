@@ -12,11 +12,12 @@ print("Creating the Model v6 from the last version")
 dqn_agent = AbadIA.NGDQN.NGDQN(env=None, initModelName="models/last_model_v6.model", modelName="models/last_model_v6.model")
 
 print("Loading some vectors from a dir")
-dqn_agent.load_vectors_from_a_dir("./games/20190415")
+dqn_agent.load_vectors_from_a_dir("./games/20190416")
 
 print("Training with replay_game")
 [history, score] = dqn_agent.replay_game(epochs=20, verbose=1)
-print("history:", history)
+print("history loss:", history.history['loss'])
+print("history val loss:", history.history['val_loss'])
 print("score:", score)
 
 print("Saving the updated model")

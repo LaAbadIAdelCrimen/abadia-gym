@@ -15,7 +15,7 @@ print("Transforming some actions to vectors and saving it into a dir")
 dqn_agent.load_actions_from_a_dir_and_save_to_vectors("./games/20190415")
 
 print("Loading the vectors from a dir")
-dqn_agent.load_vectors_from_a_dir("./games/20190415")
+dqn_agent.load_vectors_from_a_dir("./games/20190416")
 
 
 

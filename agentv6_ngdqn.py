@@ -78,7 +78,9 @@ def init_env(env):
     env.logging = logging
 
 def checkValidMovs(env):
-    env.valMovs = np.zeros(9, np.int)
+    env.valMovs  = np.zeros(9, np.int)
+    env.wallMovs = np.zeros(9, np.int)
+    env.perMovs  = np.zeros(9, np.int)
 
     if(env.rejilla == []):
         for ii in range(0,9):
@@ -205,6 +207,9 @@ def checkValidMovs(env):
     # env.valMovs[8] = 1
 
     env.valMovs2 = np.zeros(9, np.int)
+    env.wallMovs = np.zeros(9, np.int)
+    env.perMovs  = np.zeros(9, np.int)
+
     for action in range(0, 8):
         if (env.verbose > 1):
             env.logging.info ("checking action {} room at {},{}".format(action, yPos, xPos))
@@ -225,14 +230,19 @@ def checkValidMovs(env):
                     diff = room[yPos+yy-1, xPos+xx-1, 1] - room[yPos, xPos, 1]
                     if (not(diff >= -1 and diff <= 1)):
                         env.valMovs2[action] = 0
+                        env.wallMovs[action]  = 1
                         if (env.verbose > 1):
                             print("Wall Blocks G {},{} ".format(yy,xx))
                 if (chkM2[action][1][yy][xx] == 1 and room[yPos+yy-1, xPos+xx-1, 0] != 0):
                     if (env.verbose > 1):
                         print("Adso/* block {},{} ".format(yy,xx))
                     env.valMovs2[action] = 0
+                    env.perMovs[action] = 1
+
     env.valMovs2[8] = 1
     env.logging.info ("new valMovs2: {}".format(env.valMovs2))
+    env.logging.info ("wallMovs: {}".format(env.wallMovs))
+    env.logging.info ("perMovs: {}".format(env.perMovs))
     env.valMovs = env.valMovs2
     ss = "Valid Movements:"
     for ii in range(9):

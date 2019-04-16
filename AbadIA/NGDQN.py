@@ -84,7 +84,8 @@ class NGDQN:
         model.add(Dense(32, activation="relu"))
         model.add(Dense(output_dim))
         model.compile(loss="mean_squared_error",
-            optimizer=Adam(lr=self.learning_rate))
+            optimizer=Adam(lr=self.learning_rate),
+            metrics=['accuracy'])
         return model
 
 
@@ -104,7 +105,8 @@ class NGDQN:
         model.add(Dense(32, activation="relu"))
         model.add(Dense(output_dim))
         model.compile(loss="mean_squared_error",
-            optimizer=Adam(lr=self.learning_rate))
+            optimizer=Adam(lr=self.learning_rate),
+            metrics=['accuracy'])
         return model
 
     def load_model(self, name):
@@ -219,6 +221,8 @@ class NGDQN:
         if len(self.memory) < batch_size:
             logging.info("Not enough actions {}".format(len(self.memory)))
             return
+        else:
+            logging.info("We have {} samples for training".format(len(self.memory)))
 
         temp = self.memory
         acu  = np.zeros(32)
@@ -228,7 +232,6 @@ class NGDQN:
             acu[index % 32] = temp[index][2]
             temp[index][5]  = acu.sum()
 
-        # samples = random.sample(temp, batch_size)
         # TODO JT: we dont want to use the last 32 actions because we dont have the "future" score
 
         states  = []
@@ -248,13 +251,14 @@ class NGDQN:
         y_data = np.array(rewards).reshape(len(rewards), 1, 9)
 
         size = int(len(states)*77/100)
-        X_training = X_data[size:]
-        y_training = y_data[size:]
+        X_training = X_data[:size]
+        y_training = y_data[:size]
 
-        X_test = X_data[:size]
-        y_test = y_data[:size]
+        X_test = X_data[size:]
+        y_test = y_data[size:]
 
-        history = self.model.fit(X_training, y_training, epochs=epochs, batch_size=32, verbose=verbose)
+        history = self.model.fit(X_training, y_training, validation_data=(X_test, y_test), \
+                                epochs=epochs, batch_size=32, verbose=verbose)
 
         print("loss:", history.history["loss"], "\n")
 
