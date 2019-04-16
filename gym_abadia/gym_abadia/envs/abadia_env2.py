@@ -221,7 +221,7 @@ class AbadiaEnv2(gym.Env):
             return r.text
 
     def sendMultiCmd(self, path):
-        print("Path: %s Cmds: %s" % (path,  self.path2Pos[path]))
+        logging.info("Path: %s Cmds: %s" % (path,  self.path2Pos[path]))
         cmds = self.path2Pos[path].split(":")
         for step in cmds:
             self.sendCmd(self.url, "abadIA/game/current/actions/{}".format(step), mode='POST')
@@ -746,52 +746,54 @@ class AbadiaEnv2(gym.Env):
         x, y, ori           = self.personajeByName('Guillermo')
         adsoX, adsoY, adsoO = self.personajeByName('Adso')
 
-        print("\x1b[HGuillermo {},{} Adso {},{}".format(x, y, adsoX, adsoY))
-        print("+---+" + "-" * (w * 2) + "+" + "-" * 24 + "+" + "-" * 48 + "+")
+        logging.info("\x1b[HGuillermo {},{} Adso {},{}".format(x, y, adsoX, adsoY))
+        logging.info("+---+" + "-" * (w * 2) + "+" + "-" * 24 + "+" + "-" * 48 + "+")
+
         for yy in range(y - h, y + h):
-            print("|%3d|" % yy, end="")
+            ss = "|%3d|" % yy
             for xx in range(x - w, x + w):
                 if (xx == x and yy == y):
                     if ori == 0:
-                        print(">", end="")
+                        ss += ">"
                     if ori == 3:
-                        print("V", end="")
+                        ss += "V"
                     if ori == 1:
-                        print("^", end="")
+                        ss += "^"
                     if ori == 2:
-                        print("<", end="")
+                        ss += "<"
                 else:
                     if (xx == adsoX and yy == adsoY):
-                        print("a", end="")
+                        ss += "a"
                     else:
                         if (self.Visited[xx, yy] == 0):
-                            print("·", end="")
+                            ss += "·"
                         else:
                             if (self.Visited[xx, yy] > 0):
-                                print(" ", end="")
+                                ss += " "
                             else:
-                                print("#", end="")
+                                ss += "#"
 
-            print("|", end="")
+            ss += "|"
             if yRejilla < 24:
                 for xx in range(0, 24):
                     if (self.rejilla[yRejilla][xx] == 0):
-                        print(" ", end="")
+                        ss += " "
                     else:
                         if (self.rejilla[yRejilla][xx] >= 16):
-                            print("P", end="")
+                            ss += "P"
                         else:
-                            print("#", end="")
+                            ss += "#"
 
-            print("|", end="")
+            ss += "|"
             if yRejilla < 24:
                 for xx in range(0, 24):
                     if (self.rejilla[yRejilla][xx] == 0):
-                        print("  ", end="")
+                        ss += "  "
                     else:
-                        print("{}".format(format(self.rejilla[yRejilla][xx], '2x')), end="")
+                        ss += "{}".format(format(self.rejilla[yRejilla][xx], '2x'))
             yRejilla += 1
-            print("|")
+            ss += "|"
+            logging.info(ss)
 
-        print("+" + "-" * (w * 2) + "+" + "-" * 24 + "+" + "-" * 48 + "+")
+        logging.info("+" + "-" * (w * 2) + "+" + "-" * 24 + "+" + "-" * 48 + "+")
 
