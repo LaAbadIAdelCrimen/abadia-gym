@@ -7,8 +7,8 @@ import random
 import json
 import AbadIA.NGDQN
 AbadIA.NGDQN
-# env = gym.make('Abadia-v2')
-dqn_agent = AbadIA.NGDQN.NGDQN(env=None, modelName="models/testv5.model")
+
+dqn_agent = AbadIA.NGDQN.NGDQN(env=None, iniModelName="models/testv6.model")
 
 print("Creating a new model")
 dqn_agent.model = dqn_agent.create_model()
