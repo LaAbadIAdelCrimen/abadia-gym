@@ -15,7 +15,7 @@ from collections import deque
 
 import logging
 
-from AbadIA.NDQN import NDQN as NDQN
+from AbadIA.NGDQN import NGDQN as NGDQN
 
 def init_env(env):
     argparser = argparse.ArgumentParser()
@@ -46,9 +46,13 @@ def init_env(env):
 
     if args.model != None:
         env.modelName = args.model
+    else:
+        env.modelName = None
 
     if args.initmodel != None:
         env.initModelName = args.initmodel
+    else:
+        env.initModelName = None
 
     if args.episodes != None:
         env.num_episodes = int(args.episodes)
@@ -68,7 +72,6 @@ def init_env(env):
 
     if args.verbose != None:
         env.verbose = int(args.verbose)
-
 
     logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', datefmt='%d-%m-%y %H:%M:%S',
                         level=logging.INFO)
@@ -252,7 +255,7 @@ def mainLoop():
     gamma = 0.9
     epsilon = .95
 
-    dqn_agent = NGDQN(env=env)
+    ngdqn_agent = NGDQN(env=env)
     steps = []
 
     for i_episode in range(env.num_episodes):
@@ -275,7 +278,7 @@ def mainLoop():
             # Get new state and reward from environment and check if
             # in the state of the game is Guillermo
             checkValidMovs(env)
-            action = dqn_agent.act(state)
+            action = ngdqn_agent.act(state)
             env.prev_vector = env.vector
             while True:
                 newState, reward, done, info = env.step(action)
@@ -286,7 +289,7 @@ def mainLoop():
                     break
                     # test valid movements
 
-            dqn_agent.remember(env.prev_vector, action, reward, env.vector, done)
+            ngdqn_agent.remember(env.prev_vector, action, reward, env.vector, done)
 
             if done:
                 logging.info(f'Episode finished after {t+1} steps')
@@ -312,9 +315,9 @@ def mainLoop():
                 if (ori == 3):
                     env.Visited[x, y + 1] += -0.01
 
-            dqn_agent.replay()        # internally iterates default (prediction) model
+            ngdqn_agent.replay()        # internally iterates default (prediction) model
             # if (t % 16 == 0 ):
-            dqn_agent.target_train()
+            ngdqn_agent.target_train()
 
             # print("Episode({}:{}) A({})XYOP {},{},{},{} -> {},{} r:{} tr:{} Q(s,a)= {}"
             #      .format(i_episode, t, action, x, y, ori, env.numPantalla, newX, newY, np.round(reward,2),
@@ -343,19 +346,20 @@ def mainLoop():
 
         # TODO JT: refactoring this: the way we storage models and add info to game json
 
-        nameModel = "models/model_v4_{}_trial_{}.model".format(env.gameId, i_episode)
+        nameModel = "models/model_v6_{}_trial_{}.model".format(env.gameId, i_episode)
 
-        dqn_agent.save_model(nameModel)
+        ngdqn_agent.save_model(nameModel)
 
         if (env.gsBucket != None):
             logging.info("Uploading model to GCP")
             env.upload_blob(nameModel, nameModel)
 
-        nameModel ="models/model_v4_lastest.model".format(env.gameId)
-        dqn_agent.save_model(nameModel)
-        if (env.gsBucket != None):
-            logging.info("Uploading lastest model to GCP")
-            env.upload_blob(nameModel, nameModel)
+        # TODO JT: latest will be handed for another process in a more like A3C way
+        # nameModel ="models/model_v6_lastest.model".format(env.gameId)
+        # ngdqn_agent.save_model(nameModel)
+        # if (env.gsBucket != None):
+        #    logging.info("Uploading lastest model to GCP")
+        #    env.upload_blob(nameModel, nameModel)
 
 
         rList.append(rAll)

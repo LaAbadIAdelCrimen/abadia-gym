@@ -112,13 +112,13 @@ class NGDQN:
         self.save_model(name)
         return model
 
-    def act(self, vector):
+    def act(self, state):
         self.epsilon *= self.epsilon_decay
         self.epsilon = max(self.epsilon_min, self.epsilon)
         if (self.env == None):
-            return act_prediction(vector)
+            return act_prediction(state)
         else:
-            return act_env(vector)
+            return self.act_env(state)
 
     def act_prediction(self, vector):
 
@@ -137,9 +137,10 @@ class NGDQN:
 
         return action
 
-    def act_env(self, vector):
+    def act_env(self, state):
 
-        vector = self.env.stateVector()
+        # vector = self.env.stateVector()
+        vector = self.state2vector(state)
         self.env.vector = vector
 
         if (self.env.playing is False) and (np.random.random() < self.epsilon):
@@ -149,7 +150,8 @@ class NGDQN:
             self.env.calculated_predictions = []
             self.env.final_predictions = []
         else:
-            predictions = self.model.predict(vector)[0]
+            predictions = self.model.predict(vector.reshape(1,1,71)).reshape(9)
+            print(predictions)
             self.env.predictions = predictions
             final = np.zeros(self.env.action_space.n)
 
@@ -195,13 +197,15 @@ class NGDQN:
         samples = random.sample(temp, batch_size)
         for sample in samples:
             state, action, reward, new_state, done, future_reward = sample
-            target = self.target_model.predict(state)
+            # print(state)
+            target = self.target_model.predict((state.reshape(1,1,71))).reshape(9)
+            # print(target)
             if done:
-                target[0][action] = future_reward
+                target[action] = future_reward
             else:
-                Q_future = max(self.target_model.predict(new_state)[0])
-                target[0][action] = future_reward # Q_future # reward + Q_future * self.gamma
-            history = self.model.fit(state, target, epochs=1, verbose=verbose)
+                # TODO JT: MCTS? Q_future = max(self.target_model.predict(new_state)[0])
+                target[action] = future_reward # Q_future # reward + Q_future * self.gamma
+            history = self.model.fit(state.reshape(1, 1, 71), target.reshape(1, 1, 9), epochs=1, verbose=verbose)
             # print("loss:", history.history["loss"], "\n")
 
     def replay_game(self, epochs=4, verbose=0):
