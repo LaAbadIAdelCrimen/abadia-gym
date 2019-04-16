@@ -1,4 +1,4 @@
-# Agent v5 a.k.a. Simple DQN that will grow with CNN and mixed models with gym_abadia version 2
+# Agent v6 a.k.a. Next Generation DQN that will grow with CNN and mixed models with gym_abadia version 2
 
 import gym
 import gym_abadia

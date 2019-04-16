@@ -38,31 +38,35 @@ class NGDQN:
         self.logging = logging
 
         # TODO JT: we need to implement this when goes to production
-        # if env != None:
-        if modelName == None and initModelName == None:
-            self.model        = self.create_model()
-            self.target_model = self.create_model()
-        else:
-            self.initModelName = initModelName
+        if env != None:
+            if env.initModelName != None:
+                self.initModelName = env.initModelName
+            if env.ModelName != None:
+                self.ModelName = env.ModelName
+
+        if modelName != None:
             self.modelName = modelName
 
-            # initModelName will have priority over modelName on load if both are defined.
-            # on the save operation will use modelName
-            # with this we can load a model and save into a different file name
+        if initModelName != None:
+            self.initModelName = initModelName
 
-            if (initModelName is not None):
-                fileName = initModelName
-            else:
-                fileName = modelName
+        self.model        = self.create_model()
+        self.target_model = self.create_model()
 
-            if (self.gsBucket != None):
-                # TODO JT: we need to implement this when goes to production
-                if self.env != None:
-                    self.env.download_blob(fileName, fileName)
-                self.logging.info("Downloading the model from Bucket: {} file: {}".format(self.gsBucket, fileName))
+        if (initModelName is not None):
+            fileName = initModelName
+        else:
+            fileName = modelName
 
-            self.model        = self.load_model(fileName)
-            self.target_model = self.load_model(fileName)
+        if (self.gsBucket != None):
+            # TODO JT: we need to implement this when goes to production
+            if self.env != None:
+                self.env.download_blob(fileName, fileName)
+            self.logging.info("Downloading the model from Bucket: {} file: {}".format(self.gsBucket, fileName))
+
+        self.model        = self.load_model(fileName)
+        self.target_model = self.load_model(fileName)
+
     def create_model(self, input_dim=71, output_dim=9):
         self.logging.info("Creating a new model v6")
         model   = Sequential()
@@ -104,7 +108,8 @@ class NGDQN:
 
     def load_model(self, name):
         self.logging.info("Loading a local model from: ({})".format(name))
-        # TODO JT: is that right?????
+        # we're calling the load_model method imported from keras
+        # and return the model loaded (h5 format)
         return load_model(name)
 
     def create_empty(self, name="models/model_v6"):
