@@ -5,7 +5,7 @@ import json
 from math import hypot
 from math import atan2
 import pickle
-
+import os
 from keras.models import Sequential, load_model
 from keras.layers import Dense, Dropout
 from keras.optimizers import Adam
@@ -217,6 +217,7 @@ class NGDQN:
     def replay_game(self, epochs=4, verbose=0):
         batch_size = 32
         if len(self.memory) < batch_size:
+            logging.info("Not enough actions {}".format(len(self.memory)))
             return
 
         temp = self.memory
@@ -243,12 +244,23 @@ class NGDQN:
             states.append(state)
             rewards.append(target)
 
-        X_training = np.array(states).reshape(len(states), 1, 71)
-        Y_training = np.array(rewards).reshape(len(rewards), 1, 9)
-        history = self.model.fit(X_training, Y_training, epochs=epochs, batch_size=32, verbose=verbose)
+        X_data = np.array(states).reshape(len(states), 1, 71)
+        y_data = np.array(rewards).reshape(len(rewards), 1, 9)
+
+        size = int(len(states)*77/100)
+        X_training = X_data[size:]
+        y_training = y_data[size:]
+
+        X_test = X_data[:size]
+        y_test = y_data[:size]
+
+        history = self.model.fit(X_training, y_training, epochs=epochs, batch_size=32, verbose=verbose)
 
         print("loss:", history.history["loss"], "\n")
-        return history
+
+        score = self.model.evaluate(X_test, y_test, verbose=verbose)
+        print("score:", score)
+        return history, score
 
     def target_train(self):
         self.env.logging.info("training target ..")
@@ -261,6 +273,25 @@ class NGDQN:
     def save_model(self, fn):
         self.logging.info("Saving the model to the local file: {}".format(fn))
         self.model.save(fn)
+
+    def load_actions_from_a_dir_and_save_to_vectors(self, dirName):
+        for entry in os.scandir(dirName):
+            if entry.is_file() and 'actions_' in entry.path:
+                self.load_actions_from_a_file(entry.path)
+                tmpName = entry.path.replace("actions", "vectors")
+                print("Processing: {} -> {}".format(entry.path, tmpName))
+                self.save_actions_as_vectors(tmpName)
+
+    def load_vectors_from_a_dir(self, dirName):
+        self.memory = deque()
+        for entry in os.scandir(dirName):
+            if entry.is_file() and 'vectors_' in entry.path:
+                print("Loading: {} ".format(entry.path))
+                tmp = self.load_vectors_into_actions(entry.path)
+                for action in tmp:
+                    self.memory.append(action)
+                print("Actions: {} total {}".format(len(tmp), len(self.memory)))
+
 
     def load_actions_from_a_file(self, fileName):
         self.memory = deque(maxlen=10000)

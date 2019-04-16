@@ -9,15 +9,13 @@ import AbadIA.NGDQN
 AbadIA.NGDQN
 
 print("Creating the Model v6 from the last version")
-dqn_agent = AbadIA.NGDQN.NGDQN(env=None, initModelName="models/last_v6.model", modelName="models/last_v6.model")
+dqn_agent = AbadIA.NGDQN.NGDQN(env=None, initModelName="models/last_v6.model", modelName="models/last_version_v6.model")
 
-print("Loading some actions")
-dqn_agent.load_actions_from_a_file("/tmp/actions.json")
+print("Transforming some actions to vectors and saving it into a dir")
+dqn_agent.load_actions_from_a_dir_and_save_to_vectors("./games/20190415")
 
-print("Loading some actions from a dir")
-dqn_agent.load_actions_from_a_dir("./games/20190416")
+print("Loading the vectors from a dir")
+dqn_agent.load_vectors_from_a_dir("./games/20190415")
 
-print("Saving as vector format")
-dqn_agent.save_actions_as_vectors("/tmp/vectors.json")
 
 

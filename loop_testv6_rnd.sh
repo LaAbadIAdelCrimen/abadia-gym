@@ -16,7 +16,7 @@ do
   sleep 1
   # python3 agenttestv2.py --episodes=1 --steps=9000 -c $line -g abadia-data  -p 4477
   python3 agentv6_ngdqn.py --episodes=10 --steps=500 -g abadia-data \
-  --initmodel=models/model_v6_lastest.model \
+  --initmodel=models/last_model_v6.model \
   -g abadia-data -c $file
   # -s http://35.241.222.173 -p 80 # -c /tmp/check
 
