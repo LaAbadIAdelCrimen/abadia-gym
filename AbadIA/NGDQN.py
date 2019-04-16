@@ -41,8 +41,8 @@ class NGDQN:
         if env != None:
             if env.initModelName != None:
                 self.initModelName = env.initModelName
-            if env.ModelName != None:
-                self.ModelName = env.ModelName
+            if env.modelName != None:
+                self.ModelName = env.modelName
 
         if modelName != None:
             self.modelName = modelName
@@ -53,10 +53,10 @@ class NGDQN:
         self.model        = self.create_model()
         self.target_model = self.create_model()
 
-        if (initModelName is not None):
-            fileName = initModelName
+        if (self.initModelName is not None):
+            fileName = self.initModelName
         else:
-            fileName = modelName
+            fileName = self.modelName
 
         if (self.gsBucket != None):
             # TODO JT: we need to implement this when goes to production

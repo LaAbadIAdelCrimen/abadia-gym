@@ -8,7 +8,7 @@ import json
 import AbadIA.NGDQN
 AbadIA.NGDQN
 
-dqn_agent = AbadIA.NGDQN.NGDQN(env=None, iniModelName="models/testv6.model")
+dqn_agent = AbadIA.NGDQN.NGDQN(env=None, initModelName="models/testv6.model")
 
 print("Creating a new model")
 dqn_agent.model = dqn_agent.create_model()
