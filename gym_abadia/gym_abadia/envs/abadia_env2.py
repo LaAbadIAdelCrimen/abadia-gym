@@ -317,7 +317,7 @@ class AbadiaEnv2(gym.Env):
                     logging.info("----------")
                     logging.info("reward by screen change !!!!! {} !=  {}".format(self.prevPantalla, int(ob['numPantalla'])))
                     logging.info("Personajes: {}".format(self.Personajes))
-                    logging.info("ob: {}".format(ob))
+                    # logging.info("ob: {}".format(ob))
                     logging.info("----------")
                     self.add_event("NewRoom", "prev {} curr {}".format(self.prevPantalla, int(ob['numPantalla'])), 0.001)
                     self.prevPantalla = int(ob['numPantalla'])
@@ -523,7 +523,7 @@ class AbadiaEnv2(gym.Env):
         tooboring = 0
         while True:
             ob = self.sendCmd(self.url, "/abadIA/current/game", mode='GET', type='json')
-            logging.info("{}".format(ob))
+            # logging.info("{}".format(ob))
             tooboring += 1
             if self._get_personajes_info(ob):
                 logging.info("getting the characters from ob:{}".format(ob))

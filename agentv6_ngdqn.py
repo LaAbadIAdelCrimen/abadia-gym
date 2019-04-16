@@ -232,23 +232,19 @@ def checkValidMovs(env):
                         env.valMovs2[action] = 0
                         env.wallMovs[action]  = 1
                         if (env.verbose > 1):
-                            print("Wall Blocks G {},{} ".format(yy,xx))
+                            env.logging.info("Wall Blocks G {},{} ".format(yy,xx))
                 if (chkM2[action][1][yy][xx] == 1 and room[yPos+yy-1, xPos+xx-1, 0] != 0):
                     if (env.verbose > 1):
-                        print("Adso/* block {},{} ".format(yy,xx))
+                        env.logging.info("Adso/* block {},{} ".format(yy,xx))
                     env.valMovs2[action] = 0
                     env.perMovs[action] = 1
 
     env.valMovs2[8] = 1
-    env.logging.info ("new valMovs2: {}".format(env.valMovs2))
-    env.logging.info ("wallMovs: {}".format(env.wallMovs))
-    env.logging.info ("perMovs: {}".format(env.perMovs))
     env.valMovs = env.valMovs2
-    ss = "Valid Movements:"
-    for ii in range(9):
-        ss += "%s:%s " % (env.actions_list[ii], env.valMovs[ii])
-    ss += "<--"
-    env.logging.info(ss)
+    # env.logging.info ("new valMovs2: {}".format(env.valMovs2))
+    # env.logging.info ("wallMovs: {}".format(env.wallMovs))
+    # env.logging.info ("perMovs: {}".format(env.perMovs))
+    # ss = "Valid Movements:"
 
     return env.valMovs
 
@@ -333,13 +329,13 @@ def mainLoop():
             #      .format(i_episode, t, action, x, y, ori, env.numPantalla, newX, newY, np.round(reward,2),
             #              np.round(rAll,2), np.round(Q[x,y],2)), end="\r")
 
-            logging.info("Epi {}:{} {}-{}:XYOP {},{},{},{} -> {},{} reward:{} tr:{} V:{}"
-                .format(i_episode, t, action, env.actions_list[action], x, y, ori, env.numPantalla, newX, newY, np.round(reward,8),
-                np.round(rAll,8), np.round(env.predictions,4)))
 
             # TODO JT: we need to create an option for this
             # if (t % 10 == 0 or reward > 0):
             env.pintaRejilla(40, 20)
+            logging.info("Epi {}:{} {}-{}:XYOP {},{},{},{} -> {},{} reward:{} tr:{} V:{}"
+                         .format(i_episode, t, action, env.actions_list[action], x, y, ori, env.numPantalla, newX, newY, np.round(reward,8),
+                                 np.round(rAll,8), np.round(env.predictions,4)))
 
             checkValidMovs(env)
             x, y, ori = env.personajeByName('Guillermo')

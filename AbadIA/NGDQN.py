@@ -138,7 +138,7 @@ class NGDQN:
         # final = np.zeros(self.env.action_space.n)
 
         action = np.argmax(final)
-        self.logging.info("vector:      {}              ".format(vector))
+        # self.logging.info("vector:      {}              ".format(vector))
         self.logging.info("predictions: {}              ".format(predictions))
         self.logging.info("final:       {}              ".format(final))
         self.logging.info("Action:      {} Prediction: {}    ".format(action, final[action]))
@@ -170,10 +170,17 @@ class NGDQN:
                     final[ii] = -99 # predictions[ii]*0.9
 
             action = np.argmax(final)
-            self.env.logging.info("vector:      {}              ".format(vector))
-            self.env.logging.info("predictions: {}              ".format(predictions))
-            self.env.logging.info("final:       {}              ".format(final))
+            # self.env.logging.info("vector:      {}              ".format(vector))
+            # self.env.logging.info("predictions: {}              ".format(predictions))
+            # self.env.logging.info("final:       {}              ".format(final))
             self.env.logging.info("Action:      {} Prediction: {}    ".format(action, final[action]))
+            for ii in range(9):
+                self.env.logging.info("%3s %d:%d:%d -> %.8f %.8f" % ( self.env.actions_list[ii],
+                                                                     self.env.valMovs[ii],
+                                                                     self.env.wallMovs[ii],
+                                                                     self.env.perMovs[ii],
+                                                                     predictions[ii],
+                                                                     final[ii]))
             actionType = "P"
 
             self.env.calculated_predictions = predictions.tolist()
