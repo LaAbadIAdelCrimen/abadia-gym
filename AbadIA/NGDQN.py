@@ -159,7 +159,7 @@ class NGDQN:
             self.env.final_predictions = []
         else:
             predictions = self.model.predict(vector.reshape(1,1,71)).reshape(9)
-            print(predictions)
+            logging.info(predictions)
             self.env.predictions = predictions
             final = np.zeros(self.env.action_space.n)
 
@@ -290,11 +290,11 @@ class NGDQN:
         self.memory = deque()
         for entry in os.scandir(dirName):
             if entry.is_file() and 'vectors_' in entry.path:
-                print("Loading: {} ".format(entry.path))
+                logging.info("Loading: {} ".format(entry.path))
                 tmp = self.load_vectors_into_actions(entry.path)
                 for action in tmp:
                     self.memory.append(action)
-                print("Actions: {} total {}".format(len(tmp), len(self.memory)))
+                loggin.info("Actions: {} total {}".format(len(tmp), len(self.memory)))
 
 
     def load_actions_from_a_file(self, fileName):
