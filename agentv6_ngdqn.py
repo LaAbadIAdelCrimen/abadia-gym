@@ -322,7 +322,7 @@ def mainLoop():
                     env.Visited[x, y + 1] += -0.01
 
             ngdqn_agent.replay()        # internally iterates default (prediction) model
-            # if (t % 16 == 0 ):
+            # if (t % 200 == 199):
             ngdqn_agent.target_train()
 
             # print("Episode({}:{}) A({})XYOP {},{},{},{} -> {},{} r:{} tr:{} Q(s,a)= {}"
@@ -356,7 +356,7 @@ def mainLoop():
 
         ngdqn_agent.save_model(nameModel)
 
-        if (env.gsBucket != None):
+        if (env.gsBucket != None and np.random.randint(10) <= 1):
             logging.info("Uploading model to GCP")
             env.upload_blob(nameModel, nameModel)
 
@@ -377,7 +377,8 @@ def mainLoop():
         #   dqn_agent.save_model("models/success.model")
         #   break
 
-        env.visited_snap_save()
+        if (np.random.randint(10) <= 1):
+            env.visited_snap_save()
 
     logging.info("Score over time: " + str(sum(rList)/env.num_episodes))
 

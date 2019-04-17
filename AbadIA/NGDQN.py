@@ -248,9 +248,10 @@ class NGDQN:
             target = self.target_model.predict(state.reshape(1,1,71))
             # TODO JT: we need to fix this for the case done is True
             if done:
-                target[0][0][action] = future_reward
+                target[0][0][action] = max(future_reward,target[0][0][action])
             else:
-                target[0][0][action] = future_reward
+                target[0][0][action] = max(future_reward,target[0][0][action])
+
             states.append(state)
             rewards.append(target)
 
@@ -301,8 +302,7 @@ class NGDQN:
                 tmp = self.load_vectors_into_actions(entry.path)
                 for action in tmp:
                     self.memory.append(action)
-                loggin.info("Actions: {} total {}".format(len(tmp), len(self.memory)))
-
+                logging.info("Actions: {} total {}".format(len(tmp), len(self.memory)))
 
     def load_actions_from_a_file(self, fileName):
         self.memory = deque(maxlen=10000)
