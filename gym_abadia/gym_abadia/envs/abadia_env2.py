@@ -310,11 +310,11 @@ class AbadiaEnv2(gym.Env):
         # TODO JT we need to check, that pass to another room
         # not just stay all the time between rooms to get the reward
 
-        # if self.estaGuillermo:
-            # if (self.prevPantalla == -1):
-                # self.prevPantalla = int(ob['numPantalla'])
-            # else:
-                # if (self.prevPantalla != int(ob['numPantalla'])):
+        if self.estaGuillermo:
+            if (self.prevPantalla == -1):
+                self.prevPantalla = int(ob['numPantalla'])
+            else:
+                if (self.prevPantalla != int(ob['numPantalla'])):
                     # reward += 0.03
                     # logging.info("----------")
                     # logging.info("reward by screen change !!!!! {} !=  {}".format(self.prevPantalla, int(ob['numPantalla'])))
@@ -322,8 +322,8 @@ class AbadiaEnv2(gym.Env):
                     # # logging.info("ob: {}".format(ob))
                     # logging.info("----------")
                     # self.add_event("NewRoom", "prev {} curr {}".format(self.prevPantalla, int(ob['numPantalla'])), 0.001)
-                    # self.prevPantalla = int(ob['numPantalla'])
-                    # self.save_game_checkpoint()
+                    self.prevPantalla = int(ob['numPantalla'])
+                    self.save_game_checkpoint()
 
         # # If there is an obsequium change, it will be rewarded pos/neg
         # if len(self.prev_ob) > 0 and int(self.prev_ob['obsequium']) > 0:
@@ -511,7 +511,7 @@ class AbadiaEnv2(gym.Env):
 
         logging.info('-----> RESET the GAME')
         ob = self.sendReset()
-        logging.info('reset status {}'.format(ob))
+        logging.info('reset status') # {}'.format(ob))
         logging.info('-----> DONE')
         logging.info('-----> INIT dumps files: START ...')
         self.init_dumps_files()
@@ -535,11 +535,10 @@ class AbadiaEnv2(gym.Env):
             # logging.info("{}".format(ob))
             tooboring += 1
             if self._get_personajes_info(ob):
-                logging.info("getting the characters from ob:{}".format(ob))
-                logging.info("DONE")
+                logging.info("getting the characters from Dump")
                 break
             else:
-                logging.info("getting the characters from ob:{}".format(ob))
+                logging.info("getting the characters from ob") # :{}".format(ob))
                 logging.info("Guillermo is not present yet, waiting")
                 if tooboring % 10 == 0:
                     logging.info("Getting Boring ...")
