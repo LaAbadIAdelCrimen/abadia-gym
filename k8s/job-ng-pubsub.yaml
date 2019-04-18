@@ -1,18 +1,18 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: abadia-pubsub
+  name: abadia-ng-pubsub
   labels:
-    name: abadia-pubsub
+    name: abadia-ng-pubsub
 spec:
   template:
     metadata:
         labels:
-            name: abadia-pubsub
+            name: abadia-ng-pubsub
     spec:
       containers:
       - name: engine
-        image: gcr.io/abadiadelcrimen-pmoncada/github-pmoncadaisla-vigasocosdl:latest
+        image: gcr.io/abadia-1/abadia-ng:vnc
         command: ["/bin/bash", "-c"]
         args:
           - |
