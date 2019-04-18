@@ -14,7 +14,7 @@ do
   ls -lt $file
   sleep 1
   # python3 agenttestv2.py --episodes=1 --steps=9000 -c $line -g abadia-data  -p 4477
-  python3 agentv6_ngdqn.py --episodes=1 --steps=500 \
+  python3 agentv6_ngdqn.py --episodes=5 --steps=500 \
     --initmodel=models/last_model_v6.model \
     -g abadia-data \
     -c $file

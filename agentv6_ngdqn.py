@@ -6,6 +6,7 @@ import numpy as np
 import os
 import argparse
 import random
+from threading import Thread
 
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
@@ -333,8 +334,9 @@ def mainLoop():
             # TODO JT: we need to create an option for this
             # if (t % 10 == 0 or reward > 0):
             env.pintaRejilla(40, 20)
-            logging.info("Epi {}:{} {}-{}:XYOP {},{},{},{} -> {},{} reward:{} tr:{} V:{}"
-                         .format(i_episode, t, action, env.actions_list[action], x, y, ori, env.numPantalla, newX, newY, np.round(reward,8),
+            logging.info("E{}:{} {}-{} X:{} Y:{},{},{}->{},{} O{} %{} reward:{} tr:{} V:{}"
+                         .format(i_episode, t, action, env.actions_list[action], x, y, ori, env.numPantalla,
+                                 newX, newY, env.obsequium, env.porcentaje, np.round(reward,8),
                                  np.round(rAll,8), np.round(env.predictions,4)))
 
             checkValidMovs(env)
@@ -358,7 +360,9 @@ def mainLoop():
 
         if (env.gsBucket != None and np.random.randint(10) <= 1):
             logging.info("Uploading model to GCP")
-            env.upload_blob(nameModel, nameModel)
+            thread = Thread(target=env.upload_blob, args=(nameModel, nameModel))
+            thread.start()
+            # env.upload_blob(nameModel, nameModel)
 
         # TODO JT: latest will be handed for another process in a more like A3C way
         # nameModel ="models/model_v6_lastest.model".format(env.gameId)

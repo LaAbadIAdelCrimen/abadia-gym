@@ -15,6 +15,7 @@ import time
 import datetime
 import os
 from pathlib import Path
+from threading import Thread
 
 # 3rd party modules
 import gym
@@ -607,11 +608,13 @@ class AbadiaEnv2(gym.Env):
         # self.fdGame.close()
         if (self.gsBucket != None):
             logging.info("Uploading Game: {} to GCP".format(self.dump_path + "/" + self.gameName))
-            self.upload_blob(self.dump_path + "/" + self.gameName,
-                             self.dump_path + "/" + self.gameName)
+            t = Thread(target=self.upload_blob, args=(self.dump_path + "/" + self.gameName,
+                                                      self.dump_path + "/" + self.gameName))
+            t.start()
             logging.info("Uploading Actions: {} to GCP".format(self.dump_path + "/" + self.actionsName))
-            self.upload_blob(self.dump_path + "/" + self.actionsName,
-                             self.dump_path + "/" + self.actionsName)
+            t = Thread(target=self.upload_blob, args=(self.dump_path + "/" + self.actionsName,
+                             self.dump_path + "/" + self.actionsName))
+            t.start()
 
     def save_action(self, state, action, reward, nextstate):
         s1 = state.copy()
@@ -655,8 +658,8 @@ class AbadiaEnv2(gym.Env):
 
         if (self.gsBucket != None):
             logging.info("Uploading visited to GCP")
-            self.upload_blob(nameVisitedSnap, nameVisitedSnap)
-
+            t = Thread(target=self.upload_blob, args=(nameVisitedSnap, nameVisitedSnap))
+            t.start()
 
     def reset_fin_partida(self):
         self.sendCmd(self.url, "abadIA/game/current/actions/SPACE", mode='POST')
@@ -695,10 +698,11 @@ class AbadiaEnv2(gym.Env):
 
         if (self.gsBucket != None):
             logging.info("Uploading {} to GCP".format(self.dump_path + '/' + self.checkpointTmpName))
-            self.upload_blob(self.dump_path + '/' + self.checkpointTmpName,
-                             self.dump_path + '/' + self.checkpointTmpName)
-        else:
-            logging.error("Not saving it to the local filesystem")
+            t = Thread(target=self.upload_blob, args=(self.dump_path + '/' + self.checkpointTmpName,
+                             self.dump_path + '/' + self.checkpointTmpName))
+            t.start()
+        # else:
+            # logging.error("Not saving it to the local filesystem")
 
     def load_game_checkpoint(self, name):
         logging.info("voy a abrir el fichero ({})".format(name))
@@ -746,7 +750,10 @@ class AbadiaEnv2(gym.Env):
         x, y, ori           = self.personajeByName('Guillermo')
         adsoX, adsoY, adsoO = self.personajeByName('Adso')
 
-        logging.info("\x1b[HGuillermo {},{} Adso {},{}".format(x, y, adsoX, adsoY))
+        logging.info("\x1b[HGuillermo {},{} Adso {},{} Obsequium:{} Porcentaje:{} V:{}".format(x, y, adsoX, adsoY,
+                             self.obsequium, self.porcentaje, np.round(self.predictions, 4)))
+
+
         logging.info("+---+" + "-" * (w * 2) + "+" + "-" * 24 + "+" + "-" * 48 + "+")
 
         for yy in range(y - h, y + h):
