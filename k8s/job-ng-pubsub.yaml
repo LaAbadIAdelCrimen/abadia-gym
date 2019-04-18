@@ -1,0 +1,82 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: abadia-pubsub
+  labels:
+    name: abadia-pubsub
+spec:
+  template:
+    metadata:
+        labels:
+            name: abadia-pubsub
+    spec:
+      containers:
+      - name: engine
+        image: gcr.io/abadiadelcrimen-pmoncada/github-pmoncadaisla-vigasocosdl:latest
+        command: ["/bin/bash", "-c"]
+        args:
+          - |
+            (while true; do VigasocoSDL abadia; done) &
+            CHILD_PID=$!
+            (while true; do if [[ -f "/tmp/pod/main-terminated" ]]; then kill $CHILD_PID; echo "Killed $CHILD_PID as the main container terminated."; fi; sleep 1; done) &
+            wait $CHILD_PID
+            if [[ -f "/tmp/pod/main-terminated" ]]; then exit 0; echo "Job completed. Exiting..."; fi
+        volumeMounts:                 
+          - mountPath: /tmp/pod
+            name: tmp-pod
+            readOnly: true
+        resources:
+              requests:
+                memory: "50Mi"
+                cpu: "300m"
+              limits:
+                memory: "1024Mi"
+                cpu: "940m"
+      - name: agent
+        image: gcr.io/abadia-1/github-laabadiadelcrimen-abadia-gym:latest
+        command: ["/bin/bash", "-c"]
+        args:
+          - |
+            export DOCKERIZE_VERSION=v0.6.1
+            wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+            && tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz \
+            && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+            dockerize -wait tcp://localhost:4477 -timeout 2m
+            trap "touch /tmp/pod/main-terminated" EXIT
+            mkdir -p models games snapshoots
+            while true
+                do
+                options=`gcloud pubsub subscriptions pull agent-batch --auto-ack --limit=1 --format="value(DATA)"`
+                echo "I will execute $options"
+                case $options in
+                    "exit")
+                    echo "OK I will exit now"
+                    exit 0
+                    ;;
+                    "")
+                    echo "No more batches, no more fun ..."
+                    exit 0
+                    ;;
+                    *_0_0.c*)
+                    echo "game over checkpoint"
+                    ;;
+                    *)
+                    python3 $options
+                    ;;
+                esac
+                done
+        volumeMounts:                 
+          - mountPath: /tmp/pod
+            name: tmp-pod
+        resources:
+              requests:
+                memory: "50Mi"
+                cpu: "300m"
+              limits:
+                memory: "1024Mi"
+                cpu: "940m"
+      restartPolicy: OnFailure
+      volumes:
+        - name: tmp-pod
+          emptyDir: {}
+  backoffLimit: 4
