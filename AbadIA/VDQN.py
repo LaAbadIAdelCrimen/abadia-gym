@@ -36,9 +36,9 @@ class VDQN:
         # TODO JT: we need to implement this when goes to production
         if env != None:
             if env.initModelName != None:
-                self.initModelName = env.initModelName
+                self.initModelName = env.initValueModelName
             if env.modelName != None:
-                self.ModelName = env.modelName
+                self.ModelName = env.valueModelName
 
         if modelName != None:
             self.modelName = modelName

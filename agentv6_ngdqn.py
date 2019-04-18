@@ -263,6 +263,7 @@ def mainLoop():
     epsilon = .95
 
     ngdqn_agent = NGDQN(env=env)
+    vdqn_agent = VDQN(env=env, initModelName="models/last_value_v1.model")
     steps = []
 
     for i_episode in range(env.num_episodes):
@@ -323,16 +324,9 @@ def mainLoop():
                     env.Visited[x, y + 1] += -0.01
 
             ngdqn_agent.replay()        # internally iterates default (prediction) model
-            # if (t % 200 == 199):
             ngdqn_agent.target_train()
 
-            # print("Episode({}:{}) A({})XYOP {},{},{},{} -> {},{} r:{} tr:{} Q(s,a)= {}"
-            #      .format(i_episode, t, action, x, y, ori, env.numPantalla, newX, newY, np.round(reward,2),
-            #              np.round(rAll,2), np.round(Q[x,y],2)), end="\r")
-
-
             # TODO JT: we need to create an option for this
-            # if (t % 10 == 0 or reward > 0):
             env.pintaRejilla(40, 20)
             logging.info("E{}:{} {}-{} X:{} Y:{},{},{}->{},{} O{} %{} reward:{} tr:{} V:{}"
                          .format(i_episode, t, action, env.actions_list[action], x, y, ori, env.numPantalla,
