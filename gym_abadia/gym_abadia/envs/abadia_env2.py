@@ -759,8 +759,7 @@ class AbadiaEnv2(gym.Env):
         adsoX, adsoY, adsoO = self.personajeByName('Adso')
 
         logging.info("\x1b[HGuillermo {},{} Adso {},{} Obsequium:{} Porcentaje:{} Reward:{} TR:{} V:{}".format(x, y, adsoX, adsoY,
-                             self.obsequium, np.round(self.porcentaje, 6), self.reward, self.totalReward, np.round(self.predictions, 4)))
-
+                             self.obsequium, self.porcentaje, np.round(self.reward, 6), np.round(self.totalReward, 6), np.round(self.predictions, 4)))
 
         logging.info("+---+" + "-" * (w * 2) + "+" + "-" * 24 + "+" + "-" * 48 + "+")
 
