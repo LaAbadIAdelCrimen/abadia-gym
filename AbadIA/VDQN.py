@@ -11,7 +11,7 @@ from keras.layers import Dense, Dropout
 from keras.optimizers import Adam
 from collections import deque
 
-# VALUE MODEL FOR any: Day/Hour/Guillermo X,Y
+# VALUE MODEL FOR any: Guillermo X,Y/Day/Hour/Height
 
 class VDQN:
     def __init__(self, env=None, modelName=None, initModelName=None, gsBucket=None):
@@ -58,42 +58,19 @@ class VDQN:
             # TODO JT: we need to implement this when goes to production
             if self.env != None:
                 self.env.download_blob(fileName, fileName)
-            self.logging.info("Downloading the model from Bucket: {} file: {}".format(self.gsBucket, fileName))
+            self.logging.info("Downloading the value model from Bucket: {} file: {}".format(self.gsBucket, fileName))
 
         self.model        = self.load_model(fileName)
         self.target_model = self.load_model(fileName)
 
-    def create_model(self, input_dim=71, output_dim=1):
+    def create_model(self, input_dim=5, output_dim=1):
         self.logging.info("Creating a new a Value model v1")
         model   = Sequential()
 
-        state_shape  = input_dim # self.env.observation_space.shape
-
         # TODO JT we need to redesign the internal lawyers
 
-        model.add(Dense(64, input_shape=(1,71), activation="relu"))
-        model.add(Dense(32, activation="relu"))
-        model.add(Dense(output_dim))
-        model.compile(loss="mean_squared_error",
-            optimizer=Adam(lr=self.learning_rate),
-            metrics=['accuracy'])
-        return model
-
-
-    def create_model2(self, input_dim=71, output_dim=9):
-        self.logging.info("Creating a new model2 v6")
-        model   = Sequential()
-        # TODO JT we need to increment the input vector dim
-        # for now the input_dim is 71 with chars, env + validmods
-
-        state_shape  = input_dim # self.env.observation_space.shape
-
-        # TODO JT we need to redesign the internal lawyers
-
-        model.add(Dense(64, input_shape=(1,71), activation="relu"))
-        model.add(Dense(128, activation="relu"))
-        model.add(Dense(64, activation="relu"))
-        model.add(Dense(32, activation="relu"))
+        model.add(Dense(8, input_shape=(1,5), activation="relu"))
+        model.add(Dense(16, activation="relu"))
         model.add(Dense(output_dim))
         model.compile(loss="mean_squared_error",
             optimizer=Adam(lr=self.learning_rate),
@@ -101,12 +78,12 @@ class VDQN:
         return model
 
     def load_model(self, name):
-        self.logging.info("Loading a local model from: ({})".format(name))
+        self.logging.info("Loading a local value model from: ({})".format(name))
         # we're calling the load_model method imported from keras
         # and return the model loaded (h5 format)
         return load_model(name)
 
-    def create_empty(self, name="models/model_v6"):
+    def create_empty(self, name="models/empty_value_model_v6.model"):
         model = self.create_model()
         self.save_model(name)
         return model
@@ -187,67 +164,22 @@ class VDQN:
     def remember(self, state, action, reward, new_state, done):
         self.memory.append([state, action, reward, new_state, done, 0])
 
-    def replay(self, verbose=0):
-        batch_size = 32
-        if len(self.memory) < batch_size:
-            return
-
-        temp = self.memory
-        acu  = np.zeros(32)
-
-        # adding the future reward 32 rewards ahead to the vector information
-        for index in range(len(temp)-1, 0, -1):
-            acu[index % 32] = temp[index][2]
-            temp[index][5]  = acu.sum()
-
-        samples = random.sample(temp, batch_size)
-        for sample in samples:
-            state, action, reward, new_state, done, future_reward = sample
-            # print(state)
-            target = self.target_model.predict((state.reshape(1,1,71))).reshape(9)
-            # print(target)
-            if done:
-                target[action] = future_reward
-            else:
-                # TODO JT: MCTS? Q_future = max(self.target_model.predict(new_state)[0])
-                target[action] = future_reward # Q_future # reward + Q_future * self.gamma
-            history = self.model.fit(state.reshape(1, 1, 71), target.reshape(1, 1, 9), epochs=1, verbose=verbose)
-            # print("loss:", history.history["loss"], "\n")
-
     def replay_game(self, epochs=4, verbose=0):
         batch_size = 32
-        if len(self.memory) < batch_size:
-            logging.info("Not enough actions {}".format(len(self.memory)))
-            return
-        else:
-            logging.info("We have {} samples for training".format(len(self.memory)))
+        logging.info("We have {} samples for training".format(len(self.memory)))
 
         temp = self.memory
-        acu  = np.zeros(32)
-
-        # adding the future reward 32 rewards ahead to the vector information
-        for index in range(len(temp)-1, 0, -1):
-            acu[index % 32] = temp[index][2]
-            temp[index][5]  = acu.sum()
-
-        # TODO JT: we dont want to use the last 32 actions because we dont have the "future" score
 
         states  = []
         rewards = []
         for sample in temp:
             state, action, reward, new_state, done, future_reward = sample
-            target = self.target_model.predict(state.reshape(1,1,71))
-            # TODO JT: we need to fix this for the case done is True
-            if done:
-                target[0][0][action] = max(future_reward,target[0][0][action])
-            else:
-                target[0][0][action] = max(future_reward,target[0][0][action])
 
             states.append(state)
-            rewards.append(target)
+            rewards.append(reward)
 
-        X_data = np.array(states).reshape(len(states), 1, 71)
-        y_data = np.array(rewards).reshape(len(rewards), 1, 9)
+        X_data = np.array(states).reshape(len(states), 1, 5)
+        y_data = np.array(rewards).reshape(len(rewards), 1, 1)
 
         size = int(len(states)*77/100)
         X_training = X_data[:size]
@@ -274,21 +206,21 @@ class VDQN:
         self.target_model.set_weights(target_weights)
 
     def save_model(self, fn):
-        self.logging.info("Saving the model to the local file: {}".format(fn))
+        self.logging.info("Saving the value model to the local file: {}".format(fn))
         self.model.save(fn)
 
     def load_actions_from_a_dir_and_save_to_vectors(self, dirName):
         for entry in os.scandir(dirName):
             if entry.is_file() and 'actions_' in entry.path:
                 self.load_actions_from_a_file(entry.path)
-                tmpName = entry.path.replace("actions", "vectors")
+                tmpName = entry.path.replace("actions", "value_vectors")
                 print("Processing: {} -> {}".format(entry.path, tmpName))
                 self.save_actions_as_vectors(tmpName)
 
     def load_vectors_from_a_dir(self, dirName):
         self.memory = deque()
         for entry in os.scandir(dirName):
-            if entry.is_file() and 'vectors_' in entry.path:
+            if entry.is_file() and 'value_vectors_' in entry.path:
                 logging.info("Loading: {} ".format(entry.path))
                 tmp = self.load_vectors_into_actions(entry.path)
                 for action in tmp:
