@@ -96,6 +96,7 @@ class AbadiaEnv2(gym.Env):
         self.actions_list = ("N", "NE", "E", "SE", "S", "SW", "W", "NW", "NOP")
 
         self.obsequium = -1
+        self.reward = 0
         self.porcentaje = -1
         self.haFracasado = False
         self.prevPantalla = -1
@@ -306,52 +307,52 @@ class AbadiaEnv2(gym.Env):
 
         reward = 0
         self.eventsAction = []
-        # JT we need to check, that pass to another room
+        # TODO JT we need to check, that pass to another room
         # not just stay all the time between rooms to get the reward
 
-        if self.estaGuillermo:
-            if (self.prevPantalla == -1):
-                self.prevPantalla = int(ob['numPantalla'])
-            else:
-                if (self.prevPantalla != int(ob['numPantalla'])):
-                    reward += 0.03
-                    logging.info("----------")
-                    logging.info("reward by screen change !!!!! {} !=  {}".format(self.prevPantalla, int(ob['numPantalla'])))
-                    logging.info("Personajes: {}".format(self.Personajes))
-                    # logging.info("ob: {}".format(ob))
-                    logging.info("----------")
-                    self.add_event("NewRoom", "prev {} curr {}".format(self.prevPantalla, int(ob['numPantalla'])), 0.001)
-                    self.prevPantalla = int(ob['numPantalla'])
-                    self.save_game_checkpoint()
+        # if self.estaGuillermo:
+            # if (self.prevPantalla == -1):
+                # self.prevPantalla = int(ob['numPantalla'])
+            # else:
+                # if (self.prevPantalla != int(ob['numPantalla'])):
+                    # reward += 0.03
+                    # logging.info("----------")
+                    # logging.info("reward by screen change !!!!! {} !=  {}".format(self.prevPantalla, int(ob['numPantalla'])))
+                    # logging.info("Personajes: {}".format(self.Personajes))
+                    # # logging.info("ob: {}".format(ob))
+                    # logging.info("----------")
+                    # self.add_event("NewRoom", "prev {} curr {}".format(self.prevPantalla, int(ob['numPantalla'])), 0.001)
+                    # self.prevPantalla = int(ob['numPantalla'])
+                    # self.save_game_checkpoint()
 
-        # If there is an obsequium change, it will be rewarded pos/neg
-        if len(self.prev_ob) > 0 and int(self.prev_ob['obsequium']) > 0:
-            # reward for incrementing the obsequium: > 0 +50 / < 0 -30
-            incr_obsequium = self.obsequium - int(self.prev_ob['obsequium'])
-            if incr_obsequium > 0:
-                reward += (50 * incr_obsequium) / 10000
-                self.add_event("IncrObsequium", "Obsequium {} Incr {}".format(self.prev_ob['obsequium'],incr_obsequium), (50 * incr_obsequium) / 10000)
+        # # If there is an obsequium change, it will be rewarded pos/neg
+        # if len(self.prev_ob) > 0 and int(self.prev_ob['obsequium']) > 0:
+            # # reward for incrementing the obsequium: > 0 +50 / < 0 -30
+            # incr_obsequium = self.obsequium - int(self.prev_ob['obsequium'])
+            # if incr_obsequium > 0:
+                # reward += (50 * incr_obsequium) / 10000
+                # self.add_event("IncrObsequium", "Obsequium {} Incr {}".format(self.prev_ob['obsequium'],incr_obsequium), (50 * incr_obsequium) / 10000)
 
-            if incr_obsequium < 0:
-                reward += (30 * incr_obsequium) / 10000
-                self.add_event("DecrObsequium", "Obsequium {} Decr {}".format(self.prev_ob['obsequium'], incr_obsequium),(30 * incr_obsequium) / 10000)
+            # if incr_obsequium < 0:
+                # reward += (30 * incr_obsequium) / 10000
+                # self.add_event("DecrObsequium", "Obsequium {} Decr {}".format(self.prev_ob['obsequium'], incr_obsequium),(30 * incr_obsequium) / 10000)
 
         # reward for incrementing the bonus: >0 +500
-        if len(self.prev_ob) > 0 and int(self.prev_ob['bonus']) > 0:
-            incr_bonus = self.bonus - int(self.prev_ob['bonus'])
-            if incr_bonus > 0:
-                reward += (500 * incr_bonus) / 10000
-                self.add_event("Bonus", "prev {} curr {}".format(self.bonus, int(self.prev_ob['bonus'])), (500 * incr_bonus) / 10000)
+        # if len(self.prev_ob) > 0 and int(self.prev_ob['bonus']) > 0:
+            # incr_bonus = self.bonus - int(self.prev_ob['bonus'])
+            # if incr_bonus > 0:
+                # reward += (500 * incr_bonus) / 10000
+                # self.add_event("Bonus", "prev {} curr {}".format(self.bonus, int(self.prev_ob['bonus'])), (500 * incr_bonus) / 10000)
 
         # we check if Guillermo change his position. Positive reward if yes, negative if no
         # if action == 0:
-        if len(self.prev_ob) > 0 and len(self.prev_ob['Personajes']) > 0:
-            prev = self.dataPersonaje(self.prev_ob, "Guillermo")
-            curr = self.dataPersonaje(ob, "Guillermo")
-            if (prev['posX'] != curr['posX']) or (prev['posY'] != curr['posY']):
-                logging.info("se ha movido: {},{} -> {},{}".format(prev['posX'], prev['posY'],
-                                                        curr['posX'], curr['posY']))
-                reward += 0.001
+        # if len(self.prev_ob) > 0 and len(self.prev_ob['Personajes']) > 0:
+            # prev = self.dataPersonaje(self.prev_ob, "Guillermo")
+            # curr = self.dataPersonaje(ob, "Guillermo")
+            # if (prev['posX'] != curr['posX']) or (prev['posY'] != curr['posY']):
+                # logging.info("se ha movido: {},{} -> {},{}".format(prev['posX'], prev['posY'],
+                                                        # curr['posX'], curr['posY']))
+                # reward += 0.001
 
         # TODO: check this self.eventsGame.extend(self.eventsAction)
         # if the game is over, we just finish the game and reward is -1000
@@ -376,37 +377,44 @@ class AbadiaEnv2(gym.Env):
             reward = 1
 
         # if no reward we penalized it
-        if reward == 0:
-            logging.info("***** No reward, penalizing it")
-            reward = -0.005
+        # if reward == 0:
+            # logging.info("***** No reward, penalizing it")
+            # reward = -0.005
 
-        if self.obsequium > 0:
-            reward = reward * float((self.obsequium / self.obsequium)*0.5)
-        if self.porcentaje > 0:
-            reward = reward * float(((self.porcentaje * 0.5) / self.porcentaje)+1)
+        # if self.obsequium > 0:
+        #    reward = reward * float((self.obsequium / self.obsequium)*0.5)
+        # if self.porcentaje > 0:
+        #    reward = reward * float(((self.porcentaje * 0.5) / self.porcentaje)+1)
 
         if (self.wallMovs[action] == 1):
             logging.info("***** Invalid move against Wall, penalizing it")
-            reward = -0.0901
+            reward = -0.00901
 
         if (self.perMovs[action] == 1):
             logging.info("***** Invalid move against a Character, penalizing it")
-            reward = -0.0902
+            reward = -0.00902
 
+        ###########################
+        # New Experimental Reward #
+        ###########################
+
+        reward = float( ((self.porcentaje + 1) / 10000) * self.obsequium / 31)
+
+        self.reward       = reward
         self.totalReward += reward
-        ob['reward'] = reward
+        ob['reward']      = reward
         ob['totalReward'] = self.totalReward
         logging.info("reward: {} tr: {} action: {} ".format(reward, self.totalReward, action))
 
         # adding more information for debugging: valid moves, vectors, predictions, etc.
-        ob['valMovs'] = self.valMovs.tolist()
-        ob['wallMovs'] = self.wallMovs.tolist()
-        ob['perMovs'] = self.perMovs.tolist()
-        ob['predictions'] = self.calculated_predictions
-        ob['final'] = self.final_predictions
-        ob['vector'] = self.vector_predictions
+        ob['valMovs']            = self.valMovs.tolist()
+        ob['wallMovs']           = self.wallMovs.tolist()
+        ob['perMovs']            = self.perMovs.tolist()
+        ob['predictions']        = self.calculated_predictions
+        ob['final']              = self.final_predictions
+        ob['vector']             = self.vector_predictions
         ob['action_predictions'] = self.action_predictions
-        ob['action_type'] = self.action_type
+        ob['action_type']        = self.action_type
 
         # we make a copy for the current observation in order to calculate
         # the reward for the next state
@@ -750,8 +758,8 @@ class AbadiaEnv2(gym.Env):
         x, y, ori           = self.personajeByName('Guillermo')
         adsoX, adsoY, adsoO = self.personajeByName('Adso')
 
-        logging.info("\x1b[HGuillermo {},{} Adso {},{} Obsequium:{} Porcentaje:{} V:{}".format(x, y, adsoX, adsoY,
-                             self.obsequium, self.porcentaje, np.round(self.predictions, 4)))
+        logging.info("\x1b[HGuillermo {},{} Adso {},{} Obsequium:{} Porcentaje:{} Reward:{} TR:{} V:{}".format(x, y, adsoX, adsoY,
+                             self.obsequium, np.round(self.porcentaje, 6), self.reward, self.totalReward, np.round(self.predictions, 4)))
 
 
         logging.info("+---+" + "-" * (w * 2) + "+" + "-" * 24 + "+" + "-" * 48 + "+")
