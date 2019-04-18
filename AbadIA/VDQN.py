@@ -58,10 +58,11 @@ class VDQN:
             # TODO JT: we need to implement this when goes to production
             if self.env != None:
                 self.env.download_blob(fileName, fileName)
-            self.logging.info("Downloading the value model from Bucket: {} file: {}".format(self.gsBucket, fileName))
+                self.logging.info("Downloading the value model from Bucket: {} file: {}".format(self.gsBucket, fileName))
 
-        self.model        = self.load_model(fileName)
-        self.target_model = self.load_model(fileName)
+        if not (env == None and initModelName == None and modelName == None):
+            self.model        = self.load_model(fileName)
+            self.target_model = self.load_model(fileName)
 
     def create_model(self, input_dim=5, output_dim=1):
         self.logging.info("Creating a new a Value model v1")
@@ -268,6 +269,6 @@ class VDQN:
         vEnv[2] = float(state['planta']/3)
 
         vector = np.append(vChars, vEnv)
-        print(vector)
+        # print(vector)
         return vector.reshape(1,5)
 
