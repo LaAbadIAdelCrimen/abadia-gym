@@ -11,17 +11,12 @@ from keras.layers import Dense, Dropout
 from keras.optimizers import Adam
 from collections import deque
 
-# TODO JT:
-# 1) Need a method to fill the memory with actions
-# 2) Need a method to training / validating out the agent
-# 3) A method to get the history of the training/validating
-# 4) a method to convert from the json format to the input vector
+# VALUE MODEL FOR any: Day/Hour/Guillermo X,Y
 
-class NGDQN:
+class VDQN:
     def __init__(self, env=None, modelName=None, initModelName=None, gsBucket=None):
         self.env     = env
         self.memory  = deque(maxlen=10000)
-        # Exploring or playing
 
         self.gamma = 0.85
         self.epsilon = 1.0
@@ -68,19 +63,15 @@ class NGDQN:
         self.model        = self.load_model(fileName)
         self.target_model = self.load_model(fileName)
 
-    def create_model(self, input_dim=71, output_dim=9):
-        self.logging.info("Creating a new model v6")
+    def create_model(self, input_dim=71, output_dim=1):
+        self.logging.info("Creating a new a Value model v1")
         model   = Sequential()
-        # TODO JT we need to increment the input vector dim
-        # for now the input_dim is 71 with chars, env + validmods
 
         state_shape  = input_dim # self.env.observation_space.shape
 
         # TODO JT we need to redesign the internal lawyers
 
         model.add(Dense(64, input_shape=(1,71), activation="relu"))
-        model.add(Dense(128, activation="relu"))
-        model.add(Dense(64, activation="relu"))
         model.add(Dense(32, activation="relu"))
         model.add(Dense(output_dim))
         model.compile(loss="mean_squared_error",
@@ -334,60 +325,17 @@ class NGDQN:
 
         chars  = state['Personajes']
         # print(chars)
-        vChars = np.zeros([4,7], np.float)
-        for ii in range(0, min(len(chars), 4)):
-            # print (ii, chars[ii]['nombre'], chars[ii]['posX'], chars[ii]['posY'])
-            vChars[ii][0] = float(chars[ii]['posX']/256)
-            vChars[ii][1] = float(chars[ii]['posY']/256)
-            vChars[ii][2] = float(chars[ii]['orientacion'] / 4)
-            vChars[ii][3] = float(chars[ii]['altura'] / 4)
-            if (ii >= 1):
-                vChars[ii][4] = hypot(vChars[ii][0] - vChars[0][0], vChars[ii][1] - vChars[0][1])
-                vChars[ii][5] = atan2(vChars[ii][0] - vChars[0][0], vChars[ii][1] - vChars[0][1]) / 3.14159
-            if (ii <= 1):
-                vChars[ii][6] = float(chars[ii]['objetos'] / 32)
+        vChars = np.zeros([2], np.float)
+        vChars[0] = float(chars[0]['posX']/256)
+        vChars[1] = float(chars[0]['posY']/256)
 
         # vEnv vector with the environment data
-        vEnv = np.zeros([10], np.float)
-        vEnv[0] = float(state['bonus']/100)
-        vEnv[1] = float(state['dia']/7)
-        vEnv[2] = float(state['momentoDia']/10)
-        vEnv[3] = float(state['numPantalla']/256)
-        vEnv[4] = float(state['numeroRomano']/10)
-        vEnv[5] = float(state['obsequium']/31)
-        vEnv[6] = float(state['planta']/3)
-        vEnv[7] = float(state['porcentaje']/100)
-        if len(state['Objetos']) >= 1:
-            vEnv[8] = float(state['Objetos'][0]/32)
+        vEnv = np.zeros([3], np.float)
+        vEnv[0] = float(state['dia']/7)
+        vEnv[1] = float(state['momentoDia']/10)
+        vEnv[2] = float(state['planta']/3)
 
-        if 'jugada' in state:
-            vEnv[9] = float(state['jugada']/10000)
-
-        # print(vEnv)
-        vector = np.append(vChars.reshape([1, 28]), vEnv)
-
-        # vAudio the last sounds
-        vAudio = np.zeros([12], np.float)
-        for ii in range(0, len(state['sonidos'])):
-            vAudio[ii] = float(state['sonidos'][ii]/64)
-
-        vector = np.append(vector, vAudio)
-
-        # vFrases the last frases
-        vFrases = np.zeros([12], np.float)
-        for ii in range(0, len(state['frases'])):
-            vFrases[ii] = float(state['frases'][ii]/64)
-
-        vector = np.append(vector, vFrases)
-
-        # vValidm the validmovs
-        vValidm = np.zeros([9], np.float)
-        if 'valMovs' in state and state['valMovs'] != None:
-            for ii in range(len(state['valMovs'])):
-                vValidm[ii] = float(state['valMovs'][ii])
-
-        vector = np.append(vector, vValidm)
-
-        # print("vector {}".format(vector))
-        return vector.reshape(1,71)
+        vector = np.append(vChars, vEnv)
+        print(vector)
+        return vector.reshape(1,5)
 
