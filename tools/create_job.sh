@@ -7,8 +7,8 @@ REPLICAS=$1
 CALLED=$_
 if [[ $CALLED != $0 ]]; then BASEPATH=$(dirname "${BASH_SOURCE[0]}") ; else BASEPATH=$(dirname "$0"); fi
 
-JOB_YAML="$BASEPATH/../k8s/job-pubsub.yaml"
-SEARCH="abadia-pubsub"
+JOB_YAML="$BASEPATH/../k8s/job-ng-pubsub.yaml"
+SEARCH="abadia-ng-pubsub"
 
 re='^[0-9]+$'
 if ! [[ $REPLICAS =~ $re ]] ; then
@@ -17,7 +17,7 @@ fi
 
 RND=$(LC_CTYPE=C tr -dc 'a-z0-9'  < /dev/urandom | fold -w 4 | head -n 1)
 DATE=$(date '+%Y%m%d%H%M%S')
-BASE_NAME="abadia-pubsub-"${DATE}-$RND
+BASE_NAME="abadia-ng-pubsub-"${DATE}-$RND
 
 for (( c=1; c<=$REPLICAS; c++ ))
 do

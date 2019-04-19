@@ -59,11 +59,11 @@ class NGDQN:
         else:
             fileName = self.modelName
 
-        if (self.gsBucket != None):
+        if self.env != None:
+            if (env.gsBucket != None):
             # TODO JT: we need to implement this when goes to production
-            if self.env != None:
                 self.env.download_blob(fileName, fileName)
-            self.logging.info("Downloading the model from Bucket: {} file: {}".format(self.gsBucket, fileName))
+                self.logging.info("Downloading the model from Bucket: {} file: {}".format(self.gsBucket, fileName))
 
         self.model        = self.load_model(fileName)
         self.target_model = self.load_model(fileName)
@@ -297,7 +297,7 @@ class NGDQN:
     def load_vectors_from_a_dir(self, dirName):
         self.memory = deque()
         for entry in os.scandir(dirName):
-            if entry.is_file() and 'vectors_' in entry.path:
+            if entry.is_file() and 'abadia_vectors_' in entry.path:
                 logging.info("Loading: {} ".format(entry.path))
                 tmp = self.load_vectors_into_actions(entry.path)
                 for action in tmp:

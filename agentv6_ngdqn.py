@@ -17,6 +17,7 @@ from collections import deque
 import logging
 
 from AbadIA.NGDQN import NGDQN as NGDQN
+from AbadIA.VDQN import VDQN as VDQN
 
 def init_env(env):
     argparser = argparse.ArgumentParser()
@@ -262,7 +263,7 @@ def mainLoop():
     gamma = 0.9
     epsilon = .95
 
-    ngdqn_agent = NGDQN(env=env)
+    ngdqn_agent = NGDQN(env=env, initModelName="models/last_model_v6.model",)
     vdqn_agent = VDQN(env=env, initModelName="models/last_value_v1.model")
     steps = []
 

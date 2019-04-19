@@ -16,7 +16,7 @@ spec:
         command: ["/bin/bash", "-c"]
         args:
           - |
-            (while true; do VigasocoSDL abadia; done) &
+            (while true; do cd /home/abadIA/VigasocoSDL-AI/VigasocoSDL&&./loop-abadIA.sh; done) &
             CHILD_PID=$!
             (while true; do if [[ -f "/tmp/pod/main-terminated" ]]; then kill $CHILD_PID; echo "Killed $CHILD_PID as the main container terminated."; fi; sleep 1; done) &
             wait $CHILD_PID

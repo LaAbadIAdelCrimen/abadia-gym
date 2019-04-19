@@ -54,9 +54,9 @@ class VDQN:
         else:
             fileName = self.modelName
 
-        if (self.gsBucket != None):
+        if self.env != None:
             # TODO JT: we need to implement this when goes to production
-            if self.env != None:
+            if (env.gsBucket != None):
                 self.env.download_blob(fileName, fileName)
                 self.logging.info("Downloading the value model from Bucket: {} file: {}".format(self.gsBucket, fileName))
 
