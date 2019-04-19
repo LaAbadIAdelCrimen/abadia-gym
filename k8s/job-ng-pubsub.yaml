@@ -61,8 +61,8 @@ spec:
                     echo "game over checkpoint"
                     ;;
                     *)
-                    locate python
-                    locate python3
+                    type python
+                    type python3
                     ls -lt agent*
                     pwd
                     python3 $options
