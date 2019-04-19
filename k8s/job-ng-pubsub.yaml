@@ -43,6 +43,7 @@ spec:
             && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
             dockerize -wait tcp://localhost:4477 -timeout 2m
             trap "touch /tmp/pod/main-terminated" EXIT
+            pip3 install -e gym_abadia
             mkdir -p models games snapshoots
             while true
                 do

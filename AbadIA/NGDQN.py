@@ -31,6 +31,7 @@ class NGDQN:
         self.tau = .125
         self.initModelName = None
         self.modelName = None
+        self.valueModelName = None
         self.gsBucket = None
 
         logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', datefmt='%d-%m-%y %H:%M:%S',
