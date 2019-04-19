@@ -46,7 +46,7 @@ spec:
             mkdir -p models games snapshoots
             while true
                 do
-                options=`gcloud pubsub subscriptions pull agent-batch --auto-ack --limit=1 --format="value(DATA)"`
+                options=`gcloud pubsub subscriptions pull agent-batches --auto-ack --limit=1 --format="value(DATA)"`
                 echo "I will execute $options"
                 case $options in
                     "exit")

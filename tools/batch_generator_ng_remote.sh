@@ -12,7 +12,7 @@ do
       echo "look like a dead checkpoint, I don't queue it ($line)"
       ;;
     *)
-      options=" $2 --episodes=5 --steps=2000 --initmodel=models/last_model_v6.model -g abadia-data -s http://localhost -p 4477 -c $line "
+      options="python  $2 --episodes=5 --steps=2000 --initmodel=models/last_model_v6.model -g abadia-data -s http://localhost -p 4477 -c $line "
       echo "Queuing -> ($options) into the topic agent-batches"
       gcloud beta pubsub topics publish agent-batches --message "$options"
       ;;
