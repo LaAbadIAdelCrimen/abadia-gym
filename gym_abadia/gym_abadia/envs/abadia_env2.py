@@ -59,6 +59,7 @@ class AbadiaEnv2(gym.Env):
         self.actionsName    = ""
         self.checkpointName = None
         self.modelName      = None
+        self.valueModelName = None
         self.initValueModelName = None
         self.dump_path      = "games/now/"
         self.gameId = datetime.datetime.now().strftime('%y%m%d_%H%M%S_%f')
