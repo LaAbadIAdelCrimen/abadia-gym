@@ -66,8 +66,9 @@ class NGDQN:
                 self.env.download_blob(fileName, fileName)
                 self.logging.info("Downloading the model from Bucket: {} file: {}".format(self.gsBucket, fileName))
 
-        self.model        = self.load_model(fileName)
-        self.target_model = self.load_model(fileName)
+        if (not (env == None and modelName == None and initModelName == None)):
+            self.model        = self.load_model(fileName)
+            self.target_model = self.load_model(fileName)
 
     def create_model(self, input_dim=71, output_dim=9):
         self.logging.info("Creating a new model v6")
@@ -313,13 +314,16 @@ class NGDQN:
             if lines:
                 for line in lines:
                     # if (len(line) > 0 and line.startswith("[")):
-                    state = json.loads(line)[0]
-                    # print("{}".format(state))
+                    try:
+                        state = json.loads(line)[0]
+                        # print("{}".format(state))
 
-                    current_state = self.state2vector(state['action']['state'])
-                    new_state = self.state2vector(state['action']['state'])
-                    action = state['action']['action']
-                    reward = state['action']['reward']
+                        current_state = self.state2vector(state['action']['state'])
+                        new_state = self.state2vector(state['action']['state'])
+                        action = state['action']['action']
+                        reward = state['action']['reward']
+                    except:
+                        print("json line read error")
 
                     self.remember(current_state, action, reward, new_state, False)
 

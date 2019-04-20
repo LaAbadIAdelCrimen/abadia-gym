@@ -236,13 +236,16 @@ class VDQN:
             if lines:
                 for line in lines:
                     # if (len(line) > 0 and line.startswith("[")):
-                    state = json.loads(line)[0]
-                    # print("{}".format(state))
+                    try:
+                        state = json.loads(line)[0]
+                        # print("{}".format(state))
 
-                    current_state = self.state2vector(state['action']['state'])
-                    new_state = self.state2vector(state['action']['state'])
-                    action = state['action']['action']
-                    reward = state['action']['reward']
+                        current_state = self.state2vector(state['action']['state'])
+                        new_state = self.state2vector(state['action']['state'])
+                        action = state['action']['action']
+                        reward = state['action']['reward']
+                    except:
+                        print("json line read error")
 
                     self.remember(current_state, action, reward, new_state, False)
 

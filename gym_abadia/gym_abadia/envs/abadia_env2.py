@@ -65,13 +65,11 @@ class AbadiaEnv2(gym.Env):
         self.gameId = datetime.datetime.now().strftime('%y%m%d_%H%M%S_%f')
         self.checkpointSec  = 1
         self.storage_client = None
-        self.storage_client = None
         self.eventsGame     = []
         self.eventsAction   = []
         self.totalReward    = 0.0
         self.verbose        = 0
         self.playing        = False
-
 
         # Define what the agent can do
         # 0 -> STEP FORWARD
@@ -106,7 +104,6 @@ class AbadiaEnv2(gym.Env):
         self.prev_ob = dict()
         self.estaGuillermo= False
         self.room = np.zeros([20,20,3], np.int)
-
 
         self.curr_step = -1
         self.is_game_done = False
