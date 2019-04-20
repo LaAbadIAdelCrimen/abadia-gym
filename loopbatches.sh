@@ -1,7 +1,7 @@
 #!/bin/bash
 while true
 do
-  options=`gcloud beta pubsub subscriptions pull agent-batch --auto-ack --limit=1 --format="value(DATA)"`
+  options=`gcloud beta pubsub subscriptions pull agent-batches --auto-ack --limit=1 --format="value(DATA)"`
   echo "I will execute $options"
   case $options in
     "exit")
@@ -17,7 +17,7 @@ do
       echo "game over checkpoint"
       ;;
     *)
-      python3 agentv4_dqn.py $options -s http://35.240.42.100 -p 80
+      python3 $options
       # --episodes=500 --steps=2000 --model=models/model_v1_lastest.model -g abadia-data -s http://35.241.222.173 -p 80 # -c /tmp/check # -c partidas/20180602/abadia_checkpoint_180602_214255_980367_2_1_4_21_25_0.checkpoint
       ;;
   esac

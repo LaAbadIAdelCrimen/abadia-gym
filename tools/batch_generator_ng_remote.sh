@@ -4,7 +4,7 @@
 # example: _21_ would select the room 21 or not ;-P
 # the second argument ($2) is the agent you want to run
 
-(gsutil ls -r "gs://abadia-data/games/**" | grep checkpoint | sed -e 's/gs:\/\/abadia-data\///g'| grep $1 | grep -v "_0_0.che" | head -500) |
+(gsutil cat  "gs://abadia-data/last_5000_checkpoint_list.txt" | sed -e 's/gs:\/\/abadia-data\///g'| grep $1 | grep -v "_0_0.che" | head -500) |
 while read -r line
 do
   case $line in
