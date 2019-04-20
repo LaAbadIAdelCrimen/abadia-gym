@@ -15,14 +15,20 @@ def download_blob(source_blob_name, destination_file_name):
     directory = os.path.dirname(destination_file_name)
     if not os.path.exists(directory):
         os.makedirs(directory)
-    blob.download_to_filename(destination_file_name)
-    print('Blob {} downloaded to {}.'.format(source_blob_name, destination_file_name))
+    try:
+        blob.download_to_filename(destination_file_name)
+        print('Blob {} downloaded to {}.'.format(source_blob_name, destination_file_name))
+    except:
+        print("Error downloading {}".format(source_blob_name,))
 
 def upload_blob(source_file_name, destination_blob_name):
     """Uploads a file to the bucket."""
     blob = google_storage_bucket.blob(destination_blob_name)
-    blob.upload_from_filename(source_file_name)
-    print('File {} uploaded to {}.'.format( source_file_name, destination_blob_name))
+    try:
+        blob.upload_from_filename(source_file_name)
+        print('File {} uploaded to {}.'.format(source_file_name, destination_blob_name))
+    except:
+        print("Error uploading {}".format(source_file_name))
 
 print("Creating the models classes")
 
@@ -48,14 +54,28 @@ with open("/tmp/lista") as fp:
        days[day] = day
        line = fp.readline()
        cnt += 1
+       if(cnt > 5):
+           break
 
 for day in days:
     print("Generating values for the day {}".format(day))
 
     print("Transforming some actions to vectors and saving it into a dir")
-    ngdqn.load_actions_from_a_dir_and_save_to_vectors("./games/{}".format(day))
+    vectors_files = ngdqn.load_actions_from_a_dir_and_save_to_vectors("./games/{}".format(day))
+
+    print("uploading vectors files to google cloud")
+    for file in vectors_files:
+        print("Uploading --> {} ".format(file))
+        upload_blob(file, file)
+
     print("Transforming some actions to vectors and saving it into a dir")
-    value.load_actions_from_a_dir_and_save_to_vectors("./games/{}".format(day))
+    value_vectors_files = value.load_actions_from_a_dir_and_save_to_vectors("./games/{}".format(day))
+
+    print("uploading value vectors files to google cloud")
+    for file in value_vectors_files:
+        print("Uploading --> {} ".format(file))
+        upload_blob(file, file)
+
 
 print("Uploading the vectors from a dir to the cloud")
 # dqn_agent.load_vectors_from_a_dir("./games/20190416")

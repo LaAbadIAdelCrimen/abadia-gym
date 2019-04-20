@@ -289,12 +289,15 @@ class NGDQN:
         self.model.save(fn)
 
     def load_actions_from_a_dir_and_save_to_vectors(self, dirName):
+        files = []
         for entry in os.scandir(dirName):
             if entry.is_file() and 'actions_' in entry.path:
                 self.load_actions_from_a_file(entry.path)
                 tmpName = entry.path.replace("actions", "vectors")
                 print("Processing: {} -> {}".format(entry.path, tmpName))
                 self.save_actions_as_vectors(tmpName)
+                files.append(tmpName)
+        return files
 
     def load_vectors_from_a_dir(self, dirName):
         self.memory = deque()
