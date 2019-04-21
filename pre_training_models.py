@@ -54,8 +54,6 @@ with open("/tmp/lista") as fp:
        days[day] = day
        line = fp.readline()
        cnt += 1
-       if(cnt > 5):
-           break
 
 for day in days:
     print("Generating values for the day {}".format(day))
@@ -75,13 +73,6 @@ for day in days:
     for file in value_vectors_files:
         print("Uploading --> {} ".format(file))
         upload_blob(file, file)
-
-
-print("Uploading the vectors from a dir to the cloud")
-# dqn_agent.load_vectors_from_a_dir("./games/20190416")
-
-
-
 
 
 
