@@ -17,6 +17,7 @@ import os
 from pathlib import Path
 from threading import Thread
 import gzip
+import shutil
 
 # 3rd party modules
 import gym
@@ -495,7 +496,7 @@ class AbadiaEnv2(gym.Env):
         """
         self.gameId      = datetime.datetime.now().strftime('%y%m%d_%H%M%S_%f')
         self.gameName    = "abadia_game_{}.json".format(self.gameId)
-        self.actionsName = "abadia_actions_{}.json.gz".format(self.gameId)
+        self.actionsName = "abadia_actions_{}.json".format(self.gameId)
 
         self.curr_episode += 1
         self.curr_step     = 1
@@ -613,19 +614,26 @@ class AbadiaEnv2(gym.Env):
         self.fdGame.write("{}\n".format("}]"))
         self.fdGame.flush()
         # self.fdGame.close()
+
+        if (not self.fdActions.closed):
+            logging.info("flushing and closing {} before exit".format(self.actionsName))
+            self.fdActions.flush()
+            self.fdActions.close()
+
         if (self.gsBucket != None):
             logging.info("Uploading Game: {} to GCP".format(self.dump_path + "/" + self.gameName))
             t = Thread(target=self.upload_blob, args=(self.dump_path + "/" + self.gameName,
                                                       self.dump_path + "/" + self.gameName))
             t.start()
 
-            if (not self.fdActions.closed):
-                self.fdActions.flush()
-                self.fdActions.close()
+            # compressing the file
 
-            logging.info("Uploading Actions: {} to GCP".format(self.dump_path + "/" + self.actionsName))
-            t = Thread(target=self.upload_blob, args=(self.dump_path + "/" + self.actionsName,
-                             self.dump_path + "/" + self.actionsName))
+            with open(self.dump_path + "/" + self.actionsName, 'rb') as f_in, gzip.open(self.dump_path + "/" + self.actionsName + '.gz', 'wb') as f_out:
+                shutil.copyfileobj(f_in, f_out)
+
+            logging.info("Uploading Actions: {} to GCP".format(self.dump_path + "/" + self.actionsName + ".gz"))
+            t = Thread(target=self.upload_blob, args=(self.dump_path + "/" + self.actionsName + ".gz",
+                             self.dump_path + "/" + self.actionsName + ".gz"))
             t.start()
 
     def save_action(self, state, action, reward, nextstate):
@@ -633,7 +641,7 @@ class AbadiaEnv2(gym.Env):
         s2 = nextstate.copy()
 
         string = "{}{}\"action\":{}\"state\":{},\"action\":{},\"reward\":{},\"nextstate\":{}{}{}\n".format("[", "{", "{", json.dumps(s1), action, reward, json.dumps(s2), "}", "}]")
-        self.fdActions.write(bytes(string, 'utf-8'))
+        self.fdActions.write(string)
         self.fdActions.flush()
 
 
@@ -687,7 +695,7 @@ class AbadiaEnv2(gym.Env):
 
         # create the game and actions files
         self.fdGame    = open(self.dump_path + "/" + self.gameName, "w")
-        self.fdActions = gzip.open(self.dump_path + "/" + self.actionsName, "w")
+        self.fdActions = open(self.dump_path + "/" + self.actionsName, "w")
 
     def save_game_checkpoint(self):
 
