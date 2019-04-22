@@ -619,8 +619,10 @@ class AbadiaEnv2(gym.Env):
                                                       self.dump_path + "/" + self.gameName))
             t.start()
 
-            self.fdActions.flush()
-            self.fdActions.close()
+            if (not fdActions.closed):
+                self.fdActions.flush()
+                self.fdActions.close()
+
             logging.info("Uploading Actions: {} to GCP".format(self.dump_path + "/" + self.actionsName))
             t = Thread(target=self.upload_blob, args=(self.dump_path + "/" + self.actionsName,
                              self.dump_path + "/" + self.actionsName))
