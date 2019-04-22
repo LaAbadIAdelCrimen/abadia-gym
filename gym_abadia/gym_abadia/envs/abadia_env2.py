@@ -627,10 +627,10 @@ class AbadiaEnv2(gym.Env):
             t.start()
 
             # compressing the file
-
             with open(self.dump_path + "/" + self.actionsName, 'rb') as f_in, gzip.open(self.dump_path + "/" + self.actionsName + '.gz', 'wb') as f_out:
                 shutil.copyfileobj(f_in, f_out)
 
+            os.remove(self.dump_path + "/" + self.actionsName)
             logging.info("Uploading Actions: {} to GCP".format(self.dump_path + "/" + self.actionsName + ".gz"))
             t = Thread(target=self.upload_blob, args=(self.dump_path + "/" + self.actionsName + ".gz",
                              self.dump_path + "/" + self.actionsName + ".gz"))
