@@ -619,7 +619,7 @@ class AbadiaEnv2(gym.Env):
                                                       self.dump_path + "/" + self.gameName))
             t.start()
 
-            if (not fdActions.closed):
+            if (not self.fdActions.closed):
                 self.fdActions.flush()
                 self.fdActions.close()
 
