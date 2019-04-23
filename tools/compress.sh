@@ -7,14 +7,14 @@ do
   echo "$file"
   gs=`echo $file | sed -e 's/https\:\/\/storage\.googleapis\.com/gs\:\//'`
   echo "$gs"
-  gsutil ls -l $file
+  gsutil ls -l $gs
   ret=$?
   case $ret in
     0)
         curl $file | gzip - | gsutil cp - $gs.gz && gsutil rm $gs
         ;;
     *)
-        echo "Looks like there is an problem with $file"
+        echo "Looks like there is an problem with $gs"
         ;;
   esac
 done
