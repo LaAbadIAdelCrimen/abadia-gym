@@ -14,7 +14,7 @@ do
         curl $file | gzip - | gsutil cp - $gs.gz && gsutil rm $gs
         ;;
     *)
-        echo "Looks like there is an problem with $file
+        echo "Looks like there is an problem with $file"
         ;;
   esac
 done
