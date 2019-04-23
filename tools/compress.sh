@@ -12,6 +12,7 @@ do
   case $ret in
     0)
         curl $file | gzip - | gsutil cp - $gs.gz && gsutil rm $gs
+        gsutil ls -l $gs.gz
         ;;
     *)
         echo "Looks like there is an problem with $gs"
