@@ -39,10 +39,13 @@ value = AbadIA.VDQN.VDQN(env=None, initModelName=None, modelName=None)
 print("--> Processing the action file {}".format(sys.argv[1]))
 
 Filename = sys.argv[1].replace("gs://abadia-data/", "")
-localName = "/tmp/actions.gz"
+if ".gz" in Filename:
+    localName = "/tmp/actions.gz"
+else:
+    localName = "/tmp/actions"
+
 print("Download {}".format(Filename))
 download_blob(Filename, localName)
-
 
 print("Transforming some actions to vectors and saving it into a dir")
 ngdqn.load_actions_from_a_file(localName)
@@ -55,7 +58,7 @@ print("uploading vectors files to google cloud")
 upload_blob("/tmp/vectors.data", vectorName)
 
 print("Transforming some actions to value vectors and saving it into a dir")
-value.load_actions_from_a_file(Filename)
+value.load_actions_from_a_file(localName)
 vectorName = Filename.replace("actions", "values_vectors").replace(".gz", "").replace(".json", ".data")
 
 print("Processing: {} -> {}".format(Filename, vectorName))

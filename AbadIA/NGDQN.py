@@ -317,22 +317,22 @@ class NGDQN:
         else:
             json_data = open(fileName)
 
-        lines = json_data.readlines()
-        if lines:
-            for line in lines:
-                # if (len(line) > 0 and line.startswith("[")):
-                try:
-                    state = json.loads(line)[0]
-                    # print("{}".format(state))
+        # lines = json_data.readlines()
+        # if lines:
+        for line in json_data:
+            # if (len(line) > 0 and line.startswith("[")):
+            try:
+                state = json.loads(line)[0]
+                # print("{}".format(state))
 
-                    current_state = self.state2vector(state['action']['state'])
-                    new_state = self.state2vector(state['action']['state'])
-                    action = state['action']['action']
-                    reward = state['action']['reward']
-                except:
-                    print("json line read error")
+                current_state = self.state2vector(state['action']['state'])
+                new_state = self.state2vector(state['action']['state'])
+                action = state['action']['action']
+                reward = state['action']['reward']
+            except:
+                print("json line read error")
 
-                self.remember(current_state, action, reward, new_state, False)
+            self.remember(current_state, action, reward, new_state, False)
 
     def save_actions_as_vectors(self, filename):
         with open(filename, 'wb') as f:
