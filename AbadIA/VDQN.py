@@ -253,10 +253,10 @@ class VDQN:
                     new_state = self.state2vector(state['action']['state'])
                     action = state['action']['action']
                     reward = state['action']['reward']
+                    self.remember(current_state, action, reward, new_state, False)
                 except:
                     print("json line read error")
 
-                self.remember(current_state, action, reward, new_state, False)
     def save_actions_as_vectors(self, filename):
         with open(filename, 'wb') as f:
             pickle.dump(self.memory, f)
