@@ -2,6 +2,7 @@ import random
 import numpy as np
 import logging
 import json
+import gzip
 from math import hypot
 from math import atan2
 import pickle
@@ -311,24 +312,27 @@ class NGDQN:
 
     def load_actions_from_a_file(self, fileName):
         self.memory = deque(maxlen=10000)
-        with open(fileName) as json_data:
-            # TODO JT: we need to optimize this reading a line by a line
-            lines = json_data.readlines()
-            if lines:
-                for line in lines:
-                    # if (len(line) > 0 and line.startswith("[")):
-                    try:
-                        state = json.loads(line)[0]
-                        # print("{}".format(state))
+        if ".gz" in fileName:
+            json_data = gzip.open(fileName, 'rb')
+        else:
+            json_data = open(fileName)
 
-                        current_state = self.state2vector(state['action']['state'])
-                        new_state = self.state2vector(state['action']['state'])
-                        action = state['action']['action']
-                        reward = state['action']['reward']
-                    except:
-                        print("json line read error")
+        lines = json_data.readlines()
+        if lines:
+            for line in lines:
+                # if (len(line) > 0 and line.startswith("[")):
+                try:
+                    state = json.loads(line)[0]
+                    # print("{}".format(state))
 
-                    self.remember(current_state, action, reward, new_state, False)
+                    current_state = self.state2vector(state['action']['state'])
+                    new_state = self.state2vector(state['action']['state'])
+                    action = state['action']['action']
+                    reward = state['action']['reward']
+                except:
+                    print("json line read error")
+
+                self.remember(current_state, action, reward, new_state, False)
 
     def save_actions_as_vectors(self, filename):
         with open(filename, 'wb') as f:
