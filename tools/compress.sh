@@ -1,6 +1,6 @@
 #!/bin/bash
-echo "updating the all everithing lists to speed it up"
-echo "and avoid to destroy existing gzips (we need to fix and improve it)"
+echo "Updating the all  actions lists to speed it up"
+echo "and avoid to destroy existing gzips (we need to fix and improve iti **Mostly fixed)"
 tools/create_all_actions_lists.sh
 for file in `curl https://storage.googleapis.com/abadia-data/all_abadia_actions_list.txt | grep $1 | grep -v ".gz"`
 do
