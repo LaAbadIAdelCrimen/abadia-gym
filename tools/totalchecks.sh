@@ -15,7 +15,7 @@ echo "REMOTE"
 echo "------"
 echo "Last 500 checkpoints by room (not checkd)"
 echo "-----------------------------------------"
-gsutil ls -r "gs://abadia-data/games/**" | grep checkpoint | sed -e 's/gs:\/\/abadia-data\///g' | head -500 | cut -d"_"  -f9 | sort -n | uniq -c
+gsutil cat "gs://abadia-data/all_checkpoint_list.txt" | grep checkpoint | sed -e 's/gs:\/\/abadia-data\///g' | head -500 | cut -d"_"  -f9 | sort -n | uniq -c
 echo "All time  checkpoints"
 echo "---------------------"
-gsutil ls -r "gs://abadia-data/games/**" | grep checkpoint | sed -e 's/gs:\/\/abadia-data\///g' | cut -d"_"  -f9 | sort -n | uniq -c
+gsutil cat "gs://abadia-data/all_checkpoint_list.txt" | grep checkpoint | sed -e 's/gs:\/\/abadia-data\///g' | cut -d"_"  -f9 | sort -n | uniq -c
