@@ -16,7 +16,7 @@ spec:
         command: ["/bin/bash", "-c"]
         args:
           - |
-            tools/compress.sh _actions_18
+            tools/compress.sh _actions_1904
             exit 0
         resources:
               requests:
