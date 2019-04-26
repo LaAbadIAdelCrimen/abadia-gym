@@ -270,11 +270,17 @@ class AbadiaEnv2(gym.Env):
                  use this for learning.
         """
 
-        if (action >=8 ):
-            ob = self.sendCmd(self.url, self.actions_list[action], mode="POST")
-        else:
-            ori = str(self.Personajes['Guillermo']['orientacion'])
-            ob = self.sendMultiCmd(ori + self.actions_list[action])
+        try:
+            if (action >=8 ):
+                ob = self.sendCmd(self.url, self.actions_list[action], mode="POST")
+            else:
+                ori = str(self.Personajes['Guillermo']['orientacion'])
+                ob = self.sendMultiCmd(ori + self.actions_list[action])
+        except:
+            logging.error("Communication Error: I cannot send the CMDs")
+            logging.error("Check if the game engine is UP")
+            self.game_is_done = True
+            return self.prev_ob, 0, self.game_is_done, {}
 
         # print("ob -> {}".format(ob)) # ['obsequium']))
 
