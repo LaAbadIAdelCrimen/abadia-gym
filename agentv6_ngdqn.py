@@ -302,7 +302,7 @@ def mainLoop():
 
             if done:
                 logging.info(f'Episode finished after {t+1} steps')
-                env.save_game()
+                # env.save_game()
                 if (env.haFracasado):
                     logging.info(f'Episode finished with a FAIL')
                     env.reset_fin_partida()
@@ -339,7 +339,8 @@ def mainLoop():
             rAll += reward
             state = newState
             if done == True:
-                env.save_game()
+                logging.info("DONE is True, exit and dont save the game")
+                # env.save_game()
                 break
 
         if rAll > 0:
