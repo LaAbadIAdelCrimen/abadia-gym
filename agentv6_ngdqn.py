@@ -324,8 +324,9 @@ def mainLoop():
                 if (ori == 3):
                     env.Visited[x, y + 1] += -0.01
 
-            ngdqn_agent.replay()        # internally iterates default (prediction) model
-            ngdqn_agent.target_train()
+            if (env.playing == False):
+                ngdqn_agent.replay()        # internally iterates default (prediction) model
+                ngdqn_agent.target_train()
 
             # TODO JT: we need to create an option for this
             env.pintaRejilla(40, 20)
