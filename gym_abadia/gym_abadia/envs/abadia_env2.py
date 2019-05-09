@@ -655,7 +655,11 @@ class AbadiaEnv2(gym.Env):
 
     def visited_snap_load(self):
         nameVisitedSnap = "snapshoots/current-visited"
-        if (self.gsBucket != None):
+
+        # for speed up the games if the visited  exist locally
+        # we download an updated version just a 10% of the time
+
+        if self.gsBucket != None and np.random.randint(10) <= 1 and not os.path.exists(nameVisitedSnap):
             logging.info("Downloading Visited from GCP")
             try:
                 self.download_blob(nameVisitedSnap, nameVisitedSnap)
