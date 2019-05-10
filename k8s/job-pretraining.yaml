@@ -1,14 +1,14 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: abadia-ng-compress
+  name: abadia-ng-pretraining
   labels:
-    name: abadia-ng-compress
+    name: abadia-ng-pretraining
 spec:
   template:
     metadata:
         labels:
-            name: abadia-ng-compress
+            name: abadia-ng-pretraining
     spec:
       containers:
       - name: agent
@@ -16,7 +16,7 @@ spec:
         command: ["/bin/bash", "-c"]
         args:
           - |
-            tools/compress.sh _actions_1904
+            tools/loop_pretraining.sh
             exit 0
         resources:
               requests:
