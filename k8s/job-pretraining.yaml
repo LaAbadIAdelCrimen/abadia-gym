@@ -16,6 +16,7 @@ spec:
         command: ["/bin/bash", "-c"]
         args:
           - |
+            gcloud components update
             tools/loop_pretraining.sh
             exit 0
         resources:
