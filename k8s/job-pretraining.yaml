@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: abadia-ng-compress
+  labels:
+    name: abadia-ng-compress
+spec:
+  template:
+    metadata:
+        labels:
+            name: abadia-ng-compress
+    spec:
+      containers:
+      - name: agent
+        image: gcr.io/abadia-1/abadia-agent-ng:v6
+        command: ["/bin/bash", "-c"]
+        args:
+          - |
+            tools/compress.sh _actions_1904
+            exit 0
+        resources:
+              requests:
+                memory: "50Mi"
+                cpu: "300m"
+              limits:
+                memory: "1024Mi"
+                cpu: "940m"
+      restartPolicy: OnFailure
+  backoffLimit: 4
