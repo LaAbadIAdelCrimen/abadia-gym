@@ -16,7 +16,7 @@ spec:
         command: ["/bin/bash", "-c"]
         args:
           - |
-            gcloud components update
+            gcloud components update --quiet
             tools/loop_pretraining.sh
             exit 0
         resources:
