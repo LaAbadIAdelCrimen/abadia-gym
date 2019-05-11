@@ -16,7 +16,8 @@ spec:
         command: ["/bin/bash", "-c"]
         args:
           - |
-            gcloud components update --quiet
+            export CLOUDSDK_CORE_DISABLE_PROMPTS=1
+            gcloud components update
             tools/loop_pretraining.sh
             exit 0
         resources:
