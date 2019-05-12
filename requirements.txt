@@ -1,3 +1,4 @@
+-e gym_abadia
 absl-py==0.7.1
 appnope==0.1.0
 astor==0.7.1
