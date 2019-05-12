@@ -25,6 +25,13 @@ do
       case $ret in
           0)
             python3 extract_vectors_from_actions.py $actions
+            # action gs://abadia-data/games/20190504/abadia_actions_190504_053720_134598.json.gz
+            # games/20190504/abadia_values_vectors_190504_053720_134598.data
+            # line = https://storage.googleapis.com/abadia-data/
+            line=`echo $actions | sed -e 's/gs:\/\//https\:\/\/storage.googleapis.com\//g' \
+            | sed -e 's/abadia_actions/abadia_vectors/g' \
+            | sed -e 's/json\.gz/data/g'`
+            gcloud pubsub topics publish training --message "${line}"
             ;;
           *)
             echo "Looks like there is a problem with $actions"
