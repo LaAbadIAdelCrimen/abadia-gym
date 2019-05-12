@@ -12,12 +12,15 @@ spec:
     spec:
       containers:
       - name: agent
-        image: gcr.io/abadia-1/abadia-agent-ng:v6
+        image: gcr.io/abadia-1/abadia-agent-ng:v6a
         command: ["/bin/bash", "-c"]
         args:
           - |
             export CLOUDSDK_CORE_DISABLE_PROMPTS=1
             gcloud components update
+            virtualenv -p python3 python3
+            source python3/bin/activate
+            pip3 install -r requirements.txt
             tools/loop_pretraining.sh
             exit 0
         resources:
