@@ -12,4 +12,4 @@ RUN mkdir -p snapshoots
 RUN mkdir -p models
 
 
-CMD ["./loop_testv6_rnd.sh"]
+CMD ["./loop_testv6_rnd.sh > /dev/nul"]
