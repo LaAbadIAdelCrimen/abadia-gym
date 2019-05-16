@@ -6,7 +6,7 @@
 
 # egrep "_$1_[0-9]_0.c|_$1_[0-9][0-9]_0.c" | grep -v "_0_0.che"
 # (gsutil cat  "gs://abadia-data/all_checkpoint_list.txt" | sed -e 's/https:\/\/storage.googleapis.com\/abadia-data\///g'| egrep "_$1_[2-3][0-9]_0.c" | grep -v "_0_0.che" | grep -v "_2[123]_[0-9]_0.c" | grep -v "_2[123]_[0-9][0-9]_0.c" | head -100) |
-(gsutil cat  "gs://abadia-data/all_checkpoint_list.txt" | sed -e 's/https:\/\/storage.googleapis.com\/abadia-data\///g'| egrep "_$1_31_0.c" | grep -v "_2[12]_[0-9]_0.c" | grep -v "_2[12]_[0-9][0-9]_0.c" | head -1000) |
+(gsutil cat  "gs://abadia-data/all_checkpoint_list.txt" | sed -e 's/https:\/\/storage.googleapis.com\/abadia-data\///g'| egrep "_31_0.c" | grep -v "_2[12]_[0-9]_0.c" | grep -v "_2[12]_[0-9][0-9]_0.c" | head -1000) |
 while read -r line
 do
   case $line in
