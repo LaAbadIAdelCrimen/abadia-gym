@@ -13,7 +13,9 @@ cat /tmp/s1 |
 while read -r line
 do
   echo $line
-  gsutil cat $line | gzcat >> /tmp/data/$2.json
+  gsutil cp $line /tmp/temp_file.gz
+  gzunzip /tmp/temp_file
+  cat /tmp/temp_file >> /tmp/data/$2.json
 done
 echo "DONE: now we will gzip the file"
 gzip /tmp/data/$2.json
