@@ -20,6 +20,7 @@ echo "DONE: now we will pack in a tgz file"
 tar cvzf /tmp/$2.tgz *
 ls -lt /tmp/*.tar
 ls -lt *.json
+
 echo "COPYING is to GCP"
 gsutil cp /tmp/$2.tgz gs://abadia-data/datasets/$2.tgz
 gsutil ls -l gs://abadia-data/datasets/$2.tgz

@@ -308,6 +308,7 @@ class NGDQN:
                 tmp = self.load_vectors_into_actions(entry.path)
                 for action in tmp:
                     self.memory.append(action)
+                    # logging.info("vector: {}".format(action))
                 logging.info("Actions: {} total {}".format(len(tmp), len(self.memory)))
 
     def load_actions_from_a_file(self, fileName):

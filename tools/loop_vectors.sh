@@ -1,10 +1,12 @@
 #!/bin/bash
 
 gsutil cp gs://abadia-data/models/pre_last_model_v6.model models/last_model_v6.model
-gsutil cp gs://abadia-data/models/pre_last_model_v6.model models/pre_last_model_v6.model
+cp models/last_model_v6.model models/pre_last_model_v6.model
+
 while true
 do
-  options=`gcloud beta pubsub subscriptions pull training --auto-ack --limit=50 --format="value(DATA)"`
+  options=`gcloud beta pubsub subscriptions pull training --auto-ack --limit=20 --format="value(DATA)"`
+  # options=`gcloud beta pubsub subscriptions pull training --limit=300 --format="value(DATA)"`
   echo "I will pick a few vectors ---> $options"
   case $options in
     "exit")
