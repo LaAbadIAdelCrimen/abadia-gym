@@ -62,11 +62,7 @@ spec:
                     echo "game over checkpoint"
                     ;;
                     *)
-                    type python
-                    type python3
-                    ls -lt agent*
-                    pwd
-                    python3 $options > /dev/null
+                    python3 $options 
                     ;;
                 esac
                 done
