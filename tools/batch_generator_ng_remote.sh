@@ -12,9 +12,12 @@ cut -d"_"  -f9,10 < /tmp/o31 | cut -d"_" -f1 | sort -n | uniq -c  | \
  sort -n | sed -e 's/^  //g'  | sed -e 's/^ //g' | sed -e 's/^ //g' | cut -d" " -f2  | head -10 > /tmp/rooms
 echo "Selected rooms and total visits"
 cut -d"_"  -f9,10 < /tmp/o31 | cut -d"_" -f1 | sort -n | uniq -c | sort -n
-echo "I will look for the room: ($room)"
+echo "I will look for the this rooms:"
+echo "------------"
 cat /tmp/rooms
-for room in `cat /tmp/rooms`
+echo "------------"
+(cat /tmp/rooms) |
+while read -r room
 do
 echo "I will look for the room: ($room)"
 (cat /tmp/o31 | sed -e 's/https:\/\/storage.googleapis.com\/abadia-data\///g' | egrep "_${room}_3[01]_0.che|_${room}_2[789]_0.che" | head -100) |
