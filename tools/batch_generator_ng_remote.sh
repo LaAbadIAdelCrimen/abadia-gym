@@ -9,7 +9,7 @@
 gsutil cp gs://abadia-data/all_checkpoint_list.txt /tmp/acl.txt
 egrep "_31_0.check|_30_0.check|_29_0.check|_28_0.check|_27_0.check" /tmp/acl.txt | grep -v "_2[23]_[0-9]_0.c" | grep -v "_2[23]_[0-9][0-9]_0.c" > /tmp/o31
 cut -d"_"  -f9,10 < /tmp/o31 | cut -d"_" -f1 | sort -n | uniq -c  | \
- sort -n | sed -e 's/^  //g'  | sed -e 's/^ //g' | sed -e 's/^ //g' | cut -d" " -f2  | head -10 > /tmp/rooms
+ sort -n | sed -e 's/^  //g'  | sed -e 's/^  //g'  | sed -e 's/^ //g' | sed -e 's/^ //g' | cut -d" " -f2  | head -10 > /tmp/rooms
 echo "Selected rooms and total visits"
 cut -d"_"  -f9,10 < /tmp/o31 | cut -d"_" -f1 | sort -n | uniq -c | sort -n
 echo "I will look for the this rooms:"
