@@ -756,7 +756,10 @@ class AbadiaEnv2(gym.Env):
 
     def personajeByName(self, name):
         # TODO JT: we need to check that there are values for this personaje
-        return int(self.Personajes[name]['posX']), int(self.Personajes[name]['posY']), int(self.Personajes[name]['orientacion'])
+        if (name in self.Personajes):
+            return int(self.Personajes[name]['posX']), int(self.Personajes[name]['posY']), int(self.Personajes[name]['orientacion'])
+        else:
+            return 0, 0, 0
 
     def dataPersonaje(self, ob, name):
         notfound = {}

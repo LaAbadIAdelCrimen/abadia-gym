@@ -5,7 +5,7 @@ cp models/last_model_v6.model models/pre_last_model_v6.model
 
 while true
 do
-  options=`gcloud beta pubsub subscriptions pull training --auto-ack --limit=20 --format="value(DATA)"`
+  options=`gcloud beta pubsub subscriptions pull training --auto-ack --limit=50 --format="value(DATA)"`
   # options=`gcloud beta pubsub subscriptions pull training --limit=300 --format="value(DATA)"`
   echo "I will pick a few vectors ---> $options"
   case $options in
@@ -16,7 +16,7 @@ do
     "")
       echo "updatig the pre_last_model_v6.model"
       gsutil cp models/pre_last_model_v6.model gs://abadia-data/models/pre_last_model_v6.model
-      gsutil cp models/pre_last_model_v6.model gs://abadia-data/models/pre_last_model_v6_`date +'%y%m%d'`.model
+      gsutil cp models/pre_last_model_v6.model gs://abadia-data/models/pre_last_model_v6_`date +'%y%m%d-%H'`.model
       echo "No more batches, no more fun ..."
       exit 0
       ;;

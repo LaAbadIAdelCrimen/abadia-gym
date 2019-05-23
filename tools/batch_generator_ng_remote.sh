@@ -24,7 +24,7 @@ echo "------------"
 while read -r room
 do
 echo "I will look for the room: ($room)"
-(cat /tmp/o31 | sed -e 's/https:\/\/storage.googleapis.com\/abadia-data\///g' | egrep "_${room}_3[01]_0.che|_${room}_2[789]_0.che" | head -100) |
+(cat /tmp/o31 | sed -e 's/https:\/\/storage.googleapis.com\/abadia-data\///g' | egrep "_${room}_3[01]_0.che|_${room}_2[789]_0.che" | head -50) |
 while read -r line
 do
   case $line in
