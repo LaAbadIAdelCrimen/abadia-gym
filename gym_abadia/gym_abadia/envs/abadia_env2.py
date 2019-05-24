@@ -441,12 +441,13 @@ class AbadiaEnv2(gym.Env):
         for personaje in ob['Personajes']:
             if (len(personaje) == 1):
                 break
-            persona = self.listaPersonajes[int(personaje['id'])]
-            datos = self.Personajes[persona]
-            for key, value in personaje.items():
+            # persona = self.listaPersonajes[int(personaje['id'])]
+            # datos = self.Personajes[persona]
+            # for key, value in personaje.items():
                 #if key != "id" or key != "fil":
-                datos[key] = value
-            self.Personajes[persona] = datos
+                # datos[key] = value
+            self.Personajes[personaje['nombre']] = personaje
+
             if int(personaje['id']) == 0:
                 self.estaGuillermo = True
 
@@ -756,9 +757,10 @@ class AbadiaEnv2(gym.Env):
 
     def personajeByName(self, name):
         # TODO JT: we need to check that there are values for this personaje
-        if (name in self.Personajes):
+        if (name in self.Personajes) and ('posX' in self.Personajes[name]):
             return int(self.Personajes[name]['posX']), int(self.Personajes[name]['posY']), int(self.Personajes[name]['orientacion'])
         else:
+            logging.info("No hay abad: {}".format(self.Personajes))
             return 0, 0, 0
 
     def dataPersonaje(self, ob, name):
@@ -784,9 +786,10 @@ class AbadiaEnv2(gym.Env):
 
         x, y, ori           = self.personajeByName('Guillermo')
         adsoX, adsoY, adsoO = self.personajeByName('Adso')
+        abadX, abadY, abadO = self.personajeByName('Abad')
 
-        logging.info("\x1b[HGuillermo {},{} Adso {},{} Obsequium:{} Porcentaje:{} Reward:{} TR:{} V:{}".format(x, y, adsoX, adsoY,
-                             self.obsequium, self.porcentaje, np.round(self.reward, 6), np.round(self.totalReward, 6), np.round(self.predictions, 4)))
+        logging.info("\x1b[HGuillermo {},{} Adso {},{} Abad {},{} Obsequium:{} Porcentaje:{} Reward:{} TR:{} V:{}".format(x, y, adsoX, adsoY,
+                             abadX, abadY, self.obsequium, self.porcentaje, np.round(self.reward, 6), np.round(self.totalReward, 6), np.round(self.predictions, 4)))
 
         logging.info("+---+" + "-" * (w * 2) + "+" + "-" * 24 + "+" + "-" * 48 + "+")
 
@@ -803,9 +806,15 @@ class AbadiaEnv2(gym.Env):
                     if ori == 2:
                         ss += "<"
                 else:
+                    character = False
                     if (xx == adsoX and yy == adsoY):
                         ss += "a"
-                    else:
+                        character = True
+                    if (xx == abadX and yy == abadY):
+                        ss += "A"
+                        character = True
+
+                    if not character:
                         if (self.Visited[xx, yy] == 0):
                             ss += "·"
                         else:
