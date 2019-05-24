@@ -760,7 +760,7 @@ class AbadiaEnv2(gym.Env):
         if (name in self.Personajes) and ('posX' in self.Personajes[name]):
             return int(self.Personajes[name]['posX']), int(self.Personajes[name]['posY']), int(self.Personajes[name]['orientacion'])
         else:
-            logging.info("No hay abad: {}".format(self.Personajes))
+            # logging.info("No hay {}: {}".format(name, self.Personajes))
             return 0, 0, 0
 
     def dataPersonaje(self, ob, name):
