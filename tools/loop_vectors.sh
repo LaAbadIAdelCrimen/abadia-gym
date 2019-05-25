@@ -40,6 +40,7 @@ do
       echo "uploading the updated model"
       gsutil cp models/pre_last_model_v6.model gs://abadia-data/models/last_model_v6.model
       gsutil cp models/pre_last_model_v6.model gs://abadia-data/models/pre_last_model_v6.model
+      gsutil cp models/pre_last_model_v6.model gs://abadia-data/models/pre_last_model_v6_`date +'%y%m%d-%H'`.model
       ;;
   esac
 done
