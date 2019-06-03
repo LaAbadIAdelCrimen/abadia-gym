@@ -10,7 +10,7 @@
 
 gsutil cp gs://abadia-data/all_checkpoint_list.txt /tmp/acl.txt
 
-egrep "_31_0.check|_30_0.check" /tmp/acl.txt | grep -v "_2[23]_[0-9]_0.c" | grep -v "_2[23]_[0-9][0-9]_0.c" > /tmp/o31
+egrep "_31_0.check|_29_0.check" /tmp/acl.txt | grep -v "_2[23]_[0-9]_0.c" | grep -v "_2[23]_[0-9][0-9]_0.c" > /tmp/o31
 
 cut -d"_"  -f9,10 < /tmp/o31 | cut -d"_" -f1 | sort -n | uniq -c  | \
  sort -n | sed -e 's/^  //g'  | sed -e 's/^  //g'  | sed -e 's/^ //g' | sed -e 's/^ //g' | cut -d" " -f2  | head -10 > /tmp/rooms
@@ -24,7 +24,7 @@ echo "------------"
 while read -r room
 do
 echo "I will look for the room: ($room)"
-(cat /tmp/o31 | sed -e 's/https:\/\/storage.googleapis.com\/abadia-data\///g' | egrep "_${room}_3[01]_0.che|_${room}_2[789]_0.che" | head -50) |
+(cat /tmp/o31 | sed -e 's/https:\/\/storage.googleapis.com\/abadia-data\///g' | egrep "_${room}_31_0.che|_${room}_2[79]_0.che" | head -50) |
 while read -r line
 do
   case $line in

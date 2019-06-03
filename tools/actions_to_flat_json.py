@@ -61,7 +61,7 @@ def load_actions(name):
                     non_deflatten(d[0]['action']['state'], 'sonidos')
                     non_deflatten(d[0]['action']['nextstate'], 'sonidos')
 
-                    print(flatten_json(d[0]))
+                    print("[{}]".format(flatten_json(d[0])))
                     # print("json{}".format(d))
                     # print("Rejilla: {}".format(d[0]['action']['nextstate']['Rejilla']))
                     # rejilla = np.append(rejilla, d[0]['action']['nextstate']['Rejilla'], axis=0)
