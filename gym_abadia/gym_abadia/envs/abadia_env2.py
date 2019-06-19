@@ -202,14 +202,19 @@ class AbadiaEnv2(gym.Env):
 
     def sendCmd(self, url, command, type="json", mode="GET"):
         cmd = "{}/{}".format(url, command)
-        if mode == "GET":
-            r = requests.get(cmd)
-        if mode == "POST":
-            r = requests.post(cmd)
-        if (type == "json"):
-            headers = {'accept': 'application/json'}
-        else:
-            headers = {'accept': 'text/x.abadIA+plain'}
+        try:
+            if mode == "GET":
+                r = requests.get(cmd)
+            if mode == "POST":
+                r = requests.post(cmd)
+
+            if (type == "json"):
+                headers = {'accept': 'application/json'}
+            else:
+                headers = {'accept': 'text/x.abadIA+plain'}
+        except:
+            logging.error("Vigasoco comm error")
+            return None
 
         cmdDump = "{}/abadIA/game/current".format(url)
         r = requests.get(cmdDump, headers= headers)
@@ -367,10 +372,16 @@ class AbadiaEnv2(gym.Env):
         # the percentage must be variable to help the AI to learn
         # with variable explanatory/explotation
 
+        if (self.obsequium < 29):
+            logging.info("GAME OVER by lack of Obsequium")
+            self.sendCmd(self.url, "/abadIA/game", mode='POST', type='raw')
+            self.game_is_done = True
+            self.haFracasado = True
+            reward = -1
+
         if (self.haFracasado == True):
             logging.info("GAME OVER")
             self.sendCmd(self.url, "/abadIA/game", mode='POST', type='raw')
-
             self.game_is_done = True
             reward = -1
 
@@ -713,7 +724,9 @@ class AbadiaEnv2(gym.Env):
     def save_game_checkpoint(self):
 
         checkpoint = self.sendCmd(self.url, "/abadIA/game/current", mode='GET', type="raw")
-
+        if (checkpoint is None):
+            logging.error("I cannot save the checkpoint game file. Probably because I cannot connect with the game server ")
+            return
         now = datetime.datetime.now()
         self.dump_path = now.strftime('games/%Y%m%d')
         path = Path(self.dump_path)

@@ -154,12 +154,14 @@ class NGDQN:
         vector = self.state2vector(state)
         self.env.vector = vector
 
+        # exploratory mode
         if (self.env.playing is False) and (np.random.random() < self.epsilon):
             action = self.env.action_space.sample()
             self.env.logging.info("e-greedy: {}  epsilon: {}<----               ".format(action, self.epsilon))
             actionType = "E"
             self.env.calculated_predictions = []
             self.env.final_predictions = []
+        # explotation mode
         else:
             predictions = self.model.predict(vector.reshape(1,1,71)).reshape(9)
             logging.info(predictions)
@@ -171,8 +173,11 @@ class NGDQN:
                     final[ii] = predictions[ii]
                 else:
                     final[ii] = -99 # predictions[ii]*0.9
-
-            action = np.argmax(final)
+            # just testing a Mixed mode
+            # what will happen if we choose one of the best 3 actions random
+            # action = np.argmax(final)
+            idx = (-final).argsort()[:3]
+            action = idx[np.random.randint(0,2)]
             # self.env.logging.info("vector:      {}              ".format(vector))
             # self.env.logging.info("predictions: {}              ".format(predictions))
             # self.env.logging.info("final:       {}              ".format(final))
