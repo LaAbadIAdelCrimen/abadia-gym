@@ -3,13 +3,29 @@ simulating an environment for the AbadIA (The abbey of crime game).
 
 Also included some agents from random to more complex ones.
 
-## Pre-installation
+### How to launch the game engine.
+
+```
+git clone https://github.com/LaAbadIAdelCrimen/VigasocoSDL-AI.git
+
+cd VigasocoSDL-AI/extra/Docker/vnc/
+
+docker build -t vigasoco .
+
+docker run -p 4477:4477 -p 5900:5900 vigasoco
+```
+
+## Installation pyhton3
 
 We recommend use virtualenv in order to have a controlled (and tested/controlled) enviroment. 
 
 You can create this enviroment with: 
 
 ```
+git clone https://github.com/LaAbadIAdelCrimen/abadia-gym.git
+cd abadia-gym/
+apt install virtualenv
+apt install python3-pip
 virtualenv -p python3 python3
 ```
 
@@ -29,10 +45,16 @@ Note2: you don't need to do that if you have python3 and you are not worried of 
 ## Installation
 
 
-For install AbadIA-gym just install all the dependencies from the requirements.txt file using pip3: 
+For install AbadIA-gym  install all the dependencies from the requirements.txt file using pip3 and 2 last models agent: 
  
 ```
 pip3 install -r requirements.txt 
+mkdir -p snapshoots
+mkdir -p snapshoots
+cd models/
+wget https://storage.googleapis.com/abadia-data/models/last_model_v6.model
+wget https://storage.googleapis.com/abadia-data/models/last_value_v1.model
+cd ..
 ```
 
 
@@ -45,17 +67,13 @@ import gym_abadia
 env = gym.make('abadia-v0')
 ```
 
-### how to launch the game engine. 
-
-Clone the game engine project and do the usual things like read the README.md file and then launch the game engine: 
-
+### How to run the agent v6
 ```
-./VigasocoSDL abadia -input:libVigasocoFakeInputPlugin.so,FakeInputPlugin  -audio:libVigasocoNULLAudioPlugin.so,NULLAudioPlugin
+python3 agentv6_ngdqn.py --learning=false --episodes=5 --steps=2000 --initmodel=models/last_model_v6.model
 ```
-or use our not so cool bash shell loop: 
-
+You can run it in a loop: 
 ```
-./loopVigasocoSDL.sh
+./loopagentv6.sh
 ```
 
 ### How to run the agent v4
