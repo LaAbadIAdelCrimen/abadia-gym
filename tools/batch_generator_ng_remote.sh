@@ -23,6 +23,8 @@ echo "------------"
 (cat /tmp/rooms) |
 while read -r room
 do
+# now only will works with the 21 room for a while
+room=21
 echo "I will look for the room: ($room)"
 (cat /tmp/o31 | sed -e 's/https:\/\/storage.googleapis.com\/abadia-data\///g' | egrep "_${room}_31_0.che" | head -50) |
 while read -r line
