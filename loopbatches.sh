@@ -13,12 +13,12 @@ do
       curl http://$SERVERIP:$PORT/fin
       exit 0
       ;;
-    *_2[123]_[0-9]_0.c*)
+    *_2[23]_[0-9]_0.c*)
       echo "*************************************** tired of doing this for now $options"
       echo "*************************************** tired of doing this for now $options"
       echo "*************************************** tired of doing this for now $options"
       ;;
-    *_2[123]_[0-9][0-9]_0.c*)
+    *_2[23]_[0-9][0-9]_0.c*)
       echo "*************************************** tired of doing this for now $options"
       echo "*************************************** tired of doing this for now $options"
       echo "*************************************** tired of doing this for now $options"
