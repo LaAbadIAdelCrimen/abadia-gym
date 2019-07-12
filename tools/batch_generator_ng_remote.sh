@@ -7,10 +7,11 @@
 # egrep "_$1_[0-9]_0.c|_$1_[0-9][0-9]_0.c" | grep -v "_0_0.che"
 # (gsutil cat  "gs://abadia-data/all_checkpoint_list.txt" | sed -e 's/https:\/\/storage.googleapis.com\/abadia-data\///g'| egrep "_$1_[2-3][0-9]_0.c" | grep -v "_0_0.che" | grep -v "_2[123]_[0-9]_0.c" | grep -v "_2[123]_[0-9][0-9]_0.c" | head -100) |
 # egrep "_31_0.check|_30_0.check|_29_0.check|_28_0.check|_27_0.check" /tmp/acl.txt | grep -v "_2[23]_[0-9]_0.c" | grep -v "_2[23]_[0-9][0-9]_0.c" > /tmp/o31
+# egrep "_31_0.check" /tmp/acl.txt | grep -v "_2[23]_[0-9]_0.c" | grep -v "_2[23]_[0-9][0-9]_0.c" > /tmp/o31
 
 gsutil cp gs://abadia-data/all_checkpoint_list.txt /tmp/acl.txt
 
-egrep "_31_0.check" /tmp/acl.txt | grep -v "_2[23]_[0-9]_0.c" | grep -v "_2[23]_[0-9][0-9]_0.c" > /tmp/o31
+grep "_31_0.check" /tmp/acl.txt | grep -v "_2[23]_31_0.c" > /tmp/o31
 
 cut -d"_"  -f9,10 < /tmp/o31 | cut -d"_" -f1 | sort -n | uniq -c  | \
  sort -n | sed -e 's/^  //g'  | sed -e 's/^  //g'  | sed -e 's/^ //g' | sed -e 's/^ //g' | cut -d" " -f2  | head -10 > /tmp/rooms
@@ -26,7 +27,7 @@ do
 # now only will works with the 21 room for a while
 room=21
 echo "I will look for the room: ($room)"
-(cat /tmp/o31 | sed -e 's/https:\/\/storage.googleapis.com\/abadia-data\///g' | egrep "_${room}_31_0.che" | head -50) |
+(cat /tmp/o31 | sed -e 's/https:\/\/storage.googleapis.com\/abadia-data\///g' | egrep "_${room}_31_0.che" | tail -1000 | head -100) |
 while read -r line
 do
   case $line in

@@ -193,6 +193,28 @@ class AbadiaEnv2(gym.Env):
 
     def set_url(self):
         self.url = self.server + ":" + self.port
+
+    def check2dict(self, line):
+
+        pre = "core_"
+        output = {}
+        for line in line.split("\n"):
+            # print(line)
+            res = line.split("// ")
+
+            if (len(res) == 2):
+                value = res[0]
+                key = res[1]
+                if (value == ""):
+                    pre = key.replace(" ", "_") + "_"
+                else:
+                    output[pre + key] = value
+
+            # print("value ({}) key ({})".format(value, pre + key))
+        # print(json.dumps(output))
+        # logging.info(output)
+        return output
+
     # TODO JT refactoring and eliminate this function
     def sendReset(self):
         self.sendCmd(self.url, "abadIA/game/current/actions/SPACE", mode='POST')
@@ -215,16 +237,24 @@ class AbadiaEnv2(gym.Env):
         except:
             logging.error("Vigasoco comm error")
             return None
+        headers = {'accept': 'text/x.abadIA+plain'}
 
+        cmdDump = "{}/abadIA/game/current".format(self.url)
+        core = requests.get(cmdDump, headers=headers)
+        # logging.info(core.text)
+        core_dict = self.check2dict(core.text)
+
+        headers = {'accept': 'application/json'}
         cmdDump = "{}/abadIA/game/current".format(url)
         r = requests.get(cmdDump, headers= headers)
-        if r.status_code == 599:
-            tmp = r.json()
-            tmp['haFracasado'] = True
-            return tmp
 
         if (type == "json"):
-            return r.json()
+            tmp = r.json()
+            tmp['core'] = core_dict
+
+            if r.status_code == 599:
+                tmp['haFracasado'] = True
+            return tmp
         else:
             return r.text
 
@@ -234,15 +264,21 @@ class AbadiaEnv2(gym.Env):
         for step in cmds:
             self.sendCmd(self.url, "abadIA/game/current/actions/{}".format(step), mode='POST')
 
+        headers = {'accept': 'text/x.abadIA+plain'}
+        cmdDump = "{}/abadIA/game/current".format(self.url)
+        core = requests.get(cmdDump, headers=headers)
+        # logging.info(core.text)
+        core_dict = {"version": "v7"}
+        core_dict = self.check2dict(core.text)
+
         headers = {'accept': 'application/json'}
         cmdDump = "{}/abadIA/game/current".format(self.url)
         r = requests.get(cmdDump, headers=headers)
+        tmp = r.json()
+        tmp['core'] =  core_dict
         if r.status_code == 599:
-            tmp = r.json()
             tmp['haFracasado'] = True
-            return tmp
-
-        return r.json()
+        return tmp
 
     def step(self, action):
         """
@@ -281,8 +317,8 @@ class AbadiaEnv2(gym.Env):
             else:
                 ori = str(self.Personajes['Guillermo']['orientacion'])
                 ob = self.sendMultiCmd(ori + self.actions_list[action])
-        except:
-            logging.error("Communication Error: I cannot send the CMDs")
+        except Exception as e:
+            logging.error("Communication Error: I cannot send the CMDs {}".format(e))
             logging.error("Check if the game engine is UP")
             self.game_is_done = True
             return self.prev_ob, 0, self.game_is_done, {}
@@ -372,8 +408,8 @@ class AbadiaEnv2(gym.Env):
         # the percentage must be variable to help the AI to learn
         # with variable explanatory/explotation
 
-        if (self.obsequium < 29):
-            logging.info("GAME OVER by lack of Obsequium")
+        if (self.obsequium < 31):
+            logging.info("GAME OVER by lack of Obsequium {}".format(self.obsequium))
             self.sendCmd(self.url, "/abadIA/game", mode='POST', type='raw')
             self.game_is_done = True
             self.haFracasado = True
