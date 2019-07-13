@@ -408,8 +408,8 @@ class AbadiaEnv2(gym.Env):
         # the percentage must be variable to help the AI to learn
         # with variable explanatory/explotation
 
-        if (self.obsequium < 31):
-            logging.info("GAME OVER by lack of Obsequium {}".format(self.obsequium))
+        if (self.obsequium < 29):
+            logging.info("GAME OVER by lack of Obsequium {}        ".format(self.obsequium))
             self.sendCmd(self.url, "/abadIA/game", mode='POST', type='raw')
             self.game_is_done = True
             self.haFracasado = True
