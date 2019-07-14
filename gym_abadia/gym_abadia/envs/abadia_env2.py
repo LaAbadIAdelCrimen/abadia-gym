@@ -208,7 +208,7 @@ class AbadiaEnv2(gym.Env):
                 if (value == ""):
                     pre = key.replace(" ", "_") + "_"
                 else:
-                    output[pre + key] = value
+                    output[pre + key] = int(value)
 
             # print("value ({}) key ({})".format(value, pre + key))
         # print(json.dumps(output))
