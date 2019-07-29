@@ -72,6 +72,7 @@ class AbadiaEnv2(gym.Env):
         self.totalReward    = 0.0
         self.verbose        = 0
         self.playing        = False
+        self.minimunObsequium = 29
 
         # Define what the agent can do
         # 0 -> STEP FORWARD
@@ -408,7 +409,7 @@ class AbadiaEnv2(gym.Env):
         # the percentage must be variable to help the AI to learn
         # with variable explanatory/explotation
 
-        if (self.obsequium < 29):
+        if (self.obsequium < self.minimunObsequium):
             logging.info("GAME OVER by lack of Obsequium {}        ".format(self.obsequium))
             self.sendCmd(self.url, "/abadIA/game", mode='POST', type='raw')
             self.game_is_done = True

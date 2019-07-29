@@ -30,6 +30,7 @@ def init_env(env):
     argparser.add_argument('-n', '--steps', help='total steps of the episode')
     argparser.add_argument('-g', '--gcs', help='Google storage bucket')
     argparser.add_argument('-l', '--learning', help='Learning mode (True/False)')
+    argparser.add_argument('-o', '--obsequium', help='Minimun Obsequium before considering you are dead')
     argparser.add_argument('-v', '--verbose', help='Verbose output')
 
     args = argparser.parse_args()
@@ -71,6 +72,10 @@ def init_env(env):
             env.playing = False
         else:
             env.playing = True
+
+    if args.obsequium != None:
+        env.minimunObsequium = int(args.obsequium)
+
 
     if args.verbose != None:
         env.verbose = int(args.verbose)
@@ -272,6 +277,9 @@ def mainLoop():
         state = env.reset()
         if(env.checkpointName != None):
             state = env.load_game_checkpoint(env.checkpointName)
+            if state['obsequium'] < env.minimunObsequium:
+                loggin.info("Obsequium {} is less than the minimun required {} so we exit now".format(state['obsequium'], env.minimunObsequium))
+                break
 
         rAll = 0
         done = False
