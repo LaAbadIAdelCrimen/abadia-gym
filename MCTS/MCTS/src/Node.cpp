@@ -1,5 +1,6 @@
 #include "Node.h"
 
+#include <iostream>
 #include <map>
 #include <algorithm>
 #include <cassert>
@@ -236,7 +237,7 @@ struct LessStatePtr {
 template<typename State,typename Action>
 class NodeFactoryImpl {
 public:
-    typedef map<const State*, weak_ptr<NodeImpl<State,Action>>, LessStatePtr<State>>         NodesByInternalState;
+    typedef std::map<const State*, std::weak_ptr<NodeImpl<State,Action>>, LessStatePtr<State>>         NodesByInternalState;
 private:
     static size_t                       _numActions;
     static size_t                       _nodeCounter;
@@ -253,11 +254,11 @@ public:
 	static std::shared_ptr<Node<State,Action>> getOrCreate(const typename State::InternalState& internalState) {
         std::unique_ptr<State> newStatePtr(new State(internalState));
         auto stateIt = _aliveStates.find(newStatePtr.get());
-        shared_ptr<NodeImpl<State,Action>> nodeImplPtr;
+        std::shared_ptr<NodeImpl<State,Action>> nodeImplPtr;
         if(stateIt == _aliveStates.end()) {     //If internalState is not registered
-            nodeImplPtr = shared_ptr<NodeImpl<State,Action>>(create(++_nodeImplCounter, newStatePtr), &NodeFactoryImpl::remove);
+            nodeImplPtr = std::shared_ptr<NodeImpl<State,Action>>(create(++_nodeImplCounter, newStatePtr), &NodeFactoryImpl::remove);
             const State& nodeState(nodeImplPtr->getState());
-            auto insertResult = _aliveStates.insert(typename NodesByInternalState::value_type(&nodeState, weak_ptr<NodeImpl<State,Action>>(nodeImplPtr)));
+            auto insertResult = _aliveStates.insert(typename NodesByInternalState::value_type(&nodeState, std::weak_ptr<NodeImpl<State,Action>>(nodeImplPtr)));
             // auto insertResult = _aliveStates.insert(std::make_pair(&nodeState, weak_ptr<NodeImpl<State,Action>>(nodeImplPtr)));
             assert(insertResult.second == true);
         } else {
