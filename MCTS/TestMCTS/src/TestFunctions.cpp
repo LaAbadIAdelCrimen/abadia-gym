@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include "TestFunctions.h"
 
 #include "TestState.h"
@@ -11,7 +12,7 @@ using namespace test_mcts;
 using namespace mcts;
 
 static const float KEY_WEIGHT = 0.3f;
-static const float POS_WEIGHT = 1.0f - KEY_WEIGHT; 
+static const float POS_WEIGHT = 1.0f - KEY_WEIGHT;
 
 // static size_t WIDTH = 0.0f;
 // static size_t HEIGHT = 0.0f;
@@ -19,8 +20,8 @@ static const float POS_WEIGHT = 1.0f - KEY_WEIGHT;
 static const TestMaze* MAZE = nullptr;
 
 static float distance(const Pos& pos1, const Pos& pos2) {
-    float x = abs(pos2.x - pos1.x);
-    float y = abs(pos2.y - pos1.y);
+    float x = fabs(pos2.x - pos1.x);
+    float y = fabs(pos2.y - pos1.y);
     float result = sqrt(std::pow(x, 2) + std::pow(y, 2));
     return result;
 }
