@@ -60,6 +60,8 @@ class AbadiaEnv3(gym.Env):
         self.gameName       = ""
         self.actionsName    = ""
         self.checkpointName = None
+        self.actionsName    = None
+        self.actionsStep    = 1
         self.modelName      = None
         self.valueModelName = None
         self.initValueModelName = None
@@ -807,10 +809,13 @@ class AbadiaEnv3(gym.Env):
                 self.download_blob(name, name)
                 self.fdActionsCheckpoint = open(name, "r")
                 # TODO JT we need to read line by line to be less memory demanding
-                actions = self.fdActionsCheckpoint.read()
+                line = fdActionsCheckpoint.readline()
+                cnt = 1
+                while line:
+                    actions = self.fdActionsCheckpoint.read()
 
-                # TODO JT now we read the json object, get the checkpoint dict and convert it to Abbey format
-                requests.put(self.url+"/abadIA/game/current", data=checkpoint)
+                    # TODO JT now we read the json object, get the checkpoint dict and convert it to Abbey format
+                    # requests.put(self.url+"/abadIA/game/current", data=checkpoint)
 
             except:
                 logging.error("*** ErrorFile: {} not exist at bucket {}".format(name, self.gsBucket))
