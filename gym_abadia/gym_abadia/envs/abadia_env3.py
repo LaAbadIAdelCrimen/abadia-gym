@@ -581,6 +581,8 @@ class AbadiaEnv3(gym.Env):
             logging.info('Esta Guillermo')
         return ob
 
+    # TODO JT check if we use this function
+
     def render(self, mode='human', close=False):
         logging.info('state info: {}'.format(self))
         return
@@ -762,6 +764,8 @@ class AbadiaEnv3(gym.Env):
         self.fdGame    = open(self.dump_path + "/" + self.gameName, "w")
         self.fdActions = open(self.dump_path + "/" + self.actionsName, "w")
 
+    # TODO JT now every action included a checkpoint so we don't need this function. Check it.
+
     def save_game_checkpoint(self):
 
         checkpoint = self.sendCmd(self.url, "/abadIA/game/current", mode='GET', type="raw")
@@ -790,6 +794,9 @@ class AbadiaEnv3(gym.Env):
             t.start()
         # else:
             # logging.error("Not saving it to the local filesystem")
+
+    # TODO JT We need to refactoring this function
+    # Now we will pass the actions file and which step we wants to reload
 
     def load_game_checkpoint(self, name):
         logging.info("voy a abrir el fichero ({})".format(name))
