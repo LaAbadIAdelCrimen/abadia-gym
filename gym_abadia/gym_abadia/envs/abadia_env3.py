@@ -798,16 +798,20 @@ class AbadiaEnv3(gym.Env):
     # TODO JT We need to refactoring this function
     # Now we will pass the actions file and which step we wants to reload
 
-    def load_game_checkpoint(self, name):
+    def load_actions_checkpoint(self, name, step):
         logging.info("voy a abrir el fichero ({})".format(name))
 
         if (self.gsBucket != None):
-            logging.info("Downloading Checkpoint {} from GCP".format(name))
+            logging.info("Downloading Actions Checkpoint {} from GCP".format(name))
             try:
                 self.download_blob(name, name)
-                self.fdCheckpoint = open(name, "r")
-                checkpoint = self.fdCheckpoint.read()
+                self.fdActionsCheckpoint = open(name, "r")
+                # TODO JT we need to read line by line to be less memory demanding
+                actions = self.fdActionsCheckpoint.read()
+
+                # TODO JT now we read the json object, get the checkpoint dict and convert it to Abbey format
                 requests.put(self.url+"/abadIA/game/current", data=checkpoint)
+
             except:
                 logging.error("*** ErrorFile: {} not exist at bucket {}".format(name, self.gsBucket))
         else:

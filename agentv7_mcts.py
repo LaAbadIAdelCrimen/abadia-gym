@@ -420,5 +420,3 @@ if __name__ == '__main__':
     env = gym.make('Abadia-v3')
     init_env(env)
     mainLoop()
-
-
