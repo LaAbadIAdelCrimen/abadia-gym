@@ -59,8 +59,7 @@ class AbadiaEnv3(gym.Env):
 
         self.gameName       = ""
         self.actionsName    = ""
-        self.checkpointName = None
-        self.actionsName    = None
+        self.actionsCheckpointName    = None
         self.actionsStep    = 1
         self.modelName      = None
         self.valueModelName = None
@@ -378,7 +377,8 @@ class AbadiaEnv3(gym.Env):
                     # logging.info("----------")
                     # self.add_event("NewRoom", "prev {} curr {}".format(self.prevPantalla, int(ob['numPantalla'])), 0.001)
                     self.prevPantalla = int(ob['numPantalla'])
-                    self.save_game_checkpoint()
+                    # we dont need to save checkpoints alone
+                    # self.save_game_checkpoint()
 
         # # If there is an obsequium change, it will be rewarded pos/neg
         # if len(self.prev_ob) > 0 and int(self.prev_ob['obsequium']) > 0:
@@ -529,6 +529,7 @@ class AbadiaEnv3(gym.Env):
         return vector.reshape(1,15)
 
     def _take_action(self, action):
+        logging.info("append {} {}".format(self.curr_episode, action))
         self.action_episode_memory[self.curr_episode].append(action)
 
         game_is_done = (self.obsequium <= 0)
@@ -560,7 +561,7 @@ class AbadiaEnv3(gym.Env):
         self.gameName    = "abadia_game_{}.json".format(self.gameId)
         self.actionsName = "abadia_actions_{}.json".format(self.gameId)
 
-        self.curr_episode  = -11
+        self.curr_episode += 1
         self.curr_step     = 1
 
         self.eventsGame   = []
@@ -797,11 +798,42 @@ class AbadiaEnv3(gym.Env):
         # else:
             # logging.error("Not saving it to the local filesystem")
 
+    def dict2check(dict):
+        """
+        this function convert the dict with the checkpoint to the format expected by the engine
+        :return:
+        """
+        ant = ""
+        result = ""
+        for key in dict.keys():
+            print("key: {} value: {}".format(key, file2[key]))
+            elements = key.split("_")
+            pre = "NaN"
+            name = "NaN"
+
+            if (elements[0] == "core"):
+                pre = ""
+                name = elements[1]
+            else:
+                if (len(elements) == 3):
+                    pre = "{} {}".format(elements[0], elements[1])
+                    name = elements[2]
+                else:
+                    pre = elements[0]
+                    name = elements[1]
+
+                if (ant != pre):
+                    ant = pre
+                    result += "// {}\n".format(pre)
+
+            result += "{}// {}\n".format(dict[key], name)
+        return result
+
     # TODO JT We need to refactoring this function
     # Now we will pass the actions file and which step we wants to reload
 
     def load_actions_checkpoint(self, name, step):
-        logging.info("voy a abrir el fichero ({})".format(name))
+        logging.info("Opening the local actions file ({})".format(name))
 
         if (self.gsBucket != None):
             logging.info("Downloading Actions Checkpoint {} from GCP".format(name))
@@ -813,7 +845,8 @@ class AbadiaEnv3(gym.Env):
                 cnt = 1
                 while line:
                     actions = self.fdActionsCheckpoint.read()
-
+                    state = json.loads(actions)[0]
+                    print(state)
                     # TODO JT now we read the json object, get the checkpoint dict and convert it to Abbey format
                     # requests.put(self.url+"/abadIA/game/current", data=checkpoint)
 

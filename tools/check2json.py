@@ -433,6 +433,35 @@ file = """1// dia
 0// numPersonaje
 """
 
+file2 = {"core_dia":1,"core_momentoDia":4,"core_duracionMomentoDia":0,"core_oldMomentoDia":0,"core_avanzarMomentoDia":0,"core_obsequium":31,"core_haFracasado":0,"core_investigacionCompleta":0,"core_bonus":0,"core_mascaraPuertas":239,"core_espejoCerrado":1,"core_numeroRomano":0,"core_despDatosAlturaEspejo":103444,"core_despBloqueEspejo":123468,"core_seAcabaLaNoche":0,"core_haAmanecido":0,"core_usandoLampara":0,"core_lamparaDesaparecida":1,"core_tiempoUsoLampara":0,"core_cambioEstadoLampara":0,"core_cntTiempoAOscuras":0,"core_cntLeeLibroSinGuantes":0,"core_pergaminoGuardado":0,"core_numeroAleatorio":113,"core_hayMovimiento":1,"core_cntMovimiento":0,"core_numPersonajeCamara":0,"core_opcionPersonajeCamara":0,"SPRITE_0_esVisible":1,"SPRITE_1_esVisible":1,"SPRITE_2_esVisible":0,"SPRITE_3_esVisible":0,"SPRITE_4_esVisible":0,"SPRITE_5_esVisible":0,"SPRITE_6_esVisible":0,"SPRITE_7_esVisible":0,"SPRITE_8_esVisible":0,"SPRITE_9_esVisible":0,"SPRITE_10_esVisible":0,"SPRITE_11_esVisible":0,"SPRITE_12_esVisible":0,"SPRITE_13_esVisible":0,"SPRITE_14_esVisible":0,"SPRITE_15_esVisible":0,"SPRITE_16_esVisible":0,"SPRITE_17_esVisible":0,"SPRITE_18_esVisible":0,"SPRITE_19_esVisible":0,"SPRITE_20_esVisible":0,"SPRITE_21_esVisible":0,"SPRITE_22_esVisible":0,"SPRITE_23_esVisible":0,"SPRITE_24_esVisible":0,"SPRITE_25_esVisible":0,"GUILLERMO_orientacion":0,"GUILLERMO_posX":136,"GUILLERMO_posY":168,"GUILLERMO_altura":0,"GUILLERMO_estado":0,"GUILLERMO_contadorAnimacion":0,"GUILLERMO_bajando":0,"GUILLERMO_enDesnivel":0,"GUILLERMO_giradoEnDesnivel":0,"GUILLERMO_flipX":0,"GUILLERMO_despFlipX":49152,"GUILLERMO_despX":-2,"GUILLERMO_despY":-34,"GUILLERMO_valorPosicion":16,"GUILLERMO_puedeQuitarObjetos":0,"GUILLERMO_objetos":32,"GUILLERMO_mascaraObjetos":252,"GUILLERMO_contadorObjetos":0,"GUILLERMO_permisosPuertas":8,"GUILLERMO_numFotogramas":8,"GUILLERMO_incrPosY":2,"ADSO_orientacion":0,"ADSO_posX":134,"ADSO_posY":170,"ADSO_altura":0,"ADSO_estado":0,"ADSO_contadorAnimacion":0,"ADSO_bajando":0,"ADSO_enDesnivel":0,"ADSO_giradoEnDesnivel":0,"ADSO_flipX":0,"ADSO_despFlipX":49152,"ADSO_despX":-2,"ADSO_despY":-32,"ADSO_valorPosicion":32,"ADSO_puedeQuitarObjetos":0,"ADSO_objetos":0,"ADSO_mascaraObjetos":3,"ADSO_contadorObjetos":0,"ADSO_permisosPuertas":8,"ADSO_numFotogramas":8,"ADSO_mascarasPuertasBusqueda":60,"ADSO_aDondeVa":0,"ADSO_aDondeHaLlegado":-1,"ADSO_oldEstado":0,"ADSO_movimientosFrustados":0,"ADSO_cntParaDormir":0,"MALAQUIAS_orientacion":0,"MALAQUIAS_posX":38,"MALAQUIAS_posY":38,"MALAQUIAS_altura":15,"MALAQUIAS_estado":0,"MALAQUIAS_contadorAnimacion":0,"MALAQUIAS_bajando":0,"MALAQUIAS_enDesnivel":0,"MALAQUIAS_giradoEnDesnivel":0,"MALAQUIAS_flipX":0,"MALAQUIAS_despFlipX":49152,"MALAQUIAS_despX":-2,"MALAQUIAS_despY":-34,"MALAQUIAS_valorPosicion":16,"MALAQUIAS_puedeQuitarObjetos":0,"MALAQUIAS_objetos":0,"MALAQUIAS_mascaraObjetos":3,"MALAQUIAS_contadorObjetos":0,"MALAQUIAS_permisosPuertas":31,"MALAQUIAS_numFotogramas":8,"MALAQUIAS_mascarasPuertasBusqueda":63,"MALAQUIAS_aDondeVa":0,"MALAQUIAS_aDondeHaLlegado":-6,"MALAQUIAS_estaMuerto":0,"MALAQUIAS_estado2":0,"MALAQUIAS_contadorEnScriptorium":224,"ABAD_orientacion":0,"ABAD_posX":136,"ABAD_posY":132,"ABAD_altura":2,"ABAD_estado":0,"ABAD_contadorAnimacion":0,"ABAD_bajando":0,"ABAD_enDesnivel":0,"ABAD_giradoEnDesnivel":0,"ABAD_flipX":0,"ABAD_despFlipX":49152,"ABAD_despX":-2,"ABAD_despY":-34,"ABAD_valorPosicion":16,"ABAD_puedeQuitarObjetos":1,"ABAD_objetos":0,"ABAD_mascaraObjetos":16,"ABAD_contadorObjetos":0,"ABAD_permisosPuertas":25,"ABAD_numFotogramas":8,"ABAD_mascarasPuertasBusqueda":63,"ABAD_aDondeVa":0,"ABAD_aDondeHaLlegado":-6,"ABAD_contador":0,"ABAD_numFrase":0,"ABAD_guillermoBienColocado":63,"ABAD_lleganLosMonjes":0,"ABAD_guillermoHaCogidoElPergamino":0,"BERENGARIO_orientacion":0,"BERENGARIO_posX":40,"BERENGARIO_posY":72,"BERENGARIO_altura":15,"BERENGARIO_estado":0,"BERENGARIO_contadorAnimacion":0,"BERENGARIO_bajando":0,"BERENGARIO_enDesnivel":0,"BERENGARIO_giradoEnDesnivel":0,"BERENGARIO_flipX":0,"BERENGARIO_despFlipX":49152,"BERENGARIO_despX":-2,"BERENGARIO_despY":-34,"BERENGARIO_valorPosicion":16,"BERENGARIO_puedeQuitarObjetos":0,"BERENGARIO_objetos":0,"BERENGARIO_mascaraObjetos":0,"BERENGARIO_contadorObjetos":0,"BERENGARIO_permisosPuertas":31,"BERENGARIO_numFotogramas":8,"BERENGARIO_mascarasPuertasBusqueda":63,"BERENGARIO_aDondeVa":0,"BERENGARIO_aDondeHaLlegado":-6,"BERENGARIO_encapuchado":0,"BERENGARIO_estado2":0,"BERENGARIO_estaVivo":1,"BERENGARIO_contadorPergamino":0,"SEVERINO_orientacion":0,"SEVERINO_posX":200,"SEVERINO_posY":40,"SEVERINO_altura":0,"SEVERINO_estado":0,"SEVERINO_contadorAnimacion":0,"SEVERINO_bajando":0,"SEVERINO_enDesnivel":0,"SEVERINO_giradoEnDesnivel":0,"SEVERINO_flipX":0,"SEVERINO_despFlipX":49152,"SEVERINO_despX":-2,"SEVERINO_despY":-34,"SEVERINO_valorPosicion":16,"SEVERINO_puedeQuitarObjetos":0,"SEVERINO_objetos":0,"SEVERINO_mascaraObjetos":0,"SEVERINO_contadorObjetos":0,"SEVERINO_permisosPuertas":12,"SEVERINO_numFotogramas":8,"SEVERINO_mascarasPuertasBusqueda":47,"SEVERINO_aDondeVa":0,"SEVERINO_aDondeHaLlegado":-6,"SEVERINO_estaVivo":1,"JORGE_orientacion":0,"JORGE_posX":0,"JORGE_posY":0,"JORGE_altura":0,"JORGE_estado":0,"JORGE_contadorAnimacion":0,"JORGE_bajando":0,"JORGE_enDesnivel":0,"JORGE_giradoEnDesnivel":0,"JORGE_flipX":0,"JORGE_despFlipX":49152,"JORGE_despX":-2,"JORGE_despY":-34,"JORGE_valorPosicion":16,"JORGE_puedeQuitarObjetos":0,"JORGE_objetos":0,"JORGE_mascaraObjetos":0,"JORGE_contadorObjetos":0,"JORGE_permisosPuertas":31,"JORGE_numFotogramas":8,"JORGE_mascarasPuertasBusqueda":63,"JORGE_aDondeVa":0,"JORGE_aDondeHaLlegado":-6,"JORGE_estaActivo":0,"JORGE_contadorHuida":0,"BERNARDO_orientacion":0,"BERNARDO_posX":0,"BERNARDO_posY":0,"BERNARDO_altura":0,"BERNARDO_estado":0,"BERNARDO_contadorAnimacion":0,"BERNARDO_bajando":0,"BERNARDO_enDesnivel":0,"BERNARDO_giradoEnDesnivel":0,"BERNARDO_flipX":0,"BERNARDO_despFlipX":49152,"BERNARDO_despX":-2,"BERNARDO_despY":-34,"BERNARDO_valorPosicion":16,"BERNARDO_puedeQuitarObjetos":1,"BERNARDO_objetos":0,"BERNARDO_mascaraObjetos":0,"BERNARDO_contadorObjetos":0,"BERNARDO_permisosPuertas":31,"BERNARDO_numFotogramas":8,"BERNARDO_mascarasPuertasBusqueda":63,"BERNARDO_aDondeVa":0,"BERNARDO_aDondeHaLlegado":-6,"BERNARDO_estaEnLaAbadia":0,"PUERTA_0_orientacion":1,"PUERTA_0_posX":97,"PUERTA_0_posY":55,"PUERTA_0_altura":2,"PUERTA_0_identificador":1,"PUERTA_0_estaAbierta":0,"PUERTA_0_haciaDentro":1,"PUERTA_0_estaFija":0,"PUERTA_0_hayQueRedibujar":0,"PUERTA_1_orientacion":2,"PUERTA_1_posX":183,"PUERTA_1_posY":30,"PUERTA_1_altura":2,"PUERTA_1_identificador":2,"PUERTA_1_estaAbierta":0,"PUERTA_1_haciaDentro":1,"PUERTA_1_estaFija":0,"PUERTA_1_hayQueRedibujar":0,"PUERTA_2_orientacion":0,"PUERTA_2_posX":102,"PUERTA_2_posY":95,"PUERTA_2_altura":2,"PUERTA_2_identificador":4,"PUERTA_2_estaAbierta":0,"PUERTA_2_haciaDentro":0,"PUERTA_2_estaFija":0,"PUERTA_2_hayQueRedibujar":0,"PUERTA_3_orientacion":3,"PUERTA_3_posX":158,"PUERTA_3_posY":40,"PUERTA_3_altura":2,"PUERTA_3_identificador":8,"PUERTA_3_estaAbierta":0,"PUERTA_3_haciaDentro":1,"PUERTA_3_estaFija":0,"PUERTA_3_hayQueRedibujar":0,"PUERTA_4_orientacion":3,"PUERTA_4_posX":126,"PUERTA_4_posY":38,"PUERTA_4_altura":2,"PUERTA_4_identificador":16,"PUERTA_4_estaAbierta":0,"PUERTA_4_haciaDentro":0,"PUERTA_4_estaFija":0,"PUERTA_4_hayQueRedibujar":0,"PUERTA_5_orientacion":2,"PUERTA_5_posX":96,"PUERTA_5_posY":118,"PUERTA_5_altura":0,"PUERTA_5_identificador":0,"PUERTA_5_estaAbierta":1,"PUERTA_5_haciaDentro":1,"PUERTA_5_estaFija":1,"PUERTA_5_hayQueRedibujar":0,"PUERTA_6_orientacion":2,"PUERTA_6_posX":96,"PUERTA_6_posY":123,"PUERTA_6_altura":0,"PUERTA_6_identificador":0,"PUERTA_6_estaAbierta":1,"PUERTA_6_haciaDentro":0,"PUERTA_6_estaFija":1,"PUERTA_6_hayQueRedibujar":0,"OBJETO_0_orientacion":1,"OBJETO_0_posX":52,"OBJETO_0_posY":94,"OBJETO_0_altura":19,"OBJETO_0_seEstaCogiendo":0,"OBJETO_0_seHaCogido":0,"OBJETO_0_numPersonaje":0,"OBJETO_1_orientacion":0,"OBJETO_1_posX":107,"OBJETO_1_posY":85,"OBJETO_1_altura":6,"OBJETO_1_seEstaCogiendo":0,"OBJETO_1_seHaCogido":0,"OBJETO_1_numPersonaje":0,"OBJETO_2_orientacion":0,"OBJETO_2_posX":0,"OBJETO_2_posY":0,"OBJETO_2_altura":0,"OBJETO_2_seEstaCogiendo":0,"OBJETO_2_seHaCogido":1,"OBJETO_2_numPersonaje":0,"OBJETO_3_orientacion":1,"OBJETO_3_posX":54,"OBJETO_3_posY":94,"OBJETO_3_altura":19,"OBJETO_3_seEstaCogiendo":0,"OBJETO_3_seHaCogido":0,"OBJETO_3_numPersonaje":0,"OBJETO_4_orientacion":0,"OBJETO_4_posX":0,"OBJETO_4_posY":0,"OBJETO_4_altura":0,"OBJETO_4_seEstaCogiendo":0,"OBJETO_4_seHaCogido":0,"OBJETO_4_numPersonaje":0,"OBJETO_5_orientacion":0,"OBJETO_5_posX":0,"OBJETO_5_posY":0,"OBJETO_5_altura":0,"OBJETO_5_seEstaCogiendo":0,"OBJETO_5_seHaCogido":0,"OBJETO_5_numPersonaje":0,"OBJETO_6_orientacion":0,"OBJETO_6_posX":53,"OBJETO_6_posY":53,"OBJETO_6_altura":19,"OBJETO_6_seEstaCogiendo":0,"OBJETO_6_seHaCogido":0,"OBJETO_6_numPersonaje":0,"OBJETO_7_orientacion":0,"OBJETO_7_posX":8,"OBJETO_7_posY":8,"OBJETO_7_altura":2,"OBJETO_7_seEstaCogiendo":0,"OBJETO_7_seHaCogido":0,"OBJETO_7_numPersonaje":0}
+
+def dict2check(dict):
+    ant = ""
+    result = ""
+    for key in dict.keys():
+        print ("key: {} value: {}".format(key, file2[key]))
+        elements = key.split("_")
+        pre = "NaN"
+        name = "NaN"
+
+        if (elements[0] == "core"):
+            pre = ""
+            name = elements[1]
+        else:
+            if (len(elements) == 3):
+                pre = "{} {}".format(elements[0], elements[1])
+                name = elements[2]
+            else:
+                pre = elements[0]
+                name = elements[1]
+
+            if (ant != pre):
+                ant = pre
+                result += "// {}\n".format(pre)
+
+        result += "{}// {}\n".format(dict[key], name)
+    return result
+
 pre = "core_"
 output = {}
 for line in file.split("\n"):
@@ -449,3 +478,35 @@ for line in file.split("\n"):
 
     print("value ({}) key ({})".format(value, pre+key))
 print(json.dumps(output))
+
+print ("dict2check")
+# print(dict2check(file2))
+# print(dict2check(output))
+out2 = dict2check(output)
+
+import difflib
+
+print("-----------")
+print(file[:250])
+print("-----------")
+print(output["core_oldMomentoDia"])
+print("-----------")
+print(out2[:250])
+print("-----------")
+for line in difflib.context_diff(file, out2):
+    print(line)
+print("file -----------")
+print(file)
+print("out -----------")
+print(out2)
+
+fout = open("/tmp/o1", "w")
+fout.write(file)
+fout.close()
+
+fout = open("/tmp/o2", "w")
+fout.write(out2)
+fout.close()
+
+
+

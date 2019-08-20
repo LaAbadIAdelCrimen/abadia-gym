@@ -23,7 +23,6 @@ def init_env(env):
     argparser = argparse.ArgumentParser()
     argparser.add_argument('-s', '--server', help='server name')
     argparser.add_argument('-p', '--port', help='port number')
-    argparser.add_argument('-c', '--checkpoint', help='checkpoint file deprecated')
     argparser.add_argument('-a', '--actions', help='actions file with the checkpoint')
     argparser.add_argument('-w', '--actionsstep', help='actions step to be checkpointed')
     argparser.add_argument('-m', '--model', help='model file')
@@ -46,14 +45,11 @@ def init_env(env):
         env.port = args.port
         env.set_url()
 
-    if args.checkpoint != None:
-        env.checkpointName = args.checkpoint
-
     if args.actions != None:
-        env.actionsName = args.actions
+        env.actionsCheckpointName = args.actions
 
     if args.actionsstep != None:
-        env.actionsStep = args.actionsstep
+        env.actionsCheckpointStep = args.actionsstep
 
     if args.model != None:
         env.modelName = args.model
@@ -286,14 +282,7 @@ def mainLoop():
         logging.info(f'runnig {i_episode} episode')
         state = env.reset()
 
-        # deprecated
-        if(env.checkpointName != None):
-            state = env.load_game_checkpoint(env.checkpointName)
-            if state['obsequium'] < env.minimunObsequium:
-                loggin.info("Obsequium {} is less than the minimun required {} so we exit now".format(state['obsequium'], env.minimunObsequium))
-                break
-
-        if(env.actionsName != None):
+        if(env.actionsCheckpointName != None):
             state = env.load_actions_checkpoint(env.actionsName, env.actionsStep)
             if state['obsequium'] < env.minimunObsequium:
                 loggin.info("Obsequium {} is less than the minimun required {} so we exit now".format(state['obsequium'], env.minimunObsequium))
