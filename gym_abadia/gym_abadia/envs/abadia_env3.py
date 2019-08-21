@@ -102,7 +102,7 @@ class AbadiaEnv3(gym.Env):
         self.estaGuillermo= False
         self.room = np.zeros([20,20,3], np.int)
 
-        self.curr_step = -1
+        self.curr_step = 1
         self.is_game_done = False
 
         self.Personajes = {
@@ -582,6 +582,7 @@ class AbadiaEnv3(gym.Env):
         # time.sleep(5)
         if self._get_personajes_info(ob):
             logging.info('Esta Guillermo')
+        ob['jugada'] = self.curr_step
         return ob
 
     # TODO JT check if we use this function
@@ -839,21 +840,21 @@ class AbadiaEnv3(gym.Env):
             logging.info("Downloading Actions Checkpoint {} from GCP".format(name))
             try:
                 self.download_blob(name, name)
-                self.fdActionsCheckpoint = open(name, "r")
-                # TODO JT we need to read line by line to be less memory demanding
-                line = fdActionsCheckpoint.readline()
-                cnt = 1
-                while line:
-                    actions = self.fdActionsCheckpoint.read()
-                    state = json.loads(actions)[0]
-                    print(state)
-                    # TODO JT now we read the json object, get the checkpoint dict and convert it to Abbey format
-                    # requests.put(self.url+"/abadIA/game/current", data=checkpoint)
-
             except:
                 logging.error("*** ErrorFile: {} not exist at bucket {}".format(name, self.gsBucket))
-        else:
-            logging.error("Not Loading {} from local filesystem.".format(name))
+
+        fdActionsCheckpoint = open(name, "r")
+        # TODO JT we need to read line by line to be less memory demanding
+        line = fdActionsCheckpoint.readline()
+        cnt = 1
+        while line:
+            # actions = self.fdActionsCheckpoint.read()
+            st = json.loads(line)[0]
+            print(st['action']['state']['jugada'])
+            # TODO JT now we read the json object, get the checkpoint dict and convert it to Abbey format
+            # requests.put(self.url+"/abadIA/game/current", data=checkpoint)
+
+        fdActionsCheckpoint.close()
 
         time.sleep(2)
         return self._get_state()

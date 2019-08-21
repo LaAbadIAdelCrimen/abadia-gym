@@ -49,7 +49,7 @@ def init_env(env):
         env.actionsCheckpointName = args.actions
 
     if args.actionsstep != None:
-        env.actionsCheckpointStep = args.actionsstep
+        env.actionsCheckpointStep = int(args.actionsstep)
 
     if args.model != None:
         env.modelName = args.model
@@ -283,7 +283,7 @@ def mainLoop():
         state = env.reset()
 
         if(env.actionsCheckpointName != None):
-            state = env.load_actions_checkpoint(env.actionsName, env.actionsStep)
+            state = env.load_actions_checkpoint(env.actionsCheckpointName, env.actionsStep)
             if state['obsequium'] < env.minimunObsequium:
                 loggin.info("Obsequium {} is less than the minimun required {} so we exit now".format(state['obsequium'], env.minimunObsequium))
                 break
