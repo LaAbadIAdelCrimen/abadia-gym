@@ -845,17 +845,20 @@ class AbadiaEnv3(gym.Env):
 
         fdActionsCheckpoint = open(name, "r")
         # TODO JT we need to read line by line to be less memory demanding
-        line = fdActionsCheckpoint.readline()
-        cnt = 1
-        while line:
-            # actions = self.fdActionsCheckpoint.read()
-            st = json.loads(line)[0]
-            print(st['action']['state']['jugada'])
-            # TODO JT now we read the json object, get the checkpoint dict and convert it to Abbey format
-            # requests.put(self.url+"/abadIA/game/current", data=checkpoint)
 
+        cnt = 1
+        while action = fdActionsCheckpoint.readline():
+            # actions = self.fdActionsCheckpoint.read()
+            st = json.loads(action)[0]
+            if st['action']['state']['jugada'] == step:
+                print("I will load the {} step into the engine".format(st['action']['state']['jugada']))
+                #    TODO JT now we read the json object, get the checkpoint dict and convert it to Abbey format
+                checkpoint = self.dict2check(st['action']['state']['core'])
+                requests.put(self.url+"/abadIA/game/current", data=checkpoint)
+                self.curr_step = step
         fdActionsCheckpoint.close()
 
+        # TODO JT check if we can delete this delay.
         time.sleep(2)
         return self._get_state()
 
