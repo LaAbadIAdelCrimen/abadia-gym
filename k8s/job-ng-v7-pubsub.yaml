@@ -13,10 +13,10 @@ spec:
       containers:
       - name: engine
         image: gcr.io/abadia-1/abadia-ng:runtime
-        command: ["/bin/bash", "-c"]
+        command: ["busybox","sh","-c"]
         args:
           - |
-            (while true; do cd /home/abadIA/VigasocoSDL-AI/VigasocoSDL&&./loop-abadIA.sh; done) &
+            (while true; do cd /home/abadIA/VigasocoSDL-AI/VigasocoSDLi/bin&&./abadIA-HEADLESS;done) &
             CHILD_PID=$!
             (while true; do if [[ -f "/tmp/pod/main-terminated" ]]; then kill $CHILD_PID; echo "Killed $CHILD_PID as the main container terminated."; fi; sleep 1; done) &
             wait $CHILD_PID
