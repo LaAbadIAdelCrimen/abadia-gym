@@ -16,7 +16,7 @@ spec:
         command: ["busybox","sh","-c"]
         args:
           - |
-            (while true; do cd /home/abadIA/VigasocoSDL-AI/VigasocoSDLi/bin&&./abadIA-HEADLESS;done) &
+            (while true; /bin/abadIA-HEADLESS;done) &
             CHILD_PID=$!
             (while true; do if [[ -f "/tmp/pod/main-terminated" ]]; then kill $CHILD_PID; echo "Killed $CHILD_PID as the main container terminated."; fi; sleep 1; done) &
             wait $CHILD_PID
