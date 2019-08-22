@@ -12,7 +12,7 @@ spec:
     spec:
       containers:
       - name: engine
-        image: gcr.io/abadia-1/abadia-ng:vnc
+        image: gcr.io/abadia-1/abadia-ng:runtime
         command: ["/bin/bash", "-c"]
         args:
           - |

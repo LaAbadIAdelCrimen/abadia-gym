@@ -593,12 +593,12 @@ class AbadiaEnv3(gym.Env):
 
     def _get_state(self):
         """Get the observation."""
-        # ob = [self.TOTAL_TIME_STEPS - self.curr_step]
+
         logging.info("--------> I wil got the initial state with Guillermo")
         tooboring = 0
         while True:
             ob = self.sendCmd(self.url, "/abadIA/current/game", mode='GET', type='json')
-            # logging.info("{}".format(ob))
+            logging.info("current game status {}".format(ob))
             tooboring += 1
             if self._get_personajes_info(ob):
                 logging.info("getting the characters from Dump")
@@ -799,15 +799,15 @@ class AbadiaEnv3(gym.Env):
         # else:
             # logging.error("Not saving it to the local filesystem")
 
-    def dict2check(dict):
+    def dict2check(self, check):
         """
         this function convert the dict with the checkpoint to the format expected by the engine
         :return:
         """
         ant = ""
         result = ""
-        for key in dict.keys():
-            print("key: {} value: {}".format(key, file2[key]))
+        for key in check.keys():
+            # print("key: {} value: {}".format(key, file2[key]))
             elements = key.split("_")
             pre = "NaN"
             name = "NaN"
@@ -827,7 +827,7 @@ class AbadiaEnv3(gym.Env):
                     ant = pre
                     result += "// {}\n".format(pre)
 
-            result += "{}// {}\n".format(dict[key], name)
+            result += "{}// {}\n".format(check[key], name)
         return result
 
     # TODO JT We need to refactoring this function
@@ -843,19 +843,18 @@ class AbadiaEnv3(gym.Env):
             except:
                 logging.error("*** ErrorFile: {} not exist at bucket {}".format(name, self.gsBucket))
 
-        fdActionsCheckpoint = open(name, "r")
-        # TODO JT we need to read line by line to be less memory demanding
-
-        cnt = 1
-        while action = fdActionsCheckpoint.readline():
-            # actions = self.fdActionsCheckpoint.read()
-            st = json.loads(action)[0]
-            if st['action']['state']['jugada'] == step:
-                print("I will load the {} step into the engine".format(st['action']['state']['jugada']))
-                #    TODO JT now we read the json object, get the checkpoint dict and convert it to Abbey format
-                checkpoint = self.dict2check(st['action']['state']['core'])
-                requests.put(self.url+"/abadIA/game/current", data=checkpoint)
-                self.curr_step = step
+        with open(name) as fdActionsCheckpoint:
+            for cnt, action in enumerate(fdActionsCheckpoint):
+                st = json.loads(action)[0]
+                if "jugada" in st['action']['state'] and st['action']['state']['jugada'] == step:
+                    print("I will load the {} step into the engine".format(st['action']['state']['jugada']))
+                    #    TODO JT now we read the json object, get the checkpoint dict and convert it to Abbey format
+                    print(st['action']['state']['core'])
+                    checkpoint = self.dict2check(st['action']['state']['core'])
+                    logging.info("Restoring the saved game")
+                    response = requests.put(self.url+"/abadIA/game/current", data=checkpoint)
+                    logging.info("Done status: {}".format(response))
+                    self.curr_step = step
         fdActionsCheckpoint.close()
 
         # TODO JT check if we can delete this delay.
