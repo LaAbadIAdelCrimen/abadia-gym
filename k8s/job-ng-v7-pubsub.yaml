@@ -13,10 +13,13 @@ spec:
       containers:
       - name: engine
         image: gcr.io/abadia-1/abadia-ng:runtime
-        command: ["busybox","sh","-c"]
+        command: ["/bin/bash", "-c"]
         args:
           - |
-            (while true; /bin/abadIA-HEADLESS;done) &
+            (while true
+                do 
+                  cd /home/abadIA/VigasocoSDL-AI/VigasocoSDL&&./loop-abadIA-HEADLESS.sh 
+                done) &
             CHILD_PID=$!
             (while true; do if [[ -f "/tmp/pod/main-terminated" ]]; then kill $CHILD_PID; echo "Killed $CHILD_PID as the main container terminated."; fi; sleep 1; done) &
             wait $CHILD_PID
@@ -27,10 +30,10 @@ spec:
             readOnly: true
         resources:
               requests:
-                memory: "50Mi"
+                memory: "5Mi"
                 cpu: "300m"
               limits:
-                memory: "1024Mi"
+                memory: "100Mi"
                 cpu: "940m"
       - name: agent
         image: gcr.io/abadia-1/abadia-agent-ng:v7

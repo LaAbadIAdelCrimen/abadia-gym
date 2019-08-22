@@ -60,7 +60,7 @@ class AbadiaEnv3(gym.Env):
         self.gameName       = ""
         self.actionsName    = ""
         self.actionsCheckpointName    = None
-        self.actionsStep    = 1
+        self.actionsCheckpointStep    = 1
         self.modelName      = None
         self.valueModelName = None
         self.initValueModelName = None
@@ -616,6 +616,7 @@ class AbadiaEnv3(gym.Env):
                     # self.sendCmd(self.url, "cmd/A")
                     time.sleep(1)
                 time.sleep(2)
+        ob['jugada'] = self.curr_step
         return ob
 
     def _seed(self, seed):
@@ -834,7 +835,7 @@ class AbadiaEnv3(gym.Env):
     # Now we will pass the actions file and which step we wants to reload
 
     def load_actions_checkpoint(self, name, step):
-        logging.info("Opening the local actions file ({})".format(name))
+        logging.info("Opening the local actions file ({}) step ({})".format(name, step))
 
         if (self.gsBucket != None):
             logging.info("Downloading Actions Checkpoint {} from GCP".format(name))
@@ -846,7 +847,7 @@ class AbadiaEnv3(gym.Env):
         with open(name) as fdActionsCheckpoint:
             for cnt, action in enumerate(fdActionsCheckpoint):
                 st = json.loads(action)[0]
-                if "jugada" in st['action']['state'] and st['action']['state']['jugada'] == step:
+                if "jugada" in st['action']['state'] and int(st['action']['state']['jugada']) == step:
                     print("I will load the {} step into the engine".format(st['action']['state']['jugada']))
                     #    TODO JT now we read the json object, get the checkpoint dict and convert it to Abbey format
                     print(st['action']['state']['core'])

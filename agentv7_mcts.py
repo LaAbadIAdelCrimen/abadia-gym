@@ -283,12 +283,12 @@ def mainLoop():
         state = env.reset()
 
         if(env.actionsCheckpointName != None):
-            state = env.load_actions_checkpoint(env.actionsCheckpointName, env.actionsStep)
+            state = env.load_actions_checkpoint(env.actionsCheckpointName, env.actionsCheckpointStep)
             if state['obsequium'] < env.minimunObsequium:
                 loggin.info("Obsequium {} is less than the minimun required {} so we exit now".format(state['obsequium'], env.minimunObsequium))
                 break
             else:
-                logging.info("Restarting the game from {} step {}".format(env.actionsName, env.actionsStep))
+                logging.info("Restarting the game from {} step {}".format(env.actionsName, env.actionsCheckpointStep))
 
         rAll = 0
         done = False
@@ -348,8 +348,8 @@ def mainLoop():
 
             # TODO JT: we need to create an option for this
             env.pintaRejilla(40, 20)
-            logging.info("E{}:{} {}-{} X:{} Y:{},{},{}->{},{} O{} %{} reward:{} tr:{} V:{}"
-                         .format(i_episode, t, action, env.actions_list[action], x, y, ori, env.numPantalla,
+            logging.info("E{}:curr_step {} {}-{} X:{} Y:{},{},{}->{},{} O{} %{} reward:{} tr:{} V:{}"
+                         .format(i_episode, env.curr_step, action, env.actions_list[action], x, y, ori, env.numPantalla,
                                  newX, newY, env.obsequium, env.porcentaje, np.round(reward,8),
                                  np.round(rAll,8), np.round(env.predictions,4)))
 
