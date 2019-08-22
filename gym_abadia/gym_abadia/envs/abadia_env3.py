@@ -447,6 +447,13 @@ class AbadiaEnv3(gym.Env):
         # if self.porcentaje > 0:
         #    reward = reward * float(((self.porcentaje * 0.5) / self.porcentaje)+1)
 
+        ###########################
+        # New Experimental Reward #
+        ###########################
+
+        reward = float(((self.porcentaje + 1) / 10000) * self.obsequium / 31) \
+            + float (self.curr_step * 0.00001)
+
         if (self.wallMovs[action] == 1):
             logging.info("***** Invalid move against Wall, penalizing it")
             reward = -0.00901
@@ -454,12 +461,6 @@ class AbadiaEnv3(gym.Env):
         if (self.perMovs[action] == 1):
             logging.info("***** Invalid move against a Character, penalizing it")
             reward = -0.00902
-
-        ###########################
-        # New Experimental Reward #
-        ###########################
-
-        reward = float( ((self.porcentaje + 1) / 10000) * self.obsequium / 31)
 
         self.reward       = reward
         self.totalReward += reward
