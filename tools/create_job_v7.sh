@@ -7,7 +7,7 @@ REPLICAS=$1
 CALLED=$_
 if [[ $CALLED != $0 ]]; then BASEPATH=$(dirname "${BASH_SOURCE[0]}") ; else BASEPATH=$(dirname "$0"); fi
 
-JOB_YAML="$BASEPATH/../k8s/job-ng-v7-pubsub.yaml"
+JOB_YAML="$BASEPATH/../k8s/job-ng-v7-mem-pubsub.yaml"
 SEARCH="abadia-ng-pubsub"
 
 re='^[0-9]+$'

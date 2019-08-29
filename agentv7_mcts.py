@@ -342,7 +342,7 @@ def mainLoop():
                 if (ori == 3):
                     env.Visited[x, y + 1] += -0.01
 
-            if (env.playing == False):
+             if (env.playing == False):
                 ngdqn_agent.replay()        # internally iterates default (prediction) model
                 ngdqn_agent.target_train()
 
