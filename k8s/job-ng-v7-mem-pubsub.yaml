@@ -16,11 +16,15 @@ spec:
         command: ["/bin/bash", "-c"]
         args:
           - |
+            ls -ld /tmp/pod
             mkdir -p /tmp/pod/VigasocoSDL
             cp -a /home/abadIA/VigasocoSDL-AI/VigasocoSDL/* /tmp/pod/VigasocoSDL
+            sleep 120 
             (while true
                 do 
+                  ls -lt /tmp/pod/* | head
                   cd /tmp/pod/VigasocoSDL&&./loop-abadIA-HEADLESS.sh
+                  sleep 2
                 done) &
             CHILD_PID=$!
             (while true; do if [[ -f "/tmp/pod/main-terminated" ]]; then kill $CHILD_PID; echo "Killed $CHILD_PID as the main container terminated."; fi; sleep 1; done) &
@@ -29,7 +33,7 @@ spec:
         volumeMounts:                 
           - mountPath: /tmp/pod
             name: tmp-pod
-            readOnly: true
+            readOnly: false
         resources:
               requests:
                 memory: "5Mi"
@@ -84,6 +88,7 @@ spec:
       restartPolicy: OnFailure
       volumes:
         - name: tmp-pod
-          emptyDir: {}
-          medium: Memory
+          emptyDir:
+            medium: Memory
+            sizeLimit: "1Gi"
   backoffLimit: 4

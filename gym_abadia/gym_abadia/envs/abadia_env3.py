@@ -878,6 +878,178 @@ class AbadiaEnv3(gym.Env):
                 return persona
         return notfound
 
+    # TODO JT we need to included as a valid mov the doors even it is closed
+
+    def checkValidMovs(self):
+        self.valMovs = np.zeros(9, np.int)
+        self.wallMovs = np.zeros(9, np.int)
+        self.perMovs = np.zeros(9, np.int)
+
+        if (self.rejilla == []):
+            for ii in range(0, 9):
+                self.valMovs[ii] = 1
+            return self.valMovs
+
+        room = np.zeros([24, 24, 2], np.int)
+        chkM2 = [
+            [0, [
+                [0, 1, 1, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0]
+            ],
+             ],
+            [1, [
+                [0, 1, 1, 1],
+                [0, 0, 0, 1],
+                [0, 0, 0, 1],
+                [0, 0, 0, 0]
+            ],
+             ],
+            [2, [
+                [0, 0, 0, 0],
+                [0, 0, 0, 1],
+                [0, 0, 0, 1],
+                [0, 0, 0, 0]
+            ],
+             ],
+            [3, [
+                [0, 0, 0, 0],
+                [0, 0, 0, 1],
+                [0, 0, 0, 1],
+                [0, 1, 1, 1]
+            ],
+             ],
+            [4, [
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 0, 0, 0],
+                [0, 1, 1, 0]
+            ],
+
+             ],
+            [5, [
+                [0, 0, 0, 0],
+                [1, 0, 0, 0],
+                [1, 0, 0, 0],
+                [1, 1, 1, 0]
+            ],
+
+             ],
+            [6, [
+                [0, 0, 0, 0],
+                [1, 0, 0, 0],
+                [1, 0, 0, 0],
+                [0, 0, 0, 0]
+            ],
+
+             ],
+            [7, [
+                [1, 1, 1, 0],
+                [1, 0, 0, 0],
+                [1, 0, 0, 0],
+                [0, 0, 0, 0]
+            ],
+
+             ],
+        ]
+
+        chkM = np.array([
+            [0, 0, 0, -1, 0],
+            [0, 0, 1, -1, 0],
+            [1, 0, 0, -1, 0],
+            [1, 0, -1, -1, 0],
+            [1, 0, 0, 0, -1],
+            [2, 0, 1, 0, 2],
+            [2, 1, 1, 1, 2],
+            [3, 1, 0, 2, 0],
+            [3, 1, -1, 2, -1],
+            [4, 1, 0, 2, 0],
+            [4, 1, -1, 2, -1],
+            [5, 0, -1, 0, -2],
+            [5, 1, -1, 1, -2],
+            [5, 1, -1, 2, -1],
+            [6, 0, -1, 0, -2],
+            [6, 1, -1, 1, -2],
+            [7, 0, 0, -1, 0],
+            [7, 0, -1, -1, -1],
+            [7, 0, -1, 0, -2]],
+            np.int)
+
+        yPos = -1
+        xPos = -1
+
+        for yy in range(0, 24):
+            for xx in range(0, 24):
+                per = int(self.rejilla[yy][xx]) >> 4
+                alt = self.rejilla[yy][xx] % 16
+                # print(per)
+
+                # we found Guillermo
+                if (per == 1 and xPos == -1 and yPos == -1):
+                    yPos = yy
+                    xPos = xx
+
+                room[yy, xx, 0] = per
+                room[yy, xx, 1] = alt
+
+        # for ii in range(0,len(chkM)):
+        # y1 = yPos+chkM[ii, 1]
+        # x1 = xPos+chkM[ii, 2]
+        # y2 = yPos+chkM[ii, 3]
+        # x2 = xPos+chkM[ii, 4]
+        # if ((y1 >= 0 and y1 <= 23) and (x1 >= 0 and x1 <= 23) and (y2 >= 0 and y2 <= 23) and (x2 >= 0 and x2 <= 23)):
+        # diff = room[y1, x1, 1] - room[y2, x2, 1]
+        # if (diff >= -1 and diff <= 1):
+        # print("Wall Blocks G {} ".format(ii), end="")
+        # env.valMovs[chkM[ii, 0]] += 1
+        # if (room[y1, x1, 0] != room[y2, x2, 0] and room[y2, x2, 0] != 0):
+        # print("Adso/* block G {}".format(ii), end="")
+        # env.valMovs[chkM[ii, 0]] = 0
+        # env.valMovs[8] = 1
+
+        self.valMovs2 = np.zeros(9, np.int)
+        self.wallMovs = np.zeros(9, np.int)
+        self.perMovs = np.zeros(9, np.int)
+
+        for action in range(0, 8):
+            if (self.verbose > 1):
+                self.logging.info("checking action {} room at {},{}".format(action, yPos, xPos))
+                for yy in range(0, 4):
+                    for xx in range(0, 4):
+                        print("{}".format(chkM2[action][1][yy][xx]), end="")
+                    print("|".format(yy), end="")
+                    for xx in range(0, 4):
+                        print("{}".format(room[yPos + yy - 1][xPos + xx - 1][0]), end="")
+                    print("|%3d|" % (yPos + yy - 1), end="")
+                    for xx in range(0, 4):
+                        print("{}".format(room[yPos + yy - 1][xPos + xx - 1][1]), end="")
+                    print("| {}".format(yPos + yy - 1))
+            self.valMovs2[action] = 1
+            for yy in range(0, 4):
+                for xx in range(0, 4):
+                    if (chkM2[action][1][yy][xx] == 1):
+                        diff = room[yPos + yy - 1, xPos + xx - 1, 1] - room[yPos, xPos, 1]
+                        if (not (diff >= -1 and diff <= 1)):
+                            self.valMovs2[action] = 0
+                            self.wallMovs[action] = 1
+                            if (self.verbose > 1):
+                                self.logging.info("Wall Blocks G {},{} ".format(yy, xx))
+                    if (chkM2[action][1][yy][xx] == 1 and room[yPos + yy - 1, xPos + xx - 1, 0] != 0):
+                        if (self.verbose > 1):
+                            self.logging.info("Adso/* block {},{} ".format(yy, xx))
+                        self.valMovs2[action] = 0
+                        self.perMovs[action] = 1
+
+        self.valMovs2[8] = 1
+        self.valMovs = self.valMovs2
+        # env.logging.info ("new valMovs2: {}".format(env.valMovs2))
+        # env.logging.info ("wallMovs: {}".format(env.wallMovs))
+        # env.logging.info ("perMovs: {}".format(env.perMovs))
+        # ss = "Valid Movements:"
+
+        return self.valMovs
+
     def pintaRejilla(self, width, height):
         w = int(width / 2)
         h = int(height / 2)
