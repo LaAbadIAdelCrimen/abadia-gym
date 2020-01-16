@@ -33,6 +33,7 @@ def init_env(env):
     argparser.add_argument('-l', '--learning', help='Learning mode (True/False)')
     argparser.add_argument('-o', '--obsequium', help='Minimun Obsequium before considering you are dead')
     argparser.add_argument('-v', '--verbose', help='Verbose output')
+    argparser.add_argument('-1', '--speedtest', help='Speed Tests')
 
     args = argparser.parse_args()
     print("args {}".format(args))
@@ -84,6 +85,9 @@ def init_env(env):
     if args.verbose != None:
         env.verbose = int(args.verbose)
 
+    if args.speedtest != None:
+        env.speedtest = True
+
     logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', datefmt='%d-%m-%y %H:%M:%S',
                         level=logging.INFO)
     env.logging = logging
@@ -91,6 +95,10 @@ def init_env(env):
 
 
 def mainLoop():
+
+    if (env.speedtest):
+        env.speed_test(100)
+        exit(0)
 
     logging.info("loading visited spap file")
     env.visited_snap_load()
@@ -130,66 +138,74 @@ def mainLoop():
             # Get new state and reward from environment and check if
             # in the state of the game is Guillermo
             env.checkValidMovs()
-            action = ngdqn_agent.act(state)
+
+            # TODO JT: just checking how to implement a repeat action in the loop
+            # if we're playing not exploring and training we don't want to do this.
+
+            # repeat = random.randint(5)+1
+
+            action, repeat = ngdqn_agent.act(state)
             env.prev_vector = env.vector
-            while True:
-                newState, reward, done, info = env.step(action)
-                # we also save the non Guillermo status because there is a lot
-                # of clues like monks location, objects, etc
-                # TODO JT as show at the perfect solution, sometimes Guillermo is not at the screen
-                # that happens when stay NOP for a time for example
-                # so we need to test it eliminate this loop
 
-                env.save_action(state, action, reward, newState)
-                if env.estaGuillermo:
+            for rep in range(repeat):
+                while True:
+                    newState, reward, done, info = env.step(action)
+                    # we also save the non Guillermo status because there is a lot
+                    # of clues like monks location, objects, etc
+                    # TODO JT as show at the perfect solution, sometimes Guillermo is not at the screen
+                    # that happens when stay NOP for a time for example
+                    # so we need to test it eliminate this loop
+
+                    env.save_action(state, action, reward, newState)
+                    if env.estaGuillermo:
+                        break
+                        # test valid movements
+
+                ngdqn_agent.remember(env.prev_vector, action, reward, env.vector, done)
+
+                if done:
+                    logging.info(f'Episode finished after {t+1} steps')
+                    # env.save_game()
+                    if (env.haFracasado):
+                        logging.info(f'Episode finished with a FAIL')
+                        env.reset_fin_partida()
+                        break
+
+                # TODO JT must be refactorized like updateRejilla/Grid
+                newX, newY, _ = env.personajeByName('Guillermo')
+
+                if (x != newX or y != newY):
+                    env.Visited[newX, newY] += 1
+
+                if (x == newX and y == newY):
+                    if (ori == 0):
+                        env.Visited[x + 1, y] += -0.01
+                    if (ori == 1):
+                        env.Visited[x, y - 1] += -0.01
+                    if (ori == 2):
+                        env.Visited[x - 1, y] += -0.01
+                    if (ori == 3):
+                        env.Visited[x, y + 1] += -0.01
+
+                if (env.playing == False):
+                    ngdqn_agent.replay()        # internally iterates default (prediction) model
+                    ngdqn_agent.target_train()
+
+                # TODO JT: we need to create an option for this
+                env.pintaRejilla(40, 20)
+                logging.info("E{}:curr_step {} {}-{} X:{} Y:{},{},{}->{},{} O{} %{} reward:{} tr:{} V:{}"
+                             .format(i_episode, env.curr_step, action, env.actions_list[action], x, y, ori, env.numPantalla,
+                                     newX, newY, env.obsequium, env.porcentaje, np.round(reward,8),
+                                     np.round(rAll,8), np.round(env.predictions,4)))
+
+                env.checkValidMovs()
+                x, y, ori = env.personajeByName('Guillermo')
+                rAll += reward
+                state = newState
+                if done == True:
+                    logging.info("DONE is True, exit and dont save the game")
+                    # env.save_game()
                     break
-                    # test valid movements
-
-            ngdqn_agent.remember(env.prev_vector, action, reward, env.vector, done)
-
-            if done:
-                logging.info(f'Episode finished after {t+1} steps')
-                # env.save_game()
-                if (env.haFracasado):
-                    logging.info(f'Episode finished with a FAIL')
-                    env.reset_fin_partida()
-                    break
-
-            # TODO JT must be refactorized like updateRejilla/Grid
-            newX, newY, _ = env.personajeByName('Guillermo')
-
-            if (x != newX or y != newY):
-                env.Visited[newX, newY] += 1
-
-            if (x == newX and y == newY):
-                if (ori == 0):
-                    env.Visited[x + 1, y] += -0.01
-                if (ori == 1):
-                    env.Visited[x, y - 1] += -0.01
-                if (ori == 2):
-                    env.Visited[x - 1, y] += -0.01
-                if (ori == 3):
-                    env.Visited[x, y + 1] += -0.01
-
-             if (env.playing == False):
-                ngdqn_agent.replay()        # internally iterates default (prediction) model
-                ngdqn_agent.target_train()
-
-            # TODO JT: we need to create an option for this
-            env.pintaRejilla(40, 20)
-            logging.info("E{}:curr_step {} {}-{} X:{} Y:{},{},{}->{},{} O{} %{} reward:{} tr:{} V:{}"
-                         .format(i_episode, env.curr_step, action, env.actions_list[action], x, y, ori, env.numPantalla,
-                                 newX, newY, env.obsequium, env.porcentaje, np.round(reward,8),
-                                 np.round(rAll,8), np.round(env.predictions,4)))
-
-            env.checkValidMovs()
-            x, y, ori = env.personajeByName('Guillermo')
-            rAll += reward
-            state = newState
-            if done == True:
-                logging.info("DONE is True, exit and dont save the game")
-                # env.save_game()
-                break
 
         # TODO JT we don't need to save checkpoint anymore.
         # check if we call it into the code
@@ -199,7 +215,7 @@ def mainLoop():
         env.save_game()
 
         # TODO JT: refactoring this: the way we storage models and add info to game json
-
+        # TODO JT: check if this make sense
         nameModel = "models/model_v6_{}_trial_{}.model".format(env.gameId, i_episode)
 
         ngdqn_agent.save_model(nameModel)
@@ -223,7 +239,7 @@ def mainLoop():
         if t >= env.num_steps:
             logging.info("Failed to complete in trial {}".format(env.num_episodes))
         # else:
-        #   print("Completed in {} trials".format(i_episode))
+        #   print("Completed in {} trial".format(i_episode))
         #   dqn_agent.save_model("models/success.model")
         #   break
 

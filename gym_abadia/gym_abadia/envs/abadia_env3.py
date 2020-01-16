@@ -13,6 +13,7 @@ import math
 import json
 import time
 import datetime
+import time
 import os
 from pathlib import Path
 from threading import Thread
@@ -74,6 +75,8 @@ class AbadiaEnv3(gym.Env):
         self.verbose        = 0
         self.playing        = False
         self.minimunObsequium = 29
+        self.speedtest      = False
+        self.speedtestcount = 100
 
         self.action_space = spaces.Discrete(9)
 
@@ -573,7 +576,7 @@ class AbadiaEnv3(gym.Env):
         self.action_episode_memory.append([])
         self.game_is_done = False
 
-        logging.info('-----> RESET the GAME')
+        logging.info('-----> RESET the GAME 2 SP + RESET')
         ob = self.sendReset()
         logging.info('reset status') # {}'.format(ob))
         logging.info('-----> DONE')
@@ -1049,6 +1052,24 @@ class AbadiaEnv3(gym.Env):
         # ss = "Valid Movements:"
 
         return self.valMovs
+
+    def speed_test(self, count=100):
+        # test one: how many count context switches the engine could do
+
+        print(f"Test 1: counts {count}")
+
+        # TODO JT build a little decorated wrapper
+
+        start_time = time.time()
+        for ii in range(0, count):
+            # load a dump in tests/dump1.txt
+            pp = 0
+        elapsed_time = time.time() - start_time
+        secs = time.strftime("%H:%M:%S", time.gmtime(elapsed_time))
+        print(f"finished test1 in {secs}")
+
+
+
 
     def pintaRejilla(self, width, height):
         w = int(width / 2)

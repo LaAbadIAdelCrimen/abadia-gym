@@ -141,12 +141,15 @@ class NGDQN:
         # final = np.zeros(self.env.action_space.n)
 
         action = np.argmax(final)
-        # self.logging.info("vector:      {}              ".format(vector))
-        self.logging.info("predictions: {}              ".format(predictions))
-        self.logging.info("final:       {}              ".format(final))
-        self.logging.info("Action:      {} Prediction: {}    ".format(action, final[action]))
+        # TODO JT: that will not be random, it will be part of the prediction model.
+        repeat = np.random.randint(5)+1
 
-        return action
+        # self.logging.info("vector:      {}              ".format(vector))
+        self.logging.info("Predictions: {}              ".format(predictions))
+        self.logging.info("Final:       {}              ".format(final))
+        self.logging.info("Action:      {} Repeat:   {}  Prediction: {}    ".format(action, repeat, final[action]))
+
+        return action, repeat
 
     def act_env(self, state):
 
@@ -154,15 +157,19 @@ class NGDQN:
         vector = self.state2vector(state)
         self.env.vector = vector
 
-        # exploratory mode
         if (self.env.playing is False) and (np.random.random() < self.epsilon):
+            # exploratory mode
             action = self.env.action_space.sample()
-            self.env.logging.info("e-greedy: {}  epsilon: {}<----               ".format(action, self.epsilon))
+
+            # TODO JT: that will not be random, it will be part of the prediction model.
+            repeat = np.random.randint(5)+1
+
+            self.env.logging.info("e-greedy: {}  repeat: {} epsilon: {}<----               ".format(action, repeat, self.epsilon))
             actionType = "E"
             self.env.calculated_predictions = []
             self.env.final_predictions = []
-        # explotation mode
         else:
+            # explotation mode
             predictions = self.model.predict(vector.reshape(1,1,71)).reshape(9)
             logging.info(predictions)
             self.env.predictions = predictions
@@ -178,10 +185,14 @@ class NGDQN:
             # action = np.argmax(final)
             idx = (-final).argsort()[:3]
             action = idx[np.random.randint(0,2)]
+
+            # TODO JT: that will not be random, it will be part of the prediction model.
+            repeat = np.random.randint(5)+1
+
             # self.env.logging.info("vector:      {}              ".format(vector))
             # self.env.logging.info("predictions: {}              ".format(predictions))
             # self.env.logging.info("final:       {}              ".format(final))
-            self.env.logging.info("Action:      {} Prediction: {}    ".format(action, final[action]))
+            self.env.logging.info("Action:      {}x{} Prediction: {}    ".format(action, repeat, final[action]))
             for ii in range(9):
                 self.env.logging.info("%3s %d:%d:%d -> %.8f %.8f" % ( self.env.actions_list[ii],
                                                                      self.env.valMovs[ii],
@@ -199,7 +210,7 @@ class NGDQN:
         self.env.action_predictions = int(action)
         self.env.action_type = actionType
 
-        return action
+        return action, repeat
 
     def remember(self, state, action, reward, new_state, done):
         self.memory.append([state, action, reward, new_state, done, 0])
