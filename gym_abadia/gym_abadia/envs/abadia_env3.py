@@ -1056,19 +1056,22 @@ class AbadiaEnv3(gym.Env):
     def speed_test(self, count=100):
         # test one: how many count context switches the engine could do
 
+        print("Resetting the game engine")
+        ob = self.reset()
+        print (f"ob {ob['core']}")
+        checkpoint = self.dict2check(ob['core'])
+
         print(f"Test 1: counts {count}")
 
         # TODO JT build a little decorated wrapper
 
         start_time = time.time()
         for ii in range(0, count):
-            # load a dump in tests/dump1.txt
-            pp = 0
+            response = requests.put(self.url + "/abadIA/game/current", data=checkpoint)
+            # logging.info("Done status: {}".format(response))
         elapsed_time = time.time() - start_time
         secs = time.strftime("%H:%M:%S", time.gmtime(elapsed_time))
         print(f"finished test1 in {secs}")
-
-
 
 
     def pintaRejilla(self, width, height):
