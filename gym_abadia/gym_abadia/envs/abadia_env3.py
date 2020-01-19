@@ -93,7 +93,11 @@ class AbadiaEnv3(gym.Env):
                              "cmd/N",
                              "cmd/_"
                              )
-        self.actions_list = ("N", "NE", "E", "SE", "S", "SW", "W", "NW", "NOP")
+
+        # self.actions_list = ("N", "NE", "E", "SE", "S", "SW", "W", "NW", "NOP")
+        # TODO JT we will include SPACE and QR in the available actions
+        self.actions_list = ('UP-2', 'UP-10', 'UP-20', 'UP-40', 'NOP-1', 'NOP-5', 'NOP-25', 'NOP-50',
+                             'RIGHT', 'LEFT', 'DOWN', 'SPACE', 'QR')
 
         self.obsequium = -1
         self.reward = 0
@@ -123,6 +127,8 @@ class AbadiaEnv3(gym.Env):
             "Severino", "Jorge", "Bernardo")
 
         self.Visited = np.zeros([512, 512])
+
+        # TODO JT: check all this initializations
 
         # Observation is the position of Guillermo and the information of the room
         X = np.array([0, 256])
@@ -228,17 +234,18 @@ class AbadiaEnv3(gym.Env):
     def sendCmd(self, url, command, type="json", mode="GET"):
         cmd = "{}/{}".format(url, command)
         try:
-            if mode == "GET":
-                r = requests.get(cmd)
-            if mode == "POST":
-                r = requests.post(cmd)
-
             if (type == "json"):
                 headers = {'accept': 'application/json'}
             else:
                 headers = {'accept': 'text/x.abadIA+plain'}
+
+            if mode == "GET":
+                r = requests.get(cmd)
+            if mode == "POST":
+                r = requests.post(cmd)
+            print(f"cmd ---> {cmd} {r.status_code}")
         except:
-            logging.error("Vigasoco comm error")
+            logging.error(f"Vigasoco comm error {r.status_code}")
             return None
         headers = {'accept': 'text/x.abadIA+plain'}
 
@@ -271,7 +278,6 @@ class AbadiaEnv3(gym.Env):
         cmdDump = "{}/abadIA/game/current".format(self.url)
         core = requests.get(cmdDump, headers=headers)
         # logging.info(core.text)
-        core_dict = {"version": "v7"}
         core_dict = self.check2dict(core.text)
 
         headers = {'accept': 'application/json'}
@@ -313,13 +319,15 @@ class AbadiaEnv3(gym.Env):
                  However, official evaluations of your agent are not allowed to
                  use this for learning.
         """
-
         try:
-            if (action >=8 ):
-                ob = self.sendCmd(self.url, self.actions_list[action], mode="POST")
+            if "-" in self.actions_list[action]:
+                cmd = self.actions_list[action].split("-")[0]
             else:
-                ori = str(self.Personajes['Guillermo']['orientacion'])
-                ob = self.sendMultiCmd(ori + self.actions_list[action])
+                cmd = self.actions_list[action]
+
+            logging.info( f"action: {action} str {self.actions_list[action]} cmd: {cmd}")
+            ob = self.sendCmd(self.url, f"abadIA/game/current/actions/{cmd}", mode="POST")
+
         except Exception as e:
             logging.error("Communication Error: I cannot send the CMDs {}".format(e))
             logging.error("Check if the game engine is UP")
@@ -332,34 +340,13 @@ class AbadiaEnv3(gym.Env):
         # first personajes
 
         self._get_personajes_info(ob)
-
-        self.obsequium    = int(ob['obsequium'])
-        self.porcentaje   = int(ob['porcentaje'])
-        self.bonus        = int(ob['bonus'])
-        self.numPantalla  = int(ob['numPantalla'])
-        self.dia          = int(ob['dia'])
-        self.momentoDia   = int(ob['momentoDia'])
-        self.haFracasado  = ob['haFracasado']
-        self.rejilla      = ob['Rejilla']
-
-
-        # print(self.rejilla)
-
-        # we need to check is make sense finish it
-        # if self.is_game_done or self.porcentaje == 100:
-        #   raise RuntimeError("Episode is done")
-
-        # TODO: now is very important to maintain the curr_step updated.
-        # In the case is checkpoint recover, se need to set the curr_step var
-        # to the last curr_step
+        self._get_general_info(ob)
 
         self.curr_step += 1
         self._take_action(action)
 
         ob['jugada'] = self.curr_step
         ob['gameId'] = self.gameId
-
-        # reward = self._get_reward()
 
         reward = 0
         self.eventsAction = []
@@ -372,45 +359,7 @@ class AbadiaEnv3(gym.Env):
                 self.prevPantalla = int(ob['numPantalla'])
             else:
                 if (self.prevPantalla != int(ob['numPantalla'])):
-                    # reward += 0.03
-                    # logging.info("----------")
-                    # logging.info("reward by screen change !!!!! {} !=  {}".format(self.prevPantalla, int(ob['numPantalla'])))
-                    # logging.info("Personajes: {}".format(self.Personajes))
-                    # # logging.info("ob: {}".format(ob))
-                    # logging.info("----------")
-                    # self.add_event("NewRoom", "prev {} curr {}".format(self.prevPantalla, int(ob['numPantalla'])), 0.001)
                     self.prevPantalla = int(ob['numPantalla'])
-                    # we dont need to save checkpoints alone
-                    # self.save_game_checkpoint()
-
-        # # If there is an obsequium change, it will be rewarded pos/neg
-        # if len(self.prev_ob) > 0 and int(self.prev_ob['obsequium']) > 0:
-            # # reward for incrementing the obsequium: > 0 +50 / < 0 -30
-            # incr_obsequium = self.obsequium - int(self.prev_ob['obsequium'])
-            # if incr_obsequium > 0:
-                # reward += (50 * incr_obsequium) / 10000
-                # self.add_event("IncrObsequium", "Obsequium {} Incr {}".format(self.prev_ob['obsequium'],incr_obsequium), (50 * incr_obsequium) / 10000)
-
-            # if incr_obsequium < 0:
-                # reward += (30 * incr_obsequium) / 10000
-                # self.add_event("DecrObsequium", "Obsequium {} Decr {}".format(self.prev_ob['obsequium'], incr_obsequium),(30 * incr_obsequium) / 10000)
-
-        # reward for incrementing the bonus: >0 +500
-        # if len(self.prev_ob) > 0 and int(self.prev_ob['bonus']) > 0:
-            # incr_bonus = self.bonus - int(self.prev_ob['bonus'])
-            # if incr_bonus > 0:
-                # reward += (500 * incr_bonus) / 10000
-                # self.add_event("Bonus", "prev {} curr {}".format(self.bonus, int(self.prev_ob['bonus'])), (500 * incr_bonus) / 10000)
-
-        # we check if Guillermo change his position. Positive reward if yes, negative if no
-        # if action == 0:
-        # if len(self.prev_ob) > 0 and len(self.prev_ob['Personajes']) > 0:
-            # prev = self.dataPersonaje(self.prev_ob, "Guillermo")
-            # curr = self.dataPersonaje(ob, "Guillermo")
-            # if (prev['posX'] != curr['posX']) or (prev['posY'] != curr['posY']):
-                # logging.info("se ha movido: {},{} -> {},{}".format(prev['posX'], prev['posY'],
-                                                        # curr['posX'], curr['posY']))
-                # reward += 0.001
 
         # TODO: check this self.eventsGame.extend(self.eventsAction)
         # if the game is over, we just finish the game and reward is -1000
@@ -487,7 +436,7 @@ class AbadiaEnv3(gym.Env):
         self.ob = ob
         self.prev_ob = ob
 
-        # JT chequear si esto está bien, no parece que este devolviendo bien el estado siguiente!!!
+        # TODO JT chequear si esto está bien, no parece que este devolviendo bien el estado siguiente!!!
 
         return ob, reward, self.game_is_done, {}
 
@@ -510,6 +459,19 @@ class AbadiaEnv3(gym.Env):
                 self.estaGuillermo = True
 
         return self.estaGuillermo
+
+
+    def _get_general_info(self, ob):
+        self.obsequium = int(ob['obsequium'])
+        self.porcentaje = int(ob['porcentaje'])
+        self.bonus = int(ob['bonus'])
+        self.numPantalla = int(ob['numPantalla'])
+        self.dia = int(ob['dia'])
+        self.momentoDia = int(ob['momentoDia'])
+        self.haFracasado = ob['haFracasado']
+        self.rejilla = ob['Rejilla']
+
+        return
 
     # check is make sense do it for special state
 
@@ -535,15 +497,6 @@ class AbadiaEnv3(gym.Env):
     def _take_action(self, action):
         logging.info("append {} {}".format(self.curr_episode, action))
         self.action_episode_memory[self.curr_episode].append(action)
-
-        game_is_done = (self.obsequium <= 0)
-
-        # remaining_steps = self.TOTAL_TIME_STEPS - self.curr_step
-        # time_is_over = (remaining_steps <= 0)
-        # throw_away = time_is_over and not self.is_banana_sold
-        # if throw_away:
-            # self.is_banana_sold = False # abuse this a bit
-            # self.price = 0.0
 
     # TODO JT this is legacy
     def _get_reward(self):
@@ -1073,6 +1026,22 @@ class AbadiaEnv3(gym.Env):
         secs = time.strftime("%H:%M:%S", time.gmtime(elapsed_time))
         print(f"finished test1 in {secs}")
 
+    def update_visited_cells(self, x, y, ori):
+
+        newX, newY, _ = self.personajeByName('Guillermo')
+
+        if (x != newX or y != newY):
+            self.Visited[newX, newY] += 1
+
+        if (x == newX and y == newY):
+            if (ori == 0):
+                self.Visited[x + 1, y] += -0.01
+            if (ori == 1):
+                self.Visited[x, y - 1] += -0.01
+            if (ori == 2):
+                self.Visited[x - 1, y] += -0.01
+            if (ori == 3):
+                self.Visited[x, y + 1] += -0.01
 
     def pintaRejilla(self, width, height):
         w = int(width / 2)

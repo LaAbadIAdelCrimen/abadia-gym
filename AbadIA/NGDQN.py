@@ -71,8 +71,8 @@ class NGDQN:
             self.model        = self.load_model(fileName)
             self.target_model = self.load_model(fileName)
 
-    def create_model(self, input_dim=71, output_dim=9):
-        self.logging.info("Creating a new model v6")
+    def create_model(self, input_dim=71, output_dim=14):
+        self.logging.info("Creating a new model v7")
         model   = Sequential()
         # TODO JT we need to increment the input vector dim
         # for now the input_dim is 71 with chars, env + validmods
@@ -92,8 +92,8 @@ class NGDQN:
         return model
 
 
-    def create_model2(self, input_dim=71, output_dim=9):
-        self.logging.info("Creating a new model2 v6")
+    def create_model2(self, input_dim=71, output_dim=14):
+        self.logging.info("Creating a new model2 v7")
         model   = Sequential()
         # TODO JT we need to increment the input vector dim
         # for now the input_dim is 71 with chars, env + validmods
@@ -118,7 +118,7 @@ class NGDQN:
         # and return the model loaded (h5 format)
         return load_model(name)
 
-    def create_empty(self, name="models/model_v6"):
+    def create_empty(self, name="models/empty_model_v7"):
         model = self.create_model()
         self.save_model(name)
         return model
@@ -141,13 +141,13 @@ class NGDQN:
         # final = np.zeros(self.env.action_space.n)
 
         action = np.argmax(final)
-        # TODO JT: that will not be random, it will be part of the prediction model.
-        repeat = np.random.randint(5)+1
-
+        repeat = 1
+        if "-" in self.env.actions_list[action]:
+            repeat = int(self.env.actions_list[action].split("-")[1])
         # self.logging.info("vector:      {}              ".format(vector))
-        self.logging.info("Predictions: {}              ".format(predictions))
-        self.logging.info("Final:       {}              ".format(final))
-        self.logging.info("Action:      {} Repeat:   {}  Prediction: {}    ".format(action, repeat, final[action]))
+        self.logging.info(f"Predictions: {predictions}              ")
+        self.logging.info(f"Final:       {final}              ")
+        self.logging.info(f"Action:      {action} Repeat:   {repeat}  Prediction: {final[action]}    ")
 
         return action, repeat
 
@@ -162,7 +162,9 @@ class NGDQN:
             action = self.env.action_space.sample()
 
             # TODO JT: that will not be random, it will be part of the prediction model.
-            repeat = np.random.randint(5)+1
+            repeat = 1
+            if "-" in self.env.actions_list[action]:
+                repeat = int(self.env.actions_list[action].split("-")[1])
 
             self.env.logging.info("e-greedy: {}  repeat: {} epsilon: {}<----               ".format(action, repeat, self.epsilon))
             actionType = "E"
@@ -170,7 +172,7 @@ class NGDQN:
             self.env.final_predictions = []
         else:
             # explotation mode
-            predictions = self.model.predict(vector.reshape(1,1,71)).reshape(9)
+            predictions = self.model.predict(vector.reshape(1,1,71)).reshape(14)
             logging.info(predictions)
             self.env.predictions = predictions
             final = np.zeros(self.env.action_space.n)
@@ -180,19 +182,22 @@ class NGDQN:
                     final[ii] = predictions[ii]
                 else:
                     final[ii] = -99 # predictions[ii]*0.9
+
             # just testing a Mixed mode
             # what will happen if we choose one of the best 3 actions random
             # action = np.argmax(final)
+
             idx = (-final).argsort()[:3]
             action = idx[np.random.randint(0,2)]
 
             # TODO JT: that will not be random, it will be part of the prediction model.
-            repeat = np.random.randint(5)+1
+            repeat = 1
+            if "-" in self.env.actions_list[action]:
+                repeat = int(self.env.actions_list[action].split("-")[1])
 
-            # self.env.logging.info("vector:      {}              ".format(vector))
             # self.env.logging.info("predictions: {}              ".format(predictions))
             # self.env.logging.info("final:       {}              ".format(final))
-            self.env.logging.info("Action:      {}x{} Prediction: {}    ".format(action, repeat, final[action]))
+            self.env.logging.info(f"Action:      {self.env.actions_list[action]}x{repeat} Prediction: {final[action]}")
             for ii in range(9):
                 self.env.logging.info("%3s %d:%d:%d -> %.8f %.8f" % ( self.env.actions_list[ii],
                                                                      self.env.valMovs[ii],
@@ -232,14 +237,14 @@ class NGDQN:
         for sample in samples:
             state, action, reward, new_state, done, future_reward = sample
             # print(state)
-            target = self.target_model.predict((state.reshape(1,1,71))).reshape(9)
+            target = self.target_model.predict((state.reshape(1,1,71))).reshape(14)
             # print(target)
             if done:
                 target[action] = future_reward
             else:
                 # TODO JT: MCTS? Q_future = max(self.target_model.predict(new_state)[0])
                 target[action] = future_reward # Q_future # reward + Q_future * self.gamma
-            history = self.model.fit(state.reshape(1, 1, 71), target.reshape(1, 1, 9), epochs=1, verbose=verbose)
+            history = self.model.fit(state.reshape(1, 1, 71), target.reshape(1, 1, 14), epochs=1, verbose=verbose)
             # print("loss:", history.history["loss"], "\n")
 
     def replay_game(self, epochs=4, verbose=0):
@@ -275,7 +280,7 @@ class NGDQN:
             rewards.append(target)
 
         X_data = np.array(states).reshape(len(states), 1, 71)
-        y_data = np.array(rewards).reshape(len(rewards), 1, 9)
+        y_data = np.array(rewards).reshape(len(rewards), 1, 14)
 
         size = int(len(states)*77/100)
         X_training = X_data[:size]

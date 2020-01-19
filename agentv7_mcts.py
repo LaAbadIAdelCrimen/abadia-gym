@@ -111,7 +111,7 @@ def mainLoop():
     gamma = 0.9
     epsilon = .95
 
-    ngdqn_agent = NGDQN(env=env, initModelName="models/last_model_v6.model",)
+    ngdqn_agent = NGDQN(env=env, initModelName="models/last_model_v7.model",)
     vdqn_agent = VDQN(env=env, initModelName="models/last_value_v1.model")
     steps = []
 
@@ -149,6 +149,7 @@ def mainLoop():
 
             for rep in range(repeat):
                 while True:
+                    print(f"action {action} repeat {rep}/{repeat}")
                     newState, reward, done, info = env.step(action)
                     # we also save the non Guillermo status because there is a lot
                     # of clues like monks location, objects, etc
@@ -171,27 +172,14 @@ def mainLoop():
                         env.reset_fin_partida()
                         break
 
-                # TODO JT must be refactorized like updateRejilla/Grid
-                newX, newY, _ = env.personajeByName('Guillermo')
-
-                if (x != newX or y != newY):
-                    env.Visited[newX, newY] += 1
-
-                if (x == newX and y == newY):
-                    if (ori == 0):
-                        env.Visited[x + 1, y] += -0.01
-                    if (ori == 1):
-                        env.Visited[x, y - 1] += -0.01
-                    if (ori == 2):
-                        env.Visited[x - 1, y] += -0.01
-                    if (ori == 3):
-                        env.Visited[x, y + 1] += -0.01
+                env.update_visited_cells(x, y, ori)
 
                 if (env.playing == False):
                     ngdqn_agent.replay()        # internally iterates default (prediction) model
                     ngdqn_agent.target_train()
 
                 # TODO JT: we need to create an option for this
+                newX, newY, newO = env.personajeByName('Guillermo')
                 env.pintaRejilla(40, 20)
                 logging.info("E{}:curr_step {} {}-{} X:{} Y:{},{},{}->{},{} O{} %{} reward:{} tr:{} V:{}"
                              .format(i_episode, env.curr_step, action, env.actions_list[action], x, y, ori, env.numPantalla,
@@ -207,16 +195,11 @@ def mainLoop():
                     # env.save_game()
                     break
 
-        # TODO JT we don't need to save checkpoint anymore.
-        # check if we call it into the code
-        # if rAll > 0:
-        #     env.save_game_checkpoint()
-
         env.save_game()
 
         # TODO JT: refactoring this: the way we storage models and add info to game json
         # TODO JT: check if this make sense
-        nameModel = "models/model_v6_{}_trial_{}.model".format(env.gameId, i_episode)
+        nameModel = "models/model_v7_{}_trial_{}.model".format(env.gameId, i_episode)
 
         ngdqn_agent.save_model(nameModel)
 
@@ -227,7 +210,7 @@ def mainLoop():
             # env.upload_blob(nameModel, nameModel)
 
         # TODO JT: latest will be handed for another process in a more like A3C way
-        # nameModel ="models/model_v6_lastest.model".format(env.gameId)
+        # nameModel ="models/model_v7_lastest.model".format(env.gameId)
         # ngdqn_agent.save_model(nameModel)
         # if (env.gsBucket != None):
         #    logging.info("Uploading lastest model to GCP")
