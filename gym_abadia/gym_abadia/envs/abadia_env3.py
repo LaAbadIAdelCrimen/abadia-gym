@@ -78,7 +78,7 @@ class AbadiaEnv3(gym.Env):
         self.speedtest      = False
         self.speedtestcount = 100
 
-        self.action_space = spaces.Discrete(9)
+        self.action_space = spaces.Discrete(14)
 
         # json from the dump state of the episode
 
@@ -96,7 +96,7 @@ class AbadiaEnv3(gym.Env):
 
         # self.actions_list = ("N", "NE", "E", "SE", "S", "SW", "W", "NW", "NOP")
         # TODO JT we will include SPACE and QR in the available actions
-        self.actions_list = ('UP-2', 'UP-10', 'UP-20', 'UP-40', 'NOP-1', 'NOP-5', 'NOP-25', 'NOP-50',
+        self.actions_list = ('UP-2', 'UP-10', 'UP-20', 'UP-40', 'UP-60', 'NOP-1', 'NOP-5', 'NOP-25', 'NOP-50',
                              'RIGHT', 'LEFT', 'DOWN', 'SPACE', 'QR')
 
         self.obsequium = -1
@@ -243,7 +243,7 @@ class AbadiaEnv3(gym.Env):
                 r = requests.get(cmd)
             if mode == "POST":
                 r = requests.post(cmd)
-            print(f"cmd ---> {cmd} {r.status_code}")
+            logging.info(f"cmd ---> {cmd} {r.status_code}")
         except:
             logging.error(f"Vigasoco comm error {r.status_code}")
             return None
@@ -347,6 +347,7 @@ class AbadiaEnv3(gym.Env):
 
         ob['jugada'] = self.curr_step
         ob['gameId'] = self.gameId
+        ob['action_meta'] = cmd
 
         reward = 0
         self.eventsAction = []
@@ -389,30 +390,19 @@ class AbadiaEnv3(gym.Env):
             logging.info("FUCKING YEAH GAME ALMOST DONE")
             reward = 1
 
-        # if no reward we penalized it
-        # if reward == 0:
-            # logging.info("***** No reward, penalizing it")
-            # reward = -0.005
+        # TODO JT we need to parametize the reward function
 
-        # if self.obsequium > 0:
-        #    reward = reward * float((self.obsequium / self.obsequium)*0.5)
-        # if self.porcentaje > 0:
-        #    reward = reward * float(((self.porcentaje * 0.5) / self.porcentaje)+1)
+        reward = float(((self.porcentaje + 1) / 100)) * float (self.curr_step * 0.00001)
 
-        ###########################
-        # New Experimental Reward #
-        ###########################
-
-        reward = float(((self.porcentaje + 1) / 10000) * self.obsequium / 31) \
-            + float (self.curr_step * 0.00001)
+        # TODO JT: deprecated now only need to check for UP and objects actions
 
         if (self.wallMovs[action] == 1):
             logging.info("***** Invalid move against Wall, penalizing it")
-            reward = -0.00901
+            reward = -0.00091
 
         if (self.perMovs[action] == 1):
             logging.info("***** Invalid move against a Character, penalizing it")
-            reward = -0.00902
+            reward = -0.00092
 
         self.reward       = reward
         self.totalReward += reward
@@ -836,78 +826,41 @@ class AbadiaEnv3(gym.Env):
 
     # TODO JT we need to included as a valid mov the doors even it is closed
 
-    def checkValidMovs(self):
-        self.valMovs = np.zeros(9, np.int)
-        self.wallMovs = np.zeros(9, np.int)
-        self.perMovs = np.zeros(9, np.int)
+    def checkValidMovs(self, orientation=0):
+
+        actions_dim = len(self.actions_list)
+        self.valMovs = np.zeros(actions_dim, np.int)
+        self.wallMovs = np.zeros(actions_dim, np.int)
+        self.perMovs = np.zeros(actions_dim, np.int)
 
         if (self.rejilla == []):
-            for ii in range(0, 9):
+            for ii in range(0, actions_dim):
                 self.valMovs[ii] = 1
             return self.valMovs
 
         room = np.zeros([24, 24, 2], np.int)
         chkM2 = [
-            [0, [
+            [ # 0 EAST
+                [0, 0, 0, 0],
+                [0, 0, 0, 1],
+                [0, 0, 0, 1],
+                [0, 0, 0, 0]
+            ],[ # 1 NORTH
                 [0, 1, 1, 0],
                 [0, 0, 0, 0],
                 [0, 0, 0, 0],
                 [0, 0, 0, 0]
-            ],
-             ],
-            [1, [
-                [0, 1, 1, 1],
-                [0, 0, 0, 1],
-                [0, 0, 0, 1],
-                [0, 0, 0, 0]
-            ],
-             ],
-            [2, [
+            ],[ # 2 WEST
                 [0, 0, 0, 0],
-                [0, 0, 0, 1],
-                [0, 0, 0, 1],
+                [1, 0, 0, 0],
+                [1, 0, 0, 0],
                 [0, 0, 0, 0]
-            ],
-             ],
-            [3, [
-                [0, 0, 0, 0],
-                [0, 0, 0, 1],
-                [0, 0, 0, 1],
-                [0, 1, 1, 1]
-            ],
-             ],
-            [4, [
+            ],[ # 3 SOUTH
                 [0, 0, 0, 0],
                 [0, 0, 0, 0],
                 [0, 0, 0, 0],
                 [0, 1, 1, 0]
             ],
-
-             ],
-            [5, [
-                [0, 0, 0, 0],
-                [1, 0, 0, 0],
-                [1, 0, 0, 0],
-                [1, 1, 1, 0]
-            ],
-
-             ],
-            [6, [
-                [0, 0, 0, 0],
-                [1, 0, 0, 0],
-                [1, 0, 0, 0],
-                [0, 0, 0, 0]
-            ],
-
-             ],
-            [7, [
-                [1, 1, 1, 0],
-                [1, 0, 0, 0],
-                [1, 0, 0, 0],
-                [0, 0, 0, 0]
-            ],
-
-             ],
         ]
 
         chkM = np.array([
@@ -940,7 +893,6 @@ class AbadiaEnv3(gym.Env):
                 per = int(self.rejilla[yy][xx]) >> 4
                 alt = self.rejilla[yy][xx] % 16
                 # print(per)
-
                 # we found Guillermo
                 if (per == 1 and xPos == -1 and yPos == -1):
                     yPos = yy
@@ -949,60 +901,50 @@ class AbadiaEnv3(gym.Env):
                 room[yy, xx, 0] = per
                 room[yy, xx, 1] = alt
 
-        # for ii in range(0,len(chkM)):
-        # y1 = yPos+chkM[ii, 1]
-        # x1 = xPos+chkM[ii, 2]
-        # y2 = yPos+chkM[ii, 3]
-        # x2 = xPos+chkM[ii, 4]
-        # if ((y1 >= 0 and y1 <= 23) and (x1 >= 0 and x1 <= 23) and (y2 >= 0 and y2 <= 23) and (x2 >= 0 and x2 <= 23)):
-        # diff = room[y1, x1, 1] - room[y2, x2, 1]
-        # if (diff >= -1 and diff <= 1):
-        # print("Wall Blocks G {} ".format(ii), end="")
-        # env.valMovs[chkM[ii, 0]] += 1
-        # if (room[y1, x1, 0] != room[y2, x2, 0] and room[y2, x2, 0] != 0):
-        # print("Adso/* block G {}".format(ii), end="")
-        # env.valMovs[chkM[ii, 0]] = 0
-        # env.valMovs[8] = 1
+        self.valMovs2 = np.zeros(14, np.int)
+        self.wallMovs = np.zeros(14, np.int)
+        self.perMovs  = np.zeros(14, np.int)
 
-        self.valMovs2 = np.zeros(9, np.int)
-        self.wallMovs = np.zeros(9, np.int)
-        self.perMovs = np.zeros(9, np.int)
+        self.valMovs[range(0,14)] = 1
+        self.valMovs2[range(0,14)] = 1
 
-        for action in range(0, 8):
-            if (self.verbose > 1):
-                self.logging.info("checking action {} room at {},{}".format(action, yPos, xPos))
-                for yy in range(0, 4):
-                    for xx in range(0, 4):
-                        print("{}".format(chkM2[action][1][yy][xx]), end="")
-                    print("|".format(yy), end="")
-                    for xx in range(0, 4):
-                        print("{}".format(room[yPos + yy - 1][xPos + xx - 1][0]), end="")
-                    print("|%3d|" % (yPos + yy - 1), end="")
-                    for xx in range(0, 4):
-                        print("{}".format(room[yPos + yy - 1][xPos + xx - 1][1]), end="")
-                    print("| {}".format(yPos + yy - 1))
-            self.valMovs2[action] = 1
+        if (self.verbose >= 1):
+            print(f"checking orientation {orientation} room at ({yPos},{xPos})   ")
+            print("*-----*-----*---*-----*")
+            print("*chkM2*Room0*---*Room1*")
+            print("*-----*-----*---*-----*")
             for yy in range(0, 4):
                 for xx in range(0, 4):
-                    if (chkM2[action][1][yy][xx] == 1):
-                        diff = room[yPos + yy - 1, xPos + xx - 1, 1] - room[yPos, xPos, 1]
-                        if (not (diff >= -1 and diff <= 1)):
-                            self.valMovs2[action] = 0
-                            self.wallMovs[action] = 1
-                            if (self.verbose > 1):
-                                self.logging.info("Wall Blocks G {},{} ".format(yy, xx))
-                    if (chkM2[action][1][yy][xx] == 1 and room[yPos + yy - 1, xPos + xx - 1, 0] != 0):
+                    print("{}".format(chkM2[orientation][yy][xx]), end="")
+                print("|".format(yy), end="")
+                for xx in range(0, 4):
+                    print("{}".format(room[yPos + yy - 1][xPos + xx - 1, 0]), end="")
+                print("|%3d|" % (yPos + yy - 1), end="")
+                for xx in range(0, 4):
+                    print("{}".format(room[yPos + yy - 1][xPos + xx - 1, 1]), end="")
+                print("| {}".format(yPos + yy - 1))
+        for yy in range(0, 4):
+            for xx in range(0, 4):
+                if (chkM2[orientation][yy][xx] == 1):
+                    diff = room[yPos + yy - 1, xPos + xx - 1, 1] - room[yPos, xPos, 1]
+                    if self.verbose > 1:
+                        print("I will check wall at {},{} diff {} pers {}   ".format(yy, xx, diff, room[yPos + yy - 1, xPos + xx - 1, 0]))
+                    if (not (diff >= -1 and diff <= 1)):
+                        self.wallMovs[range(0,5)] = 1
+                        self.valMovs2[range(0,5)] = 0
+                        if self.verbose > 1:
+                            print("Wall Blocks G {},{} ".format(yy, xx))
+                    if room[yPos + yy - 1, xPos + xx - 1, 0] != 0:
                         if (self.verbose > 1):
-                            self.logging.info("Adso/* block {},{} ".format(yy, xx))
-                        self.valMovs2[action] = 0
-                        self.perMovs[action] = 1
+                            print("Adso/* block {},{} ".format(yy, xx))
+                        self.valMovs2[range(0,5)] = 0
+                        self.perMovs[range(0,5)] = 1
 
-        self.valMovs2[8] = 1
         self.valMovs = self.valMovs2
-        # env.logging.info ("new valMovs2: {}".format(env.valMovs2))
-        # env.logging.info ("wallMovs: {}".format(env.wallMovs))
-        # env.logging.info ("perMovs: {}".format(env.perMovs))
-        # ss = "Valid Movements:"
+        if (self.verbose > 1):
+            self.logging.info ("new valMovs2: {}".format(self.valMovs2))
+            self.logging.info ("wallMovs: {}".format(self.wallMovs))
+            self.logging.info ("perMovs: {}".format(self.perMovs))
 
         return self.valMovs
 

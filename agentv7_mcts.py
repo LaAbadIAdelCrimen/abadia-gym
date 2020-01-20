@@ -36,7 +36,7 @@ def init_env(env):
     argparser.add_argument('-1', '--speedtest', help='Speed Tests')
 
     args = argparser.parse_args()
-    print("args {}".format(args))
+    logging.info("args {}".format(args))
 
     if args.server != None:
         env.server = args.server
@@ -137,7 +137,7 @@ def mainLoop():
 
             # Get new state and reward from environment and check if
             # in the state of the game is Guillermo
-            env.checkValidMovs()
+            env.checkValidMovs(ori)
 
             # TODO JT: just checking how to implement a repeat action in the loop
             # if we're playing not exploring and training we don't want to do this.
@@ -149,7 +149,7 @@ def mainLoop():
 
             for rep in range(repeat):
                 while True:
-                    print(f"action {action} repeat {rep}/{repeat}")
+                    logging.info(f"action {action} repeat {rep}/{repeat}")
                     newState, reward, done, info = env.step(action)
                     # we also save the non Guillermo status because there is a lot
                     # of clues like monks location, objects, etc
@@ -174,10 +174,6 @@ def mainLoop():
 
                 env.update_visited_cells(x, y, ori)
 
-                if (env.playing == False):
-                    ngdqn_agent.replay()        # internally iterates default (prediction) model
-                    ngdqn_agent.target_train()
-
                 # TODO JT: we need to create an option for this
                 newX, newY, newO = env.personajeByName('Guillermo')
                 env.pintaRejilla(40, 20)
@@ -186,7 +182,7 @@ def mainLoop():
                                      newX, newY, env.obsequium, env.porcentaje, np.round(reward,8),
                                      np.round(rAll,8), np.round(env.predictions,4)))
 
-                env.checkValidMovs()
+                env.checkValidMovs(newO)
                 x, y, ori = env.personajeByName('Guillermo')
                 rAll += reward
                 state = newState
@@ -194,6 +190,14 @@ def mainLoop():
                     logging.info("DONE is True, exit and dont save the game")
                     # env.save_game()
                     break
+                if env.valMovs[action] == 0:
+                    logging.info("Invalid Action: Leaving the loop of the repeat")
+                    break
+
+            if env.playing == False and (t % 100) == 1:
+                ngdqn_agent.replay()        # internally iterates default (prediction) model
+                ngdqn_agent.target_train()
+
 
         env.save_game()
 

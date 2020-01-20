@@ -144,6 +144,12 @@ class NGDQN:
         repeat = 1
         if "-" in self.env.actions_list[action]:
             repeat = int(self.env.actions_list[action].split("-")[1])
+
+        # TODO JT: need to find a way to balance exploratory and explotation for big NOP actions
+        if action in range(5, 10):
+            repeat = 1
+        # TODO JT: fix this above
+
         # self.logging.info("vector:      {}              ".format(vector))
         self.logging.info(f"Predictions: {predictions}              ")
         self.logging.info(f"Final:       {final}              ")
@@ -166,7 +172,12 @@ class NGDQN:
             if "-" in self.env.actions_list[action]:
                 repeat = int(self.env.actions_list[action].split("-")[1])
 
-            self.env.logging.info("e-greedy: {}  repeat: {} epsilon: {}<----               ".format(action, repeat, self.epsilon))
+            # TODO JT: need to find a way to balance exploratory and explotation for big NOP actions
+            if action in range(5,10):
+                repeat = 1
+            # TODO JT: fix this above
+
+            self.env.logging.info(f"e-greedy: action {action} repeat: {repeat} epsilon: {self.epsilon}<----               ")
             actionType = "E"
             self.env.calculated_predictions = []
             self.env.final_predictions = []
@@ -195,11 +206,16 @@ class NGDQN:
             if "-" in self.env.actions_list[action]:
                 repeat = int(self.env.actions_list[action].split("-")[1])
 
+            # TODO JT: need to find a way to balance exploratory and explotation for big NOP actions
+            if action in range(5, 10):
+                repeat = 1
+            # TODO JT: fix this above
+
             # self.env.logging.info("predictions: {}              ".format(predictions))
             # self.env.logging.info("final:       {}              ".format(final))
             self.env.logging.info(f"Action:      {self.env.actions_list[action]}x{repeat} Prediction: {final[action]}")
-            for ii in range(9):
-                self.env.logging.info("%3s %d:%d:%d -> %.8f %.8f" % ( self.env.actions_list[ii],
+            for ii in range(self.env.action_space.n):
+                self.env.logging.info("%2d %6s %d:%d:%d -> %.8f %.8f" % (ii, self.env.actions_list[ii],
                                                                      self.env.valMovs[ii],
                                                                      self.env.wallMovs[ii],
                                                                      self.env.perMovs[ii],
@@ -209,7 +225,6 @@ class NGDQN:
 
             self.env.calculated_predictions = predictions.tolist()
             self.env.final_predictions = final.tolist()
-
 
         self.env.vector_predictions = vector.tolist()
         self.env.action_predictions = int(action)
@@ -391,8 +406,11 @@ class NGDQN:
         vEnv[5] = float(state['obsequium']/31)
         vEnv[6] = float(state['planta']/3)
         vEnv[7] = float(state['porcentaje']/100)
-        if len(state['Objetos']) >= 1:
+        print(f"{state['Objetos']}")
+        if len(state['Objetos']) > 1:
             vEnv[8] = float(state['Objetos'][0]/32)
+        else:
+            vEnv[8] = float(0)
 
         if 'jugada' in state:
             vEnv[9] = float(state['jugada']/10000)
@@ -414,10 +432,11 @@ class NGDQN:
 
         vector = np.append(vector, vFrases)
 
+        # TODO JT we need check if we need only need 4 valid states (before 9)
         # vValidm the validmovs
         vValidm = np.zeros([9], np.float)
         if 'valMovs' in state and state['valMovs'] != None:
-            for ii in range(len(state['valMovs'])):
+            for ii in range(4):
                 vValidm[ii] = float(state['valMovs'][ii])
 
         vector = np.append(vector, vValidm)
