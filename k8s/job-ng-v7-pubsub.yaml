@@ -47,7 +47,7 @@ spec:
             dockerize -wait tcp://localhost:4477 -timeout 2m
             trap "touch /tmp/pod/main-terminated" EXIT
             pip3 install -e gym_abadia
-            mkdir -p models games snapshoots
+            mkdir -p models games snapshots
             while true
                 do
                 options=`gcloud pubsub subscriptions pull agent-batches --auto-ack --limit=1 --format="value(DATA)"`
