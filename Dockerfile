@@ -8,7 +8,7 @@ RUN curl -sSL https://sdk.cloud.google.com | bash
 COPY . .
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-RUN mkdir -p snapshoots
+RUN mkdir -p snapshots
 RUN mkdir -p models
 
 

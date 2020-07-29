@@ -49,7 +49,7 @@ For install AbadIA-gym  install all the dependencies from the requirements.txt f
  
 ```
 pip3 install -r requirements.txt 
-mkdir -p snapshoots
+mkdir -p snapshots
 mkdir -p models
 cd models/
 wget https://storage.googleapis.com/abadia-data/models/last_model_v6.model

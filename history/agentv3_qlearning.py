@@ -102,7 +102,7 @@ def mainLoop():
     # Initialize Q-table with all zeros
     # Q = np.zeros([env.observation_space.n, env.action_space.n])
 
-    nameQtableSnap = "snapshoots/current-qtable"
+    nameQtableSnap = "snapshots/current-qtable"
 
     if os.path.exists(nameQtableSnap) and os.path.getsize(nameQtableSnap) > 0:
         fqtablesnap = open(nameQtableSnap, "rb+")
@@ -114,7 +114,7 @@ def mainLoop():
         fqtablesnap.flush()
         fqtablesnap.close()
 
-    nameVisitedSnap = "snapshoots/current-visited"
+    nameVisitedSnap = "snapshots/current-visited"
 
     if os.path.exists(nameVisitedSnap) and os.path.getsize(nameVisitedSnap) > 0:
         fvisitedsnap = open(nameVisitedSnap, "rb+")

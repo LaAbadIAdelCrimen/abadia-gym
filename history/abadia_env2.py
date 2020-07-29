@@ -703,7 +703,7 @@ class AbadiaEnv2(gym.Env):
 
 
     def visited_snap_load(self):
-        nameVisitedSnap = "snapshoots/current-visited"
+        nameVisitedSnap = "snapshots/current-visited"
 
         # for speed up the games if the visited  exist locally
         # we download an updated version just a 10% of the time
@@ -730,7 +730,7 @@ class AbadiaEnv2(gym.Env):
                 self.upload_blob(nameVisitedSnap, nameVisitedSnap)
 
     def visited_snap_save(self):
-        nameVisitedSnap = "snapshoots/current-visited"
+        nameVisitedSnap = "snapshots/current-visited"
 
         fvisitedsnap = open(nameVisitedSnap, "wb+")
         np.save(fvisitedsnap, self.Visited)
