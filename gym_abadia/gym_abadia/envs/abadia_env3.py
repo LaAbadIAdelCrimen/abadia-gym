@@ -31,6 +31,10 @@ import logging
 # AbadIA2 dependencies
 import requests
 
+# LibAbadia.so
+
+
+
 def get_chance(x):
     """Get probability that a banana will be sold at price x."""
     e = math.exp(1)
@@ -222,7 +226,7 @@ class AbadiaEnv3(gym.Env):
     # TODO JT we need a Dict to Checkpoint to recover from actions check dictionary
 
     def dict2check(self):
-        return
+        pass
 
     # TODO JT refactoring and eliminate this function
     def sendReset(self):
