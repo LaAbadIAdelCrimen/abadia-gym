@@ -1,82 +1,84 @@
-from behave import *
 import json
-import requests
 from ctypes import cdll,c_int,c_char_p,c_size_t,create_string_buffer,sizeof,POINTER
 
-(P1_UP ,
-P1_LEFT,
-P1_DOWN,
-P1_RIGHT,
-P1_BUTTON1,
-P1_BUTTON2,
-P2_UP,
-P2_LEFT,
-P2_DOWN,
-P2_RIGHT,
-P2_BUTTON1,
-P2_BUTTON2,
-START_1,
-START_2,
-COIN_1,
-COIN_2,
-SERVICE_1,
-SERVICE_2,
-KEYBOARD_A,
-KEYBOARD_B,
-KEYBOARD_C,
-KEYBOARD_D,
-KEYBOARD_E,
-KEYBOARD_F,
-KEYBOARD_G,
-KEYBOARD_H,
-KEYBOARD_I,
-KEYBOARD_J,
-KEYBOARD_K,
-KEYBOARD_L,
-KEYBOARD_M,
-KEYBOARD_N,
-KEYBOARD_O,
-KEYBOARD_P,
-KEYBOARD_Q,
-KEYBOARD_R,
-KEYBOARD_S,
-KEYBOARD_T,
-KEYBOARD_U,
-KEYBOARD_V,
-KEYBOARD_W,
-KEYBOARD_X,
-KEYBOARD_Y,
-KEYBOARD_Z,
-KEYBOARD_0,
-KEYBOARD_1,
-KEYBOARD_2,
-KEYBOARD_3,
-KEYBOARD_4,
-KEYBOARD_5,
-KEYBOARD_6,
-KEYBOARD_7,
-KEYBOARD_8,
-KEYBOARD_9,
-KEYBOARD_SPACE,
-KEYBOARD_INTRO,
-KEYBOARD_SUPR,
-FUNCTION_1,
-FUNCTION_2,
-FUNCTION_3,
-FUNCTION_4,
-FUNCTION_5,
-FUNCTION_6,
-FUNCTION_7,
-FUNCTION_8,
-FUNCTION_9,
-FUNCTION_10,
-FUNCTION_11,
-FUNCTION_12) = range(69)
 
-Controles = c_int * 70
 
 class AbadIA(object):
+
 	def __init__(self):
+		(self.P1_UP,
+		 self.P1_LEFT,
+		 self.P1_DOWN,
+		 self.P1_RIGHT,
+		 self.P1_BUTTON1,
+		 self.P1_BUTTON2,
+		 self.P2_UP,
+		 self.P2_LEFT,
+		 self.P2_DOWN,
+		 self.P2_RIGHT,
+		 self.P2_BUTTON1,
+		 self.P2_BUTTON2,
+		 self.START_1,
+		 self.START_2,
+		 self.COIN_1,
+		 self.COIN_2,
+		 self.SERVICE_1,
+		 self.SERVICE_2,
+		 self.KEYBOARD_A,
+		 self.KEYBOARD_B,
+		 self.KEYBOARD_C,
+		 self.KEYBOARD_D,
+		 self.KEYBOARD_E,
+		 self.KEYBOARD_F,
+		 self.KEYBOARD_G,
+		 self.KEYBOARD_H,
+		 self.KEYBOARD_I,
+		 self.KEYBOARD_J,
+		 self.KEYBOARD_K,
+		 self.KEYBOARD_L,
+		 self.KEYBOARD_M,
+		 self.KEYBOARD_N,
+		 self.KEYBOARD_O,
+		 self.KEYBOARD_P,
+		 self.KEYBOARD_Q,
+		 self.KEYBOARD_R,
+		 self.KEYBOARD_S,
+		 self.KEYBOARD_T,
+		 self.KEYBOARD_U,
+		 self.KEYBOARD_V,
+		 self.KEYBOARD_W,
+		 self.KEYBOARD_X,
+		 self.KEYBOARD_Y,
+		 self.KEYBOARD_Z,
+		 self.KEYBOARD_0,
+		 self.KEYBOARD_1,
+		 self.KEYBOARD_2,
+		 self.KEYBOARD_3,
+		 self.KEYBOARD_4,
+		 self.KEYBOARD_5,
+		 self.KEYBOARD_6,
+		 self.KEYBOARD_7,
+		 self.KEYBOARD_8,
+		 self.KEYBOARD_9,
+		 self.KEYBOARD_SPACE,
+		 self.KEYBOARD_INTRO,
+		 self.KEYBOARD_SUPR,
+		 self.FUNCTION_1,
+		 self.FUNCTION_2,
+		 self.FUNCTION_3,
+		 self.FUNCTION_4,
+		 self.FUNCTION_5,
+		 self.FUNCTION_6,
+		 self.FUNCTION_7,
+		 self.FUNCTION_8,
+		 self.FUNCTION_9,
+		 self.FUNCTION_10,
+		 self.FUNCTION_11,
+		 self.FUNCTION_12) = range(69)
+
+		self.Controles = c_int * 70
+
+
 		print("AbadIA CONSTRUCTOR")
 		self.lib = cdll.LoadLibrary('./LibAbadIA.so')
 		self.lib.LibAbadIA_init()
@@ -86,38 +88,39 @@ class AbadIA(object):
 		self.lib.LibAbadIA_save.restype = c_char_p
 		self.lib.LibAbadIA_save.argtypes = [c_char_p,c_size_t]
 		self.lib.LibAbadIA_load.argtypes = [c_char_p]
-		self.controles = Controles()
+		self.controles = self.Controles()
 
 	def step(self):
 		result = create_string_buffer(10000)
 		tmp = self.lib.LibAbadIA_step(self.controles,result,sizeof(result)).decode()
-		self.controles = Controles()
-		return tmp
+		self.controles = self.Controles()
+		return json.loads(tmp)
 
 	def load(self,input):
 		return self.lib.LibAbadIA_load(input)
-#igual el create_string_buffer puede ir aqui y no por todos lados			
+#igual el create_string_buffer puede ir aqui y no por todos lados
 #igual que en step
 	def save(self,result,resultMaxLength):
 		return self.lib.LibAbadIA_save(result,resultMaxLength)
 
 	# @when('reinicio el juego')
 	def reset_game(self):
-		self.controles[KEYBOARD_E]=1
+		self.controles[self.KEYBOARD_E]=1
 		self.status=self.step()
+		return self.status
 
 	# revisar si se usa @when('mando el comando "{comando}"')
 	def snd_command(self, comando):
 		assert comando=="UP" or comando =="QR" or comando=="RESET"
 		if (comando=="UP"):
-			self.controles[P1_UP]=1
+			self.controles[self.P1_UP]=1
 			self.status=self.step()
 		elif comando=="QR":
-			self.controles[KEYBOARD_Q]=1
-			self.controles[KEYBOARD_R]=1
+			self.controles[self.KEYBOARD_Q]=1
+			self.controles[self.KEYBOARD_R]=1
 			self.status=self.step()
 		elif comando=="RESET":
-			self.controles[KEYBOARD_E]=1
+			self.controles[self.KEYBOARD_E]=1
 			self.status=self.step()
 		else:
 			print("la version lib solo soporta ahora mismo comando UP y QR (y RESET)")
@@ -129,54 +132,54 @@ class AbadIA(object):
 
 	# revisar si tiene sentido no ir a tope @step('duplico la velocidad')
 	def speedx2 (context):
-		context.abadIA.controles[SERVICE_1]=1
+		context.abadIA.controles[self.SERVICE_1]=1
 		context.status=context.abadIA.step()
 
 	# revisar @step('reduzco la velocidad')
 	def speed_div_2(context):
-		context.abadIA.controles[SERVICE_2]=1
+		context.abadIA.controles[self.SERVICE_2]=1
 		context.status=context.abadIA.step()
 
 	# @when('digo que SI')
 	def say_yes(context):
-		context.abadIA.controles[KEYBOARD_S]=1
+		context.abadIA.controles[self.KEYBOARD_S]=1
 		context.status=context.abadIA.step()
 
 	# @when('digo que NO')
 	def say_no(context):
-		context.abadIA.controles[KEYBOARD_N]=1
+		context.abadIA.controles[self.KEYBOARD_N]=1
 		context.status=context.abadIA.step()
 
 	# @when('giro a la izquierda')
 	def turn_left(context):
-		context.abadIA.controles[P1_LEFT]=1
+		context.abadIA.controles[self.P1_LEFT]=1
 		context.status=context.abadIA.step()
 
 	# @when('giro a la derecha')
 	def turn_right(context):
-		context.abadIA.controles[P1_RIGHT]=1
+		context.abadIA.controles[self.P1_RIGHT]=1
 		context.status=context.abadIA.step()
 
 	# revisar si se usa @when('doy media vuelta')
 	def hard_turn(context):
-		context.abadIA.controles[P1_RIGHT]=1
+		context.abadIA.controles[self.P1_RIGHT]=1
 		context.status=context.abadIA.step()
-		context.abadIA.controles[P1_RIGHT]=1
+		context.abadIA.controles[self.P1_RIGHT]=1
 		context.status=context.abadIA.step()
 		context.status=context.abadIA.step()
 
 	# @when('avanzo')
 	def forward(context):
-		context.abadIA.controles[P1_UP]=1
+		context.abadIA.controles[self.P1_UP]=1
 		context.status=context.abadIA.step()
 
 	# @when('avanzo "{numeroPasos}" pasos')
 	def forward_n_steps(context,numeroPasos):
 		i=0;
 		while i < int(numeroPasos):
-			context.abadIA.controles[P1_UP]=1
+			context.abadIA.controles[self.P1_UP]=1
 			context.status=context.abadIA.step()
-			context.abadIA.controles[P1_UP]=1
+			context.abadIA.controles[self.P1_UP]=1
 			context.status=context.abadIA.step()
 			i+=1
 
@@ -185,7 +188,7 @@ class AbadIA(object):
 
 		i=0;
 		while i < int(numeroPasos):
-			context.abadIA.controles[P1_DOWN]=1
+			context.abadIA.controles[self.P1_DOWN]=1
 			context.status=context.abadIA.step()
 			i+=1
 
@@ -199,20 +202,21 @@ class AbadIA(object):
 
 	# space @when('pulso espacio')
 	def space(context):
-		context.abadIA.controles[P1_BUTTON1]=1
+		context.abadIA.controles[self.P1_BUTTON1]=1
 		context.status=context.abadIA.step()
 
 	# @when('cargo una partida')
-	def load(context):
+	def setGameInfo(context):
 		assert context.abadIA.load(context.text.encode())
 
-
 	# @step('grabo la partida')
-	def save(context):
+	def getGameInfo(self):
+		print("create the buffer")
 		result = create_string_buffer(10000)
-		res=context.abadIA.save(result,sizeof(result)).decode()
+		print("get the context of the game")
+		res = self.lib.LibAbadIA_save(result,sizeof(result)).decode()
 		print("grabo la partida *"+res+"*")
-		assert res.count('\n')==431
+		return res
 
 	# @step('grabo la partida y comparo el volcado')
 	def save_and_check(context):
@@ -240,7 +244,7 @@ class AbadIA(object):
 
 	# @step('los valores iniciales son correctos')
 	def check_ini(context):
-		context.abadIA.controles[KEYBOARD_D]=1
+		context.abadIA.controles[self.KEYBOARD_D]=1
 		context.status=context.abadIA.step()
 		print("resultDUMPtext**"+context.status);
 		valid_json=False;

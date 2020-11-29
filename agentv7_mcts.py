@@ -91,8 +91,6 @@ def init_env(env):
                         level=logging.INFO)
     env.logging = logging
 
-
-
 def mainLoop():
 
     if (env.speedtest):
@@ -139,7 +137,6 @@ def mainLoop():
 
             # TODO JT: just checking how to implement a repeat action in the loop
             # if we're playing not exploring and training we don't want to do this.
-
             # repeat = random.randint(5)+1
 
             action, repeat = ngdqn_agent.act(state)
@@ -158,18 +155,15 @@ def mainLoop():
                     env.save_action(state, action, reward, newState)
                     if env.estaGuillermo:
                         break
-                        # test valid movements
 
                 ngdqn_agent.remember(env.prev_vector, action, reward, env.vector, done)
 
                 if done:
                     logging.info(f'Episode finished after {t+1} steps')
-                    # env.save_game()
                     if (env.haFracasado):
                         logging.info(f'Episode finished with a FAIL')
                         env.reset_fin_partida()
                         break
-
                 env.update_visited_cells(x, y, ori)
 
                 # TODO JT: we need to create an option for this
@@ -186,7 +180,6 @@ def mainLoop():
                 state = newState
                 if done == True:
                     logging.info("DONE is True, exit and dont save the game")
-                    # env.save_game()
                     break
                 if env.valMovs[action] == 0:
                     logging.info("Invalid Action: Leaving the loop of the repeat")
@@ -209,24 +202,11 @@ def mainLoop():
             logging.info("Uploading model to GCP")
             thread = Thread(target=env.upload_blob, args=(nameModel, nameModel))
             thread.start()
-            # env.upload_blob(nameModel, nameModel)
-
-        # TODO JT: latest will be handed for another process in a more like A3C way
-        # nameModel ="models/model_v7_lastest.model".format(env.gameId)
-        # ngdqn_agent.save_model(nameModel)
-        # if (env.gsBucket != None):
-        #    logging.info("Uploading lastest model to GCP")
-        #    env.upload_blob(nameModel, nameModel)
-
 
         rList.append(rAll)
 
         if t >= env.num_steps:
             logging.info("Failed to complete in trial {}".format(env.num_episodes))
-        # else:
-        #   print("Completed in {} trial".format(i_episode))
-        #   dqn_agent.save_model("models/success.model")
-        #   break
 
         if (np.random.randint(10) <= 1):
             env.visited_snap_save()
@@ -236,6 +216,6 @@ def mainLoop():
     logging.info("Score over time: " + str(sum(rList)/env.num_episodes))
 
 if __name__ == '__main__':
-    env = gym.make('Abadia-v3')
+    env = gym.make('Abadia-v4')
     init_env(env)
     mainLoop()
