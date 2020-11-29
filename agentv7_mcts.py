@@ -92,7 +92,7 @@ def init_env(env):
     env.logging = logging
 
 def mainLoop():
-
+    logging.info("Ready to Start")
     if (env.speedtest):
         env.speed_test(100)
         exit(0)
@@ -103,11 +103,13 @@ def mainLoop():
     rList = []
     bucle = 0
 
+    print("fin de la historia")
+    return
     # DQN parameters
 
     gamma = 0.9
     epsilon = .95
-
+    logging.info("Loading default model last_model_v7.model")
     ngdqn_agent = NGDQN(env=env, initModelName="models/last_model_v7.model",)
     steps = []
 

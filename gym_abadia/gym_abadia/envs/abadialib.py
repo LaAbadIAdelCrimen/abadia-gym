@@ -211,11 +211,11 @@ class AbadIA(object):
 
 	# @step('grabo la partida')
 	def getGameInfo(self):
-		print("create the buffer")
+		# print("create the buffer")
 		result = create_string_buffer(10000)
-		print("get the context of the game")
+		# print("get the context of the game")
 		res = self.lib.LibAbadIA_save(result,sizeof(result)).decode()
-		print("grabo la partida *"+res+"*")
+		# print("grabo la partida *"+res+"*")
 		return res
 
 	# @step('grabo la partida y comparo el volcado')

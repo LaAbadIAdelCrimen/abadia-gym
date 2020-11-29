@@ -227,7 +227,7 @@ class AbadiaEnv4(gym.Env):
         action : int
 
         Returns
-        -------
+        ------
         ob, reward, episode_over, info : tuple
             ob (object) :
                 an environment-specific object representing your observation of
@@ -392,14 +392,6 @@ class AbadiaEnv4(gym.Env):
     def _take_action(self, action):
         logging.info("append {} {}".format(self.curr_episode, action))
         self.action_episode_memory[self.curr_episode].append(action)
-
-    # TODO JT this is legacy
-    def _get_reward(self):
-        """Reward is about how complete is the game"""
-        if self.is_game_done:
-            return self.price - 1
-        else:
-            return 0.0
 
     def reset(self):
         """
@@ -606,8 +598,8 @@ class AbadiaEnv4(gym.Env):
             t.start()
 
     def reset_fin_partida(self):
-        self.sendCmd(self.url, "abadIA/game/current/actions/SPACE", mode='POST')
-        ob = self.sendCmd(self.url, "abadIA/game", mode="POST")
+        self.sendCmd("SPACE")
+        self.lib.reset_game()
 
     def init_dumps_files(self):
 
