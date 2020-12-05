@@ -137,9 +137,7 @@ class AbadiaEnv4(gym.Env):
 
     def __init__(self):
         self.__version__ = "0.0.8"
-        logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', datefmt='%d-%m-%y %H:%M:%S',
-                            level=logging.INFO)
-        logging.info("AbadiaEnv4 - Version {}".format(self.__version__))
+        # print("AbadiaEnv4 - Version {}".format(self.__version__))
 
         self.libAbadIA = LibAbadIA()
         self.num_episodes   = 100
@@ -222,10 +220,8 @@ class AbadiaEnv4(gym.Env):
 
         now = datetime.datetime.now()
         self._seed(time.mktime(now.timetuple()))
-        logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', datefmt='%d-%m-%y %H:%M:%S',
-                            level=logging.INFO)
 
-        logging.info("AbadiaEnv just initialized")
+        # self.logger.info("AbadiaEnv just initialized")
         # helper to normalize paths to positions
         #   1
         # 2   0
@@ -235,7 +231,8 @@ class AbadiaEnv4(gym.Env):
 
         pre = "core_"
         output = {}
-        for line in line.split("\n"):
+        self.logger.info(type(line))
+        for line in line.split('\n'):
             # print(line)
             res = line.split("// ")
 
@@ -249,7 +246,7 @@ class AbadiaEnv4(gym.Env):
 
             # print("value ({}) key ({})".format(value, pre + key))
         # print(json.dumps(output))
-        # logging.info(output)
+        # self.logger.info(output)
         return output
 
     # TODO JT we need a Dict to Checkpoint to recover from actions check dictionary
@@ -258,46 +255,45 @@ class AbadiaEnv4(gym.Env):
         pass
 
     def sendCmd(self, action):
-        try:
-            command = self.actions_list[action]
-            if "-" in command:
-                cmd = command.split("-")[0]
-            else:
-                cmd = command
-            logging.info(f"action {action}: cmd ---> {cmd}")
-        except:
-            logging.error(f"LibAbadia comm error")
-            return None
+        command = self.actions_list[action]
+        if "-" in command:
+            cmd = command.split("-")[0]
+            num = int (command.split("-")[1])
+        else:
+            cmd = command
+            num = 1
+        self.logger.info(f"action {action} {command}: cmd ---> {cmd} {num} times")
 
         # ('UP-2', 'UP-10', 'UP-20', 'UP-40', 'UP-60', 'NOP-1', 'NOP-5', 'NOP-25', 'NOP-50',
         # 'RIGHT', 'LEFT', 'DOWN', 'SPACE', 'QR')
         if (cmd == 'UP'):
             ob = self.libstep(P1_UP)
         if (cmd == 'NOP'):
-            pass
+            ob = self.libstep(-1)
         if (cmd == 'RIGHT'):
             ob = self.libstep(P1_RIGHT)
         if (cmd == 'LEFT'):
             ob = self.libstep(P1_LEFT)
         if (cmd == 'DOWN'):
-            ob = self.libstep.libstep(P1_DOWN)
+            ob = self.libstep(P1_DOWN)
         if (cmd == 'SPACE'):
             ob = self.libstep(KEYBOARD_SPACE)
         if (cmd == 'QR'):
             ob = self.libstep(KEYBOARD_Q)
             # TODO implementar en el lado del libAbaIA.so
             # self.libAbadIA.controles[self.libAbadIA.KEYBOARD_R] = 1
-
-        core = self.check2dict(self.libAbadIA.getGameInfo())
+        dump =self.getGameDump().decode()
+        # self.logger.info(dump)
+        core = self.check2dict(dump)
         ob['core'] = core
         return ob
 
     def libstep(self, control):
         result = ct.create_string_buffer(10000)
-        # logging.info("Voy a ejecutar el control ---> {}".format(control))
+        # self.logger.info("Voy a ejecutar el control ---> {}".format(control))
         tmp = self.libAbadIA.lib.LibAbadIA_step2(ct.c_int(control), ct.cast(result, ct.c_char_p))
-        # logging.info(type(result.value))
-        # logging.info("step2 result: {}".format(tmp))
+        # self.logger.info(type(result.value))
+        # self.logger.info("step2 result: {}".format(tmp))
         return json.loads(tmp)
 
     def step(self, action):
@@ -330,16 +326,16 @@ class AbadiaEnv4(gym.Env):
                  However, official evaluations of your agent are not allowed to
                  use this for learning.
         """
-        try:
+        self.logger.info(f"action: {action}")
+        # try:
 
-            logging.info( f"action: {action}")
-            ob = self.sendCmd(action)
+        ob = self.sendCmd(action)
 
-        except Exception as e:
-            logging.error("Communication Error: I cannot send the CMDs {}".format(e))
-            logging.error("Check if the game engine is UP")
-            self.game_is_done = True
-            return self.prev_ob, 0, self.game_is_done, {}
+        # except Exception as e:
+            # self.logger.error("libAbadIA.so Error: I cannot send the CMDs {}".format(e))
+            # self.logger.error("Check if the things are UP")
+            # self.game_is_done = True
+            # return self.prev_ob, 0, self.game_is_done, {}
 
         self._get_personajes_info(ob)
         self._get_general_info(ob)
@@ -355,14 +351,14 @@ class AbadiaEnv4(gym.Env):
         self.eventsAction = []
 
         if (self.obsequium < self.minimunObsequium):
-            logging.info("GAME OVER by lack of Obsequium {}        ".format(self.obsequium))
+            self.logger.info("GAME OVER by lack of Obsequium {}        ".format(self.obsequium))
             self.libAbadIA.reset_game()
             self.game_is_done = True
             self.haFracasado = True
             reward = -1
 
         if (self.haFracasado == True):
-            logging.info("GAME OVER")
+            self.logger.info("GAME OVER")
             self.libAbadIA.reset_game()
             self.game_is_done = True
             self.haFracasado = True
@@ -370,11 +366,11 @@ class AbadiaEnv4(gym.Env):
 
         if (self.porcentaje >= 90):
             self.game_is_done = True
-            logging.info("FUCKING YEAH GAME ALMOST DONE")
-            logging.info("FUCKING YEAH GAME ALMOST DONE")
-            logging.info("FUCKING YEAH GAME ALMOST DONE")
-            logging.info("FUCKING YEAH GAME ALMOST DONE")
-            logging.info("FUCKING YEAH GAME ALMOST DONE")
+            self.logger.info("FUCKING YEAH GAME ALMOST DONE")
+            self.logger.info("FUCKING YEAH GAME ALMOST DONE")
+            self.logger.info("FUCKING YEAH GAME ALMOST DONE")
+            self.logger.info("FUCKING YEAH GAME ALMOST DONE")
+            self.logger.info("FUCKING YEAH GAME ALMOST DONE")
             reward = 1
 
         # TODO JT we need to parametize the reward function
@@ -384,21 +380,22 @@ class AbadiaEnv4(gym.Env):
         # TODO JT: deprecated now only need to check for UP and objects actions
 
         if (self.wallMovs[action] == 1):
-            logging.info("***** Invalid move against Wall, penalizing it")
+            self.logger.info("***** Invalid move against Wall, penalizing it")
             reward = -0.00091
 
         if (self.perMovs[action] == 1):
-            logging.info("***** Invalid move against a Character, penalizing it")
+            self.logger.info("***** Invalid move against a Character, penalizing it")
             reward = -0.00092
 
         self.reward       = reward
         self.totalReward += reward
         ob['reward']      = reward
         ob['totalReward'] = self.totalReward
-        logging.info("reward: {} tr: {} action: {} ".format(reward, self.totalReward, action))
+        self.logger.info("reward: {} tr: {} action: {} ".format(reward, self.totalReward, action))
 
         # adding more information for debugging: valid moves, vectors, predictions, etc.
         ob['valMovs']            = self.valMovs.tolist()
+        ob['wallMovs']           = self.wallMovs.tolist()
         ob['wallMovs']           = self.wallMovs.tolist()
         ob['perMovs']            = self.perMovs.tolist()
         ob['predictions']        = self.calculated_predictions
@@ -472,7 +469,7 @@ class AbadiaEnv4(gym.Env):
         return vector.reshape(1,15)
 
     def _take_action(self, action):
-        logging.info("append {} {}".format(self.curr_episode, action))
+        self.logger.info("append {} {}".format(self.curr_episode, action))
         self.action_episode_memory[self.curr_episode].append(action)
 
     def reset(self):
@@ -498,49 +495,47 @@ class AbadiaEnv4(gym.Env):
         self.action_episode_memory.append([])
         self.game_is_done = False
 
-        logging.info('-----> RESET the GAME 1 SP')
+        self.logger.info('-----> RESET the GAME 1 SP')
 
         ob = self.libstep(KEYBOARD_E)
-        logging.info('reset status {}'.format(ob))
-        logging.info('-----> DONE')
+        self.logger.info('reset status {}'.format(ob))
+        self.logger.info('-----> DONE')
 
-        logging.info('-----> INIT dumps files: START ...')
+        self.logger.info('-----> INIT dumps files: START ...')
         self.init_dumps_files()
-        logging.info('-----> INIT dumps files: DONE')
+        self.logger.info('-----> INIT dumps files: DONE')
         if self._get_personajes_info(ob):
-            logging.info('Esta Guillermo')
+            self.logger.info('Esta Guillermo')
         ob['jugada'] = self.curr_step
         return ob
 
     # TODO JT check if we use this function
 
     def render(self, mode='human', close=False):
-        logging.info('state info: {}'.format(self))
+        self.logger.info('state info: {}'.format(self))
         return
 
     def _get_state(self):
         """Get the observation."""
 
-        logging.info("--------> I wil got the initial state with Guillermo")
+        self.logger.info("--------> I wil got the initial state with Guillermo")
         tooboring = 0
         while True:
             ob = self.sendCmd(self.url, "/abadIA/current/game", mode='GET', type='json')
-            logging.info("current game status {}".format(ob))
+            self.logger.info("current game status {}".format(ob))
             tooboring += 1
             if self._get_personajes_info(ob):
-                logging.info("getting the characters from Dump")
+                self.logger.info("getting the characters from Dump")
                 break
             else:
-                logging.info("getting the characters from ob") # :{}".format(ob))
-                logging.info("Guillermo is not present yet, waiting")
+                self.logger.info("getting the characters from ob") # :{}".format(ob))
+                self.logger.info("Guillermo is not present yet, waiting")
                 if tooboring % 10 == 0:
-                    logging.info("Getting Boring ...")
+                    self.logger.info("Getting Boring ...")
                     if tooboring <= 10:
                         self.sendCmd(self.url, "start")
                     else:
                         self.sendCmd(self.url, "fin")
-                    # self.sendCmd(self.url, "cmd/B")
-                    # self.sendCmd(self.url, "cmd/A")
                     time.sleep(1)
                 time.sleep(2)
         ob['jugada'] = self.curr_step
@@ -574,7 +569,7 @@ class AbadiaEnv4(gym.Env):
             os.makedirs(directory)
         blob.download_to_filename(destination_file_name)
 
-        logging.info('Blob {} downloaded to {}.'.format(
+        self.logger.info('Blob {} downloaded to {}.'.format(
             source_blob_name,
             destination_file_name))
 
@@ -583,7 +578,7 @@ class AbadiaEnv4(gym.Env):
         blob = self.google_storage_bucket.blob(destination_blob_name)
         blob.upload_from_filename(source_file_name)
 
-        logging.info('File {} uploaded to {}.'.format(
+        self.logger.info('File {} uploaded to {}.'.format(
             source_file_name,
             destination_blob_name))
 
@@ -592,7 +587,7 @@ class AbadiaEnv4(gym.Env):
         data.update(self.get_commons())
 
         self.eventsAction.append(data)
-        logging.info("events {}".format(self.eventsAction))
+        self.logger.info("events {}".format(self.eventsAction))
 
     def save_game(self):
         self.fdGame.write("{}{}\"gameId\":\"{}\", \"totalSteps\":{}, \"obsequium\":{}, \"porcentaje\":{}, \"bonus\":{}, "
@@ -609,26 +604,26 @@ class AbadiaEnv4(gym.Env):
         # self.fdGame.close()
 
         if (not self.fdActions.closed):
-            logging.info("flushing and closing {} before exit".format(self.actionsName))
+            self.logger.info("flushing and closing {} before exit".format(self.actionsName))
             self.fdActions.flush()
             self.fdActions.close()
 
         if (self.gsBucket != None):
-            logging.info("Uploading Game: {} to GCP".format(self.dump_path + "/" + self.gameName))
+            self.logger.info("Uploading Game: {} to GCP".format(self.dump_path + "/" + self.gameName))
             t = Thread(target=self.upload_blob, args=(self.dump_path + "/" + self.gameName,
                                                       self.dump_path + "/" + self.gameName))
             t.start()
 
             # compressing the file
-            logging.info("Gziping ---> {}".format(self.dump_path + "/" + self.actionsName))
+            self.logger.info("Gziping ---> {}".format(self.dump_path + "/" + self.actionsName))
             with open(self.dump_path + "/" + self.actionsName, 'rb') as f_in, gzip.open(self.dump_path + "/" + self.actionsName + '.gz', 'wb') as f_out:
                 shutil.copyfileobj(f_in, f_out)
 
-            logging.info("Uploading Actions: {} to GCP".format(self.dump_path + "/" + self.actionsName + ".gz"))
+            self.logger.info("Uploading Actions: {} to GCP".format(self.dump_path + "/" + self.actionsName + ".gz"))
             t = Thread(target=self.upload_blob, args=(self.dump_path + "/" + self.actionsName + ".gz",
                              self.dump_path + "/" + self.actionsName + ".gz"))
             t.start()
-            logging.info("Deleting ---> {}".format(self.dump_path + "/" + self.actionsName))
+            self.logger.info("Deleting ---> {}".format(self.dump_path + "/" + self.actionsName))
             os.remove(self.dump_path + "/" + self.actionsName)
 
     def save_action(self, state, action, reward, nextstate):
@@ -647,11 +642,11 @@ class AbadiaEnv4(gym.Env):
         # we download an updated version just a 10% of the time
 
         if self.gsBucket != None and np.random.randint(10) <= 1 and not os.path.exists(nameVisitedSnap):
-            logging.info("Downloading Visited from GCP")
+            self.logger.info("Downloading Visited from GCP")
             try:
                 self.download_blob(nameVisitedSnap, nameVisitedSnap)
             except:
-                logging.info("File {} not exist at bucket {}".format(nameVisitedSnap, self.gsBucket))
+                self.logger.info("File {} not exist at bucket {}".format(nameVisitedSnap, self.gsBucket))
 
         if os.path.exists(nameVisitedSnap) and os.path.getsize(nameVisitedSnap) > 0:
             fvisitedsnap = open(nameVisitedSnap, "rb+")
@@ -664,7 +659,7 @@ class AbadiaEnv4(gym.Env):
             fvisitedsnap.close()
 
             if (self.gsBucket != None):
-                logging.info("Uploading to GCP")
+                self.logger.info("Uploading to GCP")
                 self.upload_blob(nameVisitedSnap, nameVisitedSnap)
 
     def visited_snap_save(self):
@@ -676,7 +671,7 @@ class AbadiaEnv4(gym.Env):
         fvisitedsnap.close()
 
         if (self.gsBucket != None):
-            logging.info("Uploading visited to GCP")
+            self.logger.info("Uploading visited to GCP")
             t = Thread(target=self.upload_blob, args=(nameVisitedSnap, nameVisitedSnap))
             t.start()
 
@@ -702,7 +697,7 @@ class AbadiaEnv4(gym.Env):
 
         checkpoint = self.sendCmd(self.url, "/abadIA/game/current", mode='GET', type="raw")
         if (checkpoint is None):
-            logging.error("I cannot save the checkpoint game file. Probably because I cannot connect with the game server ")
+            self.logger.error("I cannot save the checkpoint game file. Probably because I cannot connect with the game server ")
             return
         now = datetime.datetime.now()
         self.dump_path = now.strftime('games/%Y%m%d')
@@ -720,12 +715,12 @@ class AbadiaEnv4(gym.Env):
         self.fdCheckpoint.flush()
 
         if (self.gsBucket != None):
-            logging.info("Uploading {} to GCP".format(self.dump_path + '/' + self.checkpointTmpName))
+            self.logger.info("Uploading {} to GCP".format(self.dump_path + '/' + self.checkpointTmpName))
             t = Thread(target=self.upload_blob, args=(self.dump_path + '/' + self.checkpointTmpName,
                              self.dump_path + '/' + self.checkpointTmpName))
             t.start()
         # else:
-            # logging.error("Not saving it to the local filesystem")
+            # self.logger.error("Not saving it to the local filesystem")
 
     def dict2check(self, check):
         """
@@ -762,14 +757,14 @@ class AbadiaEnv4(gym.Env):
     # Now we will pass the actions file and which step we wants to reload
 
     def load_actions_checkpoint(self, name, step):
-        logging.info("Opening the local actions file ({}) step ({})".format(name, step))
+        self.logger.info("Opening the local actions file ({}) step ({})".format(name, step))
 
         if (self.gsBucket != None):
-            logging.info("Downloading Actions Checkpoint {} from GCP".format(name))
+            self.logger.info("Downloading Actions Checkpoint {} from GCP".format(name))
             try:
                 self.download_blob(name, name)
             except:
-                logging.error("*** ErrorFile: {} not exist at bucket {}".format(name, self.gsBucket))
+                self.logger.error("*** ErrorFile: {} not exist at bucket {}".format(name, self.gsBucket))
 
         with open(name) as fdActionsCheckpoint:
             for cnt, action in enumerate(fdActionsCheckpoint):
@@ -779,14 +774,14 @@ class AbadiaEnv4(gym.Env):
                     #    TODO JT now we read the json object, get the checkpoint dict and convert it to Abbey format
                     print(st['action']['state']['core'])
                     checkpoint = self.dict2check(st['action']['state']['core'])
-                    logging.info("Restoring the saved game")
+                    self.logger.info("Restoring the saved game")
                     response = requests.put(self.url+"/abadIA/game/current", data=checkpoint)
-                    logging.info("Done status: {}".format(response))
+                    self.logger.info("Done status: {}".format(response))
                     self.curr_step = step
         fdActionsCheckpoint.close()
 
         # TODO JT check if we can delete this delay.
-        time.sleep(2)
+        # time.sleep(2)
         return self._get_state()
 
     def personajeByName(self, name):
@@ -794,7 +789,7 @@ class AbadiaEnv4(gym.Env):
         if (name in self.Personajes) and ('posX' in self.Personajes[name]):
             return int(self.Personajes[name]['posX']), int(self.Personajes[name]['posY']), int(self.Personajes[name]['orientacion'])
         else:
-            # logging.info("No hay {}: {}".format(name, self.Personajes))
+            # self.logger.info("No hay {}: {}".format(name, self.Personajes))
             return 0, 0, 0
 
     def dataPersonaje(self, ob, name):
@@ -922,15 +917,15 @@ class AbadiaEnv4(gym.Env):
 
         self.valMovs = self.valMovs2
         if (self.verbose > 1):
-            self.logging.info ("new valMovs2: {}".format(self.valMovs2))
-            self.logging.info ("wallMovs: {}".format(self.wallMovs))
-            self.logging.info ("perMovs: {}".format(self.perMovs))
+            self.self.logger.info ("new valMovs2: {}".format(self.valMovs2))
+            self.self.logger.info ("wallMovs: {}".format(self.wallMovs))
+            self.self.logger.info ("perMovs: {}".format(self.perMovs))
 
         return self.valMovs
 
-    def getGameInfo(self):
-        res = self.libAbadIA.getGameInfo()
-        return res
+    def getGameDump(self):
+        result = ct.create_string_buffer(10000)
+        return bytearray(self.libAbadIA.lib.LibAbadIA_save(ct.cast(result, ct.c_char_p), 10000))
 
     def speed_test(self, count=100):
         # test one: how many count context switches the engine could do
@@ -947,7 +942,7 @@ class AbadiaEnv4(gym.Env):
         start_time = time.time()
         for ii in range(0, count):
             response = requests.put(self.url + "/abadIA/game/current", data=checkpoint)
-            # logging.info("Done status: {}".format(response))
+            # self.logger.info("Done status: {}".format(response))
         elapsed_time = time.time() - start_time
         secs = time.strftime("%H:%M:%S", time.gmtime(elapsed_time))
         print(f"finished test1 in {secs}")
@@ -987,10 +982,10 @@ class AbadiaEnv4(gym.Env):
         adsoX, adsoY, adsoO = self.personajeByName('Adso')
         abadX, abadY, abadO = self.personajeByName('Abad')
 
-        logging.info("\x1b[HGuillermo {},{} Adso {},{} Abad {},{} Obsequium:{} Porcentaje:{} Reward:{} TR:{} V:{}".format(x, y, adsoX, adsoY,
+        self.logger.info("\x1b[HGuillermo {},{} Adso {},{} Abad {},{} Obsequium:{} Porcentaje:{} Reward:{} TR:{} V:{}".format(x, y, adsoX, adsoY,
                              abadX, abadY, self.obsequium, self.porcentaje, np.round(self.reward, 6), np.round(self.totalReward, 6), np.round(self.predictions, 4)))
 
-        logging.info("+---+" + "-" * (w * 2) + "+" + "-" * 24 + "+" + "-" * 48 + "+")
+        self.logger.info("+---+" + "-" * (w * 2) + "+" + "-" * 24 + "+" + "-" * 48 + "+")
 
         for yy in range(y - h, y + h):
             ss = "|%3d|" % yy
@@ -1042,6 +1037,6 @@ class AbadiaEnv4(gym.Env):
                         ss += "{}".format(format(self.rejilla[yRejilla][xx], '2x'))
             yRejilla += 1
             ss += "|"
-            logging.info(ss)
+            self.logger.info(ss)
 
-        logging.info("+" + "-" * (w * 2) + "+" + "-" * 24 + "+" + "-" * 48 + "+")
+        self.logger.info("+" + "-" * (w * 2) + "+" + "-" * 24 + "+" + "-" * 48 + "+")

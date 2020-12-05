@@ -35,10 +35,7 @@ class NGDQN:
         self.valueModelName = None
         self.gsBucket = None
 
-        logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', datefmt='%d-%m-%y %H:%M:%S',
-                            level=logging.INFO)
-
-        self.logging = logging
+        # self.env.logger.= logging
 
         # TODO JT: we need to implement this when goes to production
         if env != None:
@@ -65,14 +62,14 @@ class NGDQN:
             if (env.gsBucket != None):
             # TODO JT: we need to implement this when goes to production
                 self.env.download_blob(fileName, fileName)
-                self.logging.info("Downloading the model from Bucket: {} file: {}".format(self.gsBucket, fileName))
+                self.env.logger.info("Downloading the model from Bucket: {} file: {}".format(self.gsBucket, fileName))
 
         if (not (env == None and modelName == None and initModelName == None)):
             self.model        = self.load_model(fileName)
             self.target_model = self.load_model(fileName)
 
     def create_model(self, input_dim=71, output_dim=14):
-        self.logging.info("Creating a new model v7")
+        self.env.logger.info("Creating a new model v7")
         model   = Sequential()
         # TODO JT we need to increment the input vector dim
         # for now the input_dim is 71 with chars, env + validmods
@@ -93,7 +90,7 @@ class NGDQN:
 
 
     def create_model2(self, input_dim=71, output_dim=14):
-        self.logging.info("Creating a new model2 v7")
+        self.env.logger.info("Creating a new model2 v7")
         model   = Sequential()
         # TODO JT we need to increment the input vector dim
         # for now the input_dim is 71 with chars, env + validmods
@@ -113,7 +110,7 @@ class NGDQN:
         return model
 
     def load_model(self, name):
-        self.logging.info("Loading a local model from: ({})".format(name))
+        self.env.logger.info("Loading a local model from: ({})".format(name))
         # we're calling the load_model method imported from keras
         # and return the model loaded (h5 format)
         return load_model(name)
@@ -150,10 +147,10 @@ class NGDQN:
             repeat = 1
         # TODO JT: fix this above
 
-        # self.logging.info("vector:      {}              ".format(vector))
-        self.logging.info(f"Predictions: {predictions}              ")
-        self.logging.info(f"Final:       {final}              ")
-        self.logging.info(f"Action:      {action} Repeat:   {repeat}  Prediction: {final[action]}    ")
+        # self.env.logger.info("vector:      {}              ".format(vector))
+        self.env.logger.info(f"Predictions: {predictions}              ")
+        self.env.logger.info(f"Final:       {final}              ")
+        self.env.logger.info(f"Action:      {action} Repeat:   {repeat}  Prediction: {final[action]}    ")
 
         return action, repeat
 
@@ -177,14 +174,14 @@ class NGDQN:
                 repeat = 1
             # TODO JT: fix this above
 
-            self.env.logging.info(f"e-greedy: action {action} repeat: {repeat} epsilon: {self.epsilon}<----               ")
+            self.env.logger.info(f"e-greedy: action {action} repeat: {repeat} epsilon: {self.epsilon}<----               ")
             actionType = "E"
             self.env.calculated_predictions = []
             self.env.final_predictions = []
         else:
             # explotation mode
             predictions = self.model.predict(vector.reshape(1,1,71)).reshape(14)
-            logging.info(predictions)
+            self.env.logger.info(predictions)
             self.env.predictions = predictions
             final = np.zeros(self.env.action_space.n)
 
@@ -211,11 +208,11 @@ class NGDQN:
                 repeat = 1
             # TODO JT: fix this above
 
-            # self.env.logging.info("predictions: {}              ".format(predictions))
-            # self.env.logging.info("final:       {}              ".format(final))
-            self.env.logging.info(f"Action:      {self.env.actions_list[action]}x{repeat} Prediction: {final[action]}")
+            # self.env.logger.info("predictions: {}              ".format(predictions))
+            # self.env.logger.info("final:       {}              ".format(final))
+            self.env.logger.info(f"Action:      {self.env.actions_list[action]}x{repeat} Prediction: {final[action]}")
             for ii in range(self.env.action_space.n):
-                self.env.logging.info("%2d %6s %d:%d:%d -> %.8f %.8f" % (ii, self.env.actions_list[ii],
+                self.env.logger.info("%2d %6s %d:%d:%d -> %.8f %.8f" % (ii, self.env.actions_list[ii],
                                                                      self.env.valMovs[ii],
                                                                      self.env.wallMovs[ii],
                                                                      self.env.perMovs[ii],
@@ -265,10 +262,10 @@ class NGDQN:
     def replay_game(self, epochs=4, verbose=0):
         batch_size = 32
         if len(self.memory) < batch_size:
-            logging.info("Not enough actions {}".format(len(self.memory)))
+            self.env.logger.info("Not enough actions {}".format(len(self.memory)))
             return
         else:
-            logging.info("We have {} samples for training".format(len(self.memory)))
+            self.env.logger.info("We have {} samples for training".format(len(self.memory)))
 
         temp = self.memory
         acu  = np.zeros(32)
@@ -314,7 +311,7 @@ class NGDQN:
         return history, score
 
     def target_train(self):
-        self.env.logging.info("training target ..")
+        self.env.logger.info("training target ..")
         weights = self.model.get_weights()
         target_weights = self.target_model.get_weights()
         for i in range(len(target_weights)):
@@ -322,7 +319,7 @@ class NGDQN:
         self.target_model.set_weights(target_weights)
 
     def save_model(self, fn):
-        self.logging.info("Saving the model to the local file: {}".format(fn))
+        self.env.logger.info("Saving the model to the local file: {}".format(fn))
         self.model.save(fn)
 
     def load_actions_from_a_dir_and_save_to_vectors(self, dirName):
@@ -340,12 +337,12 @@ class NGDQN:
         self.memory = deque()
         for entry in os.scandir(dirName):
             if entry.is_file() and 'abadia_vectors_' in entry.path:
-                logging.info("Loading: {} ".format(entry.path))
+                self.env.logger.info("Loading: {} ".format(entry.path))
                 tmp = self.load_vectors_into_actions(entry.path)
                 for action in tmp:
                     self.memory.append(action)
-                    # logging.info("vector: {}".format(action))
-                logging.info("Actions: {} total {}".format(len(tmp), len(self.memory)))
+                    # self.env.logger.info("vector: {}".format(action))
+                self.env.logger.info("Actions: {} total {}".format(len(tmp), len(self.memory)))
 
     def load_actions_from_a_file(self, fileName):
         self.memory = deque(maxlen=10000)

@@ -80,32 +80,44 @@ def init_env(env):
 
     logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', datefmt='%d-%m-%y %H:%M:%S',
                         level=logging.INFO)
-    env.logging = logging
+    logger = logging.getLogger("AbadIA")
+    logger.setLevel(logging.INFO)
+
+    # ch = logging.StreamHandler()
+    # ch.setLevel(logging.DEBUG)
+    # create formatter
+    # formatter = logging.Formatter("%(asctime)s;%(levelname)s;%(message)s",
+    #                              "%Y-%m-%d %H:%M:%S")
+    # add formatter to ch
+    # ch.setFormatter(formatter)
+
+    env.logger = logger
+    logger.info("Logging subsystem start")
+    # logger.addHandler(ch)
 
 def mainLoop():
-    logging.info("Ready to Start")
+    env.logger.info("Ready to Start")
+    # TODO: revisar cual es la máxima velocidad
     if (env.speedtest):
         env.speed_test(100)
         exit(0)
 
-    logging.info("loading visited spap file")
+    env.logger.info("loading visited spap file")
     env.visited_snap_load()
+    env.logger.info("Done")
 
     rList = []
     bucle = 0
 
-    # print("fin de la historia")
-    # DQN parameters
-
     gamma = 0.9
     epsilon = .95
-    logging.info("Loading default model last_model_v7.model")
+    env.logger.info("Loading default model last_model_v7.model")
     ngdqn_agent = NGDQN(env=env, initModelName="models/last_model_v7.model")
-    logging.info("Loaded")
+    env.logger.info("DONE")
     steps = []
 
     for i_episode in range(env.num_episodes):
-        logging.info(f'runnig {i_episode} episode')
+        env.logger.info(f'runnig {i_episode} episode')
         state = env.reset()
 
         if(env.actionsCheckpointName != None):
@@ -114,7 +126,7 @@ def mainLoop():
                 loggin.info("Obsequium {} is less than the minimun required {} so we exit now".format(state['obsequium'], env.minimunObsequium))
                 break
             else:
-                logging.info("Restarting the game from {} step {}".format(env.actionsName, env.actionsCheckpointStep))
+                env.logger.info("Restarting the game from {} step {}".format(env.actionsName, env.actionsCheckpointStep))
 
         rAll = 0
         done = False
@@ -131,15 +143,15 @@ def mainLoop():
             # TODO JT: just checking how to implement a repeat action in the loop
             # if we're playing not exploring and training we don't want to do this.
             # repeat = random.randint(5)+1
-
+            # TODO v7 quitar el repeat
             action, repeat = ngdqn_agent.act(state)
             env.prev_vector = env.vector
 
-            logging.info(f"action {action} repeat {repeat} vector {env.vector}")
+            env.logger.info(f"action {action} repeat {repeat} vector {env.vector}")
 
             for rep in range(repeat):
                 while True:
-                    logging.info(f"action {action} repeat {rep}/{repeat}")
+                    env.logger.info(f"action {action} repeat {rep}/{repeat}")
                     newState, reward, done, info = env.step(action)
                     # we also save the non Guillermo status because there is a lot
                     # of clues like monks location, objects, etc
@@ -154,17 +166,18 @@ def mainLoop():
                 ngdqn_agent.remember(env.prev_vector, action, reward, env.vector, done)
 
                 if done:
-                    logging.info(f'Episode finished after {t+1} steps')
+                    env.logger.info(f'Episode finished after {t+1} steps')
                     if (env.haFracasado):
-                        logging.info(f'Episode finished with a FAIL')
+                        env.logger.info(f'Episode finished with a FAIL')
                         env.reset_fin_partida()
                         break
                 env.update_visited_cells(x, y, ori)
 
                 # TODO JT: we need to create an option for this
                 newX, newY, newO = env.personajeByName('Guillermo')
+                env.logger.info(env.rejilla)
                 env.pintaRejilla(40, 20)
-                logging.info("E{}:curr_step {} {}-{} X:{} Y:{},{},{}->{},{} O{} %{} reward:{} tr:{} V:{}"
+                env.logger.info("E{}:curr_step {} {}-{} X:{} Y:{},{},{}->{},{} O{} %{} reward:{} tr:{} V:{}"
                              .format(i_episode, env.curr_step, action, env.actions_list[action], x, y, ori, env.numPantalla,
                                      newX, newY, env.obsequium, env.porcentaje, np.round(reward,8),
                                      np.round(rAll,8), np.round(env.predictions,4)))
@@ -174,10 +187,10 @@ def mainLoop():
                 rAll += reward
                 state = newState
                 if done == True:
-                    logging.info("DONE is True, exit and dont save the game")
+                    env.logger.info("DONE is True, exit and dont save the game")
                     break
                 if env.valMovs[action] == 0:
-                    logging.info("Invalid Action: Leaving the loop of the repeat")
+                    env.logger.info("Invalid Action: Leaving the loop of the repeat")
                     break
 
             if env.playing == False and (t % 100) == 1:
@@ -194,27 +207,25 @@ def mainLoop():
         ngdqn_agent.save_model(nameModel)
 
         if (env.gsBucket != None and np.random.randint(10) <= 1):
-            logging.info("Uploading model to GCP")
+            env.logger.info("Uploading model to GCP")
             thread = Thread(target=env.upload_blob, args=(nameModel, nameModel))
             thread.start()
 
         rList.append(rAll)
 
         if t >= env.num_steps:
-            logging.info("Failed to complete in trial {}".format(env.num_episodes))
+            env.logger.info("Failed to complete in trial {}".format(env.num_episodes))
 
         if (np.random.randint(10) <= 1):
             env.visited_snap_save()
 
     # TODO JT, we need to save all the info available (model version, total reward, etc)
     #  so we can analyze the games
-    logging.info("Score over time: " + str(sum(rList)/env.num_episodes))
+    env.logger.info("Score over time: " + str(sum(rList)/env.num_episodes))
 
 if __name__ == '__main__':
-    logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', datefmt='%d-%m-%y %H:%M:%S',
-                        level=logging.INFO)
-    logging.info("Created Abadia v4 gym and customized env")
+    print("Creating Abadia v4 gym and customized env")
     env = gym.make('Abadia-v4')
     init_env(env)
-    logging.info("Created Abadia v4 gym and customized env")
+    env.logger.info("Created Abadia v4 gym and customized env")
     mainLoop()
