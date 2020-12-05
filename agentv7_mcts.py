@@ -83,13 +83,13 @@ def init_env(env):
     logger = logging.getLogger("AbadIA")
     logger.setLevel(logging.INFO)
 
-    # ch = logging.StreamHandler()
-    # ch.setLevel(logging.DEBUG)
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.INFO)
     # create formatter
-    # formatter = logging.Formatter("%(asctime)s;%(levelname)s;%(message)s",
-    #                              "%Y-%m-%d %H:%M:%S")
+    formatter = logging.Formatter("%(asctime)s;%(levelname)s;%(message)s",
+                                  "%Y-%m-%d %H:%M:%S")
     # add formatter to ch
-    # ch.setFormatter(formatter)
+    ch.setFormatter(formatter)
 
     env.logger = logger
     logger.info("Logging subsystem start")
@@ -175,7 +175,6 @@ def mainLoop():
 
                 # TODO JT: we need to create an option for this
                 newX, newY, newO = env.personajeByName('Guillermo')
-                env.logger.info(env.rejilla)
                 env.pintaRejilla(40, 20)
                 env.logger.info("E{}:curr_step {} {}-{} X:{} Y:{},{},{}->{},{} O{} %{} reward:{} tr:{} V:{}"
                              .format(i_episode, env.curr_step, action, env.actions_list[action], x, y, ori, env.numPantalla,

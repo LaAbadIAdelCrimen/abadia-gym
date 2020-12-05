@@ -231,7 +231,7 @@ class AbadiaEnv4(gym.Env):
 
         pre = "core_"
         output = {}
-        self.logger.info(type(line))
+        # self.logger.info(type(line))
         for line in line.split('\n'):
             # print(line)
             res = line.split("// ")
@@ -352,14 +352,14 @@ class AbadiaEnv4(gym.Env):
 
         if (self.obsequium < self.minimunObsequium):
             self.logger.info("GAME OVER by lack of Obsequium {}        ".format(self.obsequium))
-            self.libAbadIA.reset_game()
+            # self.reset_game()
             self.game_is_done = True
             self.haFracasado = True
             reward = -1
 
         if (self.haFracasado == True):
             self.logger.info("GAME OVER")
-            self.libAbadIA.reset_game()
+            # self.reset_game()
             self.game_is_done = True
             self.haFracasado = True
             reward = -1
@@ -495,11 +495,11 @@ class AbadiaEnv4(gym.Env):
         self.action_episode_memory.append([])
         self.game_is_done = False
 
-        self.logger.info('-----> RESET the GAME 1 SP')
+        # self.logger.info('-----> RESET the GAME 1 SP')
 
         ob = self.libstep(KEYBOARD_E)
-        self.logger.info('reset status {}'.format(ob))
-        self.logger.info('-----> DONE')
+        # self.logger.info('reset status {}'.format(ob))
+        # self.logger.info('-----> DONE')
 
         self.logger.info('-----> INIT dumps files: START ...')
         self.init_dumps_files()
