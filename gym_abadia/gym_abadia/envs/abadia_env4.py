@@ -328,16 +328,7 @@ class AbadiaEnv4(gym.Env):
                  use this for learning.
         """
         self.logger.info(f"action: {action}")
-        # try:
-
         ob = self.sendCmd(action)
-
-        # except Exception as e:
-            # self.logger.error("libAbadIA.so Error: I cannot send the CMDs {}".format(e))
-            # self.logger.error("Check if the things are UP")
-            # self.game_is_done = True
-            # return self.prev_ob, 0, self.game_is_done, {}
-
         self._get_personajes_info(ob)
         self._get_general_info(ob)
 
@@ -347,6 +338,7 @@ class AbadiaEnv4(gym.Env):
         ob['jugada'] = self.curr_step
         ob['gameId'] = self.gameId
         ob['action_meta'] = self.actions_list[action]
+        ob['action'] = action
 
         reward = 0
         self.eventsAction = []
@@ -470,7 +462,7 @@ class AbadiaEnv4(gym.Env):
         return vector.reshape(1,15)
 
     def _take_action(self, action):
-        self.logger.info("append {} {}".format(self.curr_episode, action))
+        # self.logger.info("append {} {}".format(self.curr_episode, action))
         self.action_episode_memory[self.curr_episode].append(action)
 
     def reset(self):
@@ -677,8 +669,8 @@ class AbadiaEnv4(gym.Env):
             t.start()
 
     def reset_fin_partida(self):
-        self.sendCmd("SPACE")
-        self.libAbadIA.reset_game()
+        self.sendCmd(self.actions_list.index("SPACE"))
+        self.libstep(KEYBOARD_E)
 
     def init_dumps_files(self):
 

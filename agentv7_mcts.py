@@ -195,9 +195,8 @@ def mainLoop():
 
         # TODO JT: refactoring this: the way we storage models and add info to game json
         # TODO JT: check if this make sense
-        nameModel = "models/model_v7_{}_trial_{}.model".format(env.gameId, i_episode)
-
-        ngdqn_agent.save_model(nameModel)
+        # nameModel = "models/model_v7_{}_trial_{}.model".format(env.gameId, i_episode)
+        # ngdqn_agent.save_model(nameModel)
 
         if (env.gsBucket != None and np.random.randint(10) <= 1):
             env.logger.info("Uploading model to GCP")
