@@ -27,13 +27,105 @@ from gym import spaces
 from google.cloud import storage
 
 import logging
+import pathlib
+import ctypes
 
 # AbadIA2 dependencies
 import requests
-from gym_abadia.envs.abadialib import AbadIA
-from ctypes import create_string_buffer
+import ctypes as ct
 
-# LibAbadia.so
+
+# Control definitions
+(P1_UP,
+ P1_LEFT,
+ P1_DOWN,
+ P1_RIGHT,
+ P1_BUTTON1,
+ P1_BUTTON2,
+ P2_UP,
+ P2_LEFT,
+ P2_DOWN,
+ P2_RIGHT,
+ P2_BUTTON1,
+ P2_BUTTON2,
+ START_1,
+ START_2,
+ COIN_1,
+ COIN_2,
+ SERVICE_1,
+ SERVICE_2,
+ KEYBOARD_A,
+ KEYBOARD_B,
+ KEYBOARD_C,
+ KEYBOARD_D,
+ KEYBOARD_E,
+ KEYBOARD_F,
+ KEYBOARD_G,
+ KEYBOARD_H,
+ KEYBOARD_I,
+ KEYBOARD_J,
+ KEYBOARD_K,
+ KEYBOARD_L,
+ KEYBOARD_M,
+ KEYBOARD_N,
+ KEYBOARD_O,
+ KEYBOARD_P,
+ KEYBOARD_Q,
+ KEYBOARD_R,
+ KEYBOARD_S,
+ KEYBOARD_T,
+ KEYBOARD_U,
+ KEYBOARD_V,
+ KEYBOARD_W,
+ KEYBOARD_X,
+ KEYBOARD_Y,
+ KEYBOARD_Z,
+ KEYBOARD_0,
+ KEYBOARD_1,
+ KEYBOARD_2,
+ KEYBOARD_3,
+ KEYBOARD_4,
+ KEYBOARD_5,
+ KEYBOARD_6,
+ KEYBOARD_7,
+ KEYBOARD_8,
+ KEYBOARD_9,
+ KEYBOARD_SPACE,
+ KEYBOARD_INTRO,
+ KEYBOARD_SUPR,
+ FUNCTION_1,
+ FUNCTION_2,
+ FUNCTION_3,
+ FUNCTION_4,
+ FUNCTION_5,
+ FUNCTION_6,
+ FUNCTION_7,
+ FUNCTION_8,
+ FUNCTION_9,
+ FUNCTION_10,
+ FUNCTION_11,
+ FUNCTION_12) = range(69)
+
+class LibAbadIA(object):
+    def __init__(self):
+
+        logging.info("Loading LibAbadia")
+        libname = pathlib.Path().absolute() / "LibAbadIA.so"
+        self.lib = ct.cdll.LoadLibrary(libname)
+        logging.info("loaded")
+
+        self.lib.LibAbadIA_init()
+
+        self.lib.LibAbadIA_step.argtypes = [ct.POINTER(ct.c_int), ct.c_char_p, ct.c_size_t]
+        self.lib.LibAbadIA_step.restype = ct.c_char_p
+
+        self.lib.LibAbadIA_step2.argtypes = [ct.c_int, ct.c_char_p]
+        self.lib.LibAbadIA_step2.restype = ct.c_char_p
+
+        self.lib.LibAbadIA_save.argtypes = [ct.c_char_p, ct.c_size_t]
+        self.lib.LibAbadIA_save.restype = ct.c_char_p
+
+        self.lib.LibAbadIA_load.argtypes = [ct.c_char_p]
 
 class AbadiaEnv4(gym.Env):
     """
@@ -45,8 +137,11 @@ class AbadiaEnv4(gym.Env):
 
     def __init__(self):
         self.__version__ = "0.0.8"
-        print("AbadiaEnv4 - Version {}".format(self.__version__))
-        self.lib = AbadIA()
+        logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', datefmt='%d-%m-%y %H:%M:%S',
+                            level=logging.INFO)
+        logging.info("AbadiaEnv4 - Version {}".format(self.__version__))
+
+        self.libAbadIA = LibAbadIA()
         self.num_episodes   = 100
         self.num_steps      = 1500
         self.gsBucket       = None
@@ -78,7 +173,6 @@ class AbadiaEnv4(gym.Env):
         self.json_dump = {}
 
         self.action_mode = 1
-
         # TODO JT we will include SPACE and QR in the available actions
         self.actions_list = ('UP-2', 'UP-10', 'UP-20', 'UP-40', 'UP-60', 'NOP-1', 'NOP-5', 'NOP-25', 'NOP-50',
                              'RIGHT', 'LEFT', 'DOWN', 'SPACE', 'QR')
@@ -131,6 +225,7 @@ class AbadiaEnv4(gym.Env):
         logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', datefmt='%d-%m-%y %H:%M:%S',
                             level=logging.INFO)
 
+        logging.info("AbadiaEnv just initialized")
         # helper to normalize paths to positions
         #   1
         # 2   0
@@ -177,46 +272,33 @@ class AbadiaEnv4(gym.Env):
         # ('UP-2', 'UP-10', 'UP-20', 'UP-40', 'UP-60', 'NOP-1', 'NOP-5', 'NOP-25', 'NOP-50',
         # 'RIGHT', 'LEFT', 'DOWN', 'SPACE', 'QR')
         if (cmd == 'UP'):
-            self.lib.controles[self.lib.P1_UP] = 1
+            ob = self.libstep(P1_UP)
         if (cmd == 'NOP'):
             pass
         if (cmd == 'RIGHT'):
-            self.lib.controles[self.lib.P1_RIGHT] = 1
+            ob = self.libstep(P1_RIGHT)
         if (cmd == 'LEFT'):
-            self.lib.controles[self.lib.P1_LEFT] = 1
+            ob = self.libstep(P1_LEFT)
         if (cmd == 'DOWN'):
-            self.lib.controles[self.lib.P1_DOWN] = 1
+            ob = self.libstep.libstep(P1_DOWN)
         if (cmd == 'SPACE'):
-            self.lib.controles[self.lib.KEYBOARD_SPACE] = 1
+            ob = self.libstep(KEYBOARD_SPACE)
         if (cmd == 'QR'):
-            self.lib.controles[self.lib.KEYBOARD_Q] = 1
-            self.lib.controles[self.lib.KEYBOARD_R] = 1
+            ob = self.libstep(KEYBOARD_Q)
+            # TODO implementar en el lado del libAbaIA.so
+            # self.libAbadIA.controles[self.libAbadIA.KEYBOARD_R] = 1
 
-        ob = self.lib.step()
-        core = self.check2dict(self.lib.getGameInfo())
+        core = self.check2dict(self.libAbadIA.getGameInfo())
         ob['core'] = core
         return ob
 
-    def sendMultiCmd(self, path):
-        logging.info("Path: %s Cmds: %s" % (path,  self.path2Pos[path]))
-        cmds = self.path2Pos[path].split(":")
-        for step in cmds:
-            self.sendCmd(self.url, "abadIA/game/current/actions/{}".format(step), mode='POST')
-
-        headers = {'accept': 'text/x.abadIA+plain'}
-        cmdDump = "{}/abadIA/game/current".format(self.url)
-        core = requests.get(cmdDump, headers=headers)
-        # logging.info(core.text)
-        core_dict = self.check2dict(core.text)
-
-        headers = {'accept': 'application/json'}
-        cmdDump = "{}/abadIA/game/current".format(self.url)
-        r = requests.get(cmdDump, headers=headers)
-        tmp = r.json()
-        tmp['core'] =  core_dict
-        if r.status_code == 599:
-            tmp['haFracasado'] = True
-        return tmp
+    def libstep(self, control):
+        result = ct.create_string_buffer(10000)
+        # logging.info("Voy a ejecutar el control ---> {}".format(control))
+        tmp = self.libAbadIA.lib.LibAbadIA_step2(ct.c_int(control), ct.cast(result, ct.c_char_p))
+        # logging.info(type(result.value))
+        # logging.info("step2 result: {}".format(tmp))
+        return json.loads(tmp)
 
     def step(self, action):
         """
@@ -274,14 +356,14 @@ class AbadiaEnv4(gym.Env):
 
         if (self.obsequium < self.minimunObsequium):
             logging.info("GAME OVER by lack of Obsequium {}        ".format(self.obsequium))
-            self.lib.reset_game()
+            self.libAbadIA.reset_game()
             self.game_is_done = True
             self.haFracasado = True
             reward = -1
 
         if (self.haFracasado == True):
             logging.info("GAME OVER")
-            self.lib.reset_game()
+            self.libAbadIA.reset_game()
             self.game_is_done = True
             self.haFracasado = True
             reward = -1
@@ -416,11 +498,12 @@ class AbadiaEnv4(gym.Env):
         self.action_episode_memory.append([])
         self.game_is_done = False
 
-        logging.info('-----> RESET the GAME 2 SP + RESET')
-        ob = self.lib.reset_game()
+        logging.info('-----> RESET the GAME 1 SP')
 
-        logging.info('reset status') # {}'.format(ob))
+        ob = self.libstep(KEYBOARD_E)
+        logging.info('reset status {}'.format(ob))
         logging.info('-----> DONE')
+
         logging.info('-----> INIT dumps files: START ...')
         self.init_dumps_files()
         logging.info('-----> INIT dumps files: DONE')
@@ -599,7 +682,7 @@ class AbadiaEnv4(gym.Env):
 
     def reset_fin_partida(self):
         self.sendCmd("SPACE")
-        self.lib.reset_game()
+        self.libAbadIA.reset_game()
 
     def init_dumps_files(self):
 
@@ -846,7 +929,7 @@ class AbadiaEnv4(gym.Env):
         return self.valMovs
 
     def getGameInfo(self):
-        res = self.lib.getGameInfo()
+        res = self.libAbadIA.getGameInfo()
         return res
 
     def speed_test(self, count=100):

@@ -1,6 +1,6 @@
 import json
+import logging
 from ctypes import cdll,c_int,c_char_p,c_size_t,create_string_buffer,sizeof,POINTER
-
 
 
 class AbadIA(object):
@@ -75,24 +75,33 @@ class AbadIA(object):
 		 self.FUNCTION_10,
 		 self.FUNCTION_11,
 		 self.FUNCTION_12) = range(69)
-
 		self.Controles = c_int * 70
 
+		logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', datefmt='%d-%m-%y %H:%M:%S',
+							level=logging.INFO)
+		logging.info("AbadIA CONSTRUCTOR")
 
-		print("AbadIA CONSTRUCTOR")
 		self.lib = cdll.LoadLibrary('./LibAbadIA.so')
+
+		logging.info("loaded")
 		self.lib.LibAbadIA_init()
+		logging.info("Initiated")
 		self.lib.LibAbadIA_step.restype = c_char_p
-#falta revisar tipo de controles
-		self.lib.LibAbadIA_step.argtypes = [POINTER(c_int),c_char_p,c_size_t]
+		self.lib.LibAbadIA_step.argtypes = [POINTER(c_int), c_char_p, c_size_t]
+
 		self.lib.LibAbadIA_save.restype = c_char_p
 		self.lib.LibAbadIA_save.argtypes = [c_char_p,c_size_t]
+
 		self.lib.LibAbadIA_load.argtypes = [c_char_p]
+		# falta revisar tipo de controles
 		self.controles = self.Controles()
+		logging.info("loaded")
+		return
 
 	def step(self):
 		result = create_string_buffer(10000)
-		tmp = self.lib.LibAbadIA_step(self.controles,result,sizeof(result)).decode()
+		tmp = self.lib.LibAbadIA_step(self.controles, result, sizeof(result))
+		logging.info("step result: {}".format(tmp))
 		self.controles = self.Controles()
 		return json.loads(tmp)
 
@@ -101,6 +110,7 @@ class AbadIA(object):
 #igual el create_string_buffer puede ir aqui y no por todos lados
 #igual que en step
 	def save(self,result,resultMaxLength):
+		result = create_string_buffer(10000)
 		return self.lib.LibAbadIA_save(result,resultMaxLength)
 
 	# @when('reinicio el juego')
@@ -207,14 +217,14 @@ class AbadIA(object):
 
 	# @when('cargo una partida')
 	def setGameInfo(context):
-		assert context.abadIA.load(context.text.encode())
+		assert context.abadIA.load(context.text)
 
 	# @step('grabo la partida')
 	def getGameInfo(self):
 		# print("create the buffer")
 		result = create_string_buffer(10000)
 		# print("get the context of the game")
-		res = self.lib.LibAbadIA_save(result,sizeof(result)).decode()
+		res = self.lib.LibAbadIA_save(result,sizeof(result))
 		# print("grabo la partida *"+res+"*")
 		return res
 
@@ -229,7 +239,6 @@ class AbadIA(object):
 		print(context.text);
 		assert res.count('\n')==431
 		assert context.text==res
-
 
 	# TODO: comparar contra tabla para poder ampliar lo que se comprueba
 	# @then('el resultado es "{resultado}" con descripcion "{descripcion}"')

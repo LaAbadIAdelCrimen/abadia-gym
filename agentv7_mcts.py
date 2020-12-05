@@ -3,17 +3,8 @@
 import gym
 import gym_abadia
 import numpy as np
-import os
 import argparse
-import random
 from threading import Thread
-
-from keras.models import Sequential
-from keras.layers import Dense, Dropout
-from keras.optimizers import Adam
-from google.cloud import storage
-from collections import deque
-
 import logging
 
 from AbadIA.NGDQN import NGDQN as NGDQN
@@ -103,14 +94,14 @@ def mainLoop():
     rList = []
     bucle = 0
 
-    print("fin de la historia")
-    return
+    # print("fin de la historia")
     # DQN parameters
 
     gamma = 0.9
     epsilon = .95
     logging.info("Loading default model last_model_v7.model")
-    ngdqn_agent = NGDQN(env=env, initModelName="models/last_model_v7.model",)
+    ngdqn_agent = NGDQN(env=env, initModelName="models/last_model_v7.model")
+    logging.info("Loaded")
     steps = []
 
     for i_episode in range(env.num_episodes):
@@ -143,6 +134,8 @@ def mainLoop():
 
             action, repeat = ngdqn_agent.act(state)
             env.prev_vector = env.vector
+
+            logging.info(f"action {action} repeat {repeat} vector {env.vector}")
 
             for rep in range(repeat):
                 while True:
@@ -218,6 +211,10 @@ def mainLoop():
     logging.info("Score over time: " + str(sum(rList)/env.num_episodes))
 
 if __name__ == '__main__':
+    logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', datefmt='%d-%m-%y %H:%M:%S',
+                        level=logging.INFO)
+    logging.info("Created Abadia v4 gym and customized env")
     env = gym.make('Abadia-v4')
     init_env(env)
+    logging.info("Created Abadia v4 gym and customized env")
     mainLoop()
