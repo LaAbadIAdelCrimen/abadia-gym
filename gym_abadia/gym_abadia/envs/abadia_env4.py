@@ -138,7 +138,8 @@ class AbadiaEnv4(gym.Env):
     def __init__(self):
         self.__version__ = "0.0.8"
         # print("AbadiaEnv4 - Version {}".format(self.__version__))
-
+        logging.basicConfig(format='%(asctime)s:[%(filename)s:%(funcName)s:%(lineno)s]:%(levelname)s:%(message)s',
+                            datefmt='%d-%m-%y %H:%M:%S', level=logging.INFO)
         self.libAbadIA = LibAbadIA()
         self.num_episodes   = 100
         self.num_steps      = 1500

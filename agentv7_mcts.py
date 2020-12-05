@@ -6,10 +6,20 @@ import numpy as np
 import argparse
 from threading import Thread
 import logging
+import sys
 
 from AbadIA.NGDQN import NGDQN as NGDQN
 
 def init_env(env):
+
+    logging.basicConfig(format='%(asctime)s:[%(filename)s:%(funcName)s:%(lineno)s]:%(levelname)s:%(message)s', datefmt='%d-%m-%y %H:%M:%S',
+                        level=logging.INFO)
+    logger = logging.getLogger('root')
+    logger.setLevel(logging.INFO)
+
+    env.logger = logger
+    logger.info("Logging subsystem start")
+
     argparser = argparse.ArgumentParser()
     argparser.add_argument('-s', '--server', help='server name')
     argparser.add_argument('-p', '--port', help='port number')
@@ -78,22 +88,6 @@ def init_env(env):
     if args.speedtest != None:
         env.speedtest = True
 
-    logging.basicConfig(format='%(asctime)s:%(levelname)s:%(message)s', datefmt='%d-%m-%y %H:%M:%S',
-                        level=logging.INFO)
-    logger = logging.getLogger("AbadIA")
-    logger.setLevel(logging.INFO)
-
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.INFO)
-    # create formatter
-    formatter = logging.Formatter("%(asctime)s;%(levelname)s;%(message)s",
-                                  "%Y-%m-%d %H:%M:%S")
-    # add formatter to ch
-    ch.setFormatter(formatter)
-
-    env.logger = logger
-    logger.info("Logging subsystem start")
-    # logger.addHandler(ch)
 
 def mainLoop():
     env.logger.info("Ready to Start")
