@@ -622,11 +622,33 @@ class AbadiaEnv4(gym.Env):
     def save_action(self, state, action, reward, nextstate):
         s1 = state.copy()
         s2 = nextstate.copy()
+        if s1["haFracasado"] == False:
+            s1["haFracasado"] = 0
+        else:
+            s1["haFracasado"] = 1
 
-        string = "{}{}\"action\":{}\"state\":{},\"action\":{},\"reward\":{},\"nextstate\":{}{}{}\n".format("[", "{", "{", json.dumps(s1), action, reward, json.dumps(s2), "}", "}]")
+        if s2["haFracasado"] == False:
+            s2["haFracasado"] = 0
+        else:
+            s2["haFracasado"] = 1
+
+        if s1["investigacionCompleta"] == False:
+            s1["investigacionCompleta"] = 0
+        else:
+            s1["investigacionCompleta"] = 1
+
+        if s2["investigacionCompleta"] == False:
+            s2["investigacionCompleta"] = 0
+        else:
+            s2["investigacionCompleta"] = 1
+
+        str1 = json.dumps(json.loads(str(s1).replace("'","\"")))
+        str2 = json.dumps(json.loads(str(s2).replace("'","\"")))
+
+        string = "{}\"action\":{}\"state\":{},\"action\":{},\"reward\":{},\"nextstate\":{}{}{}\n".format("[{", "{",
+                str1, action, reward, str2, "}", "}]")
         self.fdActions.write(string)
         self.fdActions.flush()
-
 
     def visited_snap_load(self):
         nameVisitedSnap = "snapshots/current-visited"
@@ -763,9 +785,9 @@ class AbadiaEnv4(gym.Env):
             for cnt, action in enumerate(fdActionsCheckpoint):
                 st = json.loads(action)[0]
                 if "jugada" in st['action']['state'] and int(st['action']['state']['jugada']) == step:
-                    print("I will load the {} step into the engine".format(st['action']['state']['jugada']))
+                    env.logger.info("I will load the {} step into the engine".format(st['action']['state']['jugada']))
                     #    TODO JT now we read the json object, get the checkpoint dict and convert it to Abbey format
-                    print(st['action']['state']['core'])
+                    env.logger.info(st['action']['state']['core'])
                     checkpoint = self.dict2check(st['action']['state']['core'])
                     self.logger.info("Restoring the saved game")
                     response = requests.put(self.url+"/abadIA/game/current", data=checkpoint)
@@ -910,9 +932,9 @@ class AbadiaEnv4(gym.Env):
 
         self.valMovs = self.valMovs2
         if (self.verbose > 1):
-            self.self.logger.info ("new valMovs2: {}".format(self.valMovs2))
-            self.self.logger.info ("wallMovs: {}".format(self.wallMovs))
-            self.self.logger.info ("perMovs: {}".format(self.perMovs))
+            self.logger.info ("new valMovs2: {}".format(self.valMovs2))
+            self.logger.info ("wallMovs: {}".format(self.wallMovs))
+            self.logger.info ("perMovs: {}".format(self.perMovs))
 
         return self.valMovs
 

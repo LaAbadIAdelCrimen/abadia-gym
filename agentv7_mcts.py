@@ -170,7 +170,7 @@ def mainLoop():
                 # TODO JT: we need to create an option for this
                 newX, newY, newO = env.personajeByName('Guillermo')
                 env.pintaRejilla(40, 20)
-                env.logger.info("E{}:curr_step {} {}-{} X:{} Y:{},{},{}->{},{} O{} %{} reward:{} tr:{} V:{}"
+                env.logger.info("E{}:curr_step {} {}-{} X:{} Y:{},{},{}->{},{} O{} %{} reward:{:10.8f} tr:{:10.8f} V:{}"
                              .format(i_episode, env.curr_step, action, env.actions_list[action], x, y, ori, env.numPantalla,
                                      newX, newY, env.obsequium, env.porcentaje, np.round(reward,8),
                                      np.round(rAll,8), np.round(env.predictions,4)))
