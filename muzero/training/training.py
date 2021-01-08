@@ -4,10 +4,10 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.python.keras.losses import MSE
 
-from config import MuZeroConfig
-from networks.network import BaseNetwork
-from networks.shared_storage import SharedStorage
-from training.replay_buffer import ReplayBuffer
+from muzero.config import MuZeroConfig
+from muzero.networks.network import BaseNetwork
+from muzero.networks.shared_storage import SharedStorage
+from muzero.training.replay_buffer import ReplayBuffer
 
 
 def train_network(config: MuZeroConfig, storage: SharedStorage, replay_buffer: ReplayBuffer, epochs: int):

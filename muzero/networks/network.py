@@ -5,7 +5,7 @@ from typing import Dict, List, Callable
 import numpy as np
 from tensorflow.python.keras.models import Model
 
-from game.game import Action
+from muzero.game.game import Action
 
 
 class NetworkOutput(typing.NamedTuple):

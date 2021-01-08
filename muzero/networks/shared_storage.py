@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-from networks.network import BaseNetwork, UniformNetwork, AbstractNetwork
+from muzero.networks.network import BaseNetwork, UniformNetwork, AbstractNetwork
 
 
 class SharedStorage(object):

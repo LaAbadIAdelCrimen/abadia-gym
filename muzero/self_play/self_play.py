@@ -1,12 +1,12 @@
 """Self-Play module: where the games are played."""
 
-from config import MuZeroConfig
-from game.game import AbstractGame
-from networks.network import AbstractNetwork
-from networks.shared_storage import SharedStorage
-from self_play.mcts import run_mcts, select_action, expand_node, add_exploration_noise
-from self_play.utils import Node
-from training.replay_buffer import ReplayBuffer
+from muzero.config import MuZeroConfig
+from muzero.game.game import AbstractGame
+from muzero.networks.network import AbstractNetwork
+from muzero.networks.shared_storage import SharedStorage
+from muzero.self_play.mcts import run_mcts, select_action, expand_node, add_exploration_noise
+from muzero.self_play.utils import Node
+from muzero.training.replay_buffer import ReplayBuffer
 
 
 def run_selfplay(config: MuZeroConfig, storage: SharedStorage, replay_buffer: ReplayBuffer, train_episodes: int):

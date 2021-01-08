@@ -5,11 +5,11 @@ from tensorflow.python.keras import regularizers
 from tensorflow.python.keras.layers.core import Dense
 from tensorflow.python.keras.models import Sequential
 
-from game.game import Action
-from networks.network import BaseNetwork
+from muzero.game.game import Action
+from muzero.networks.network import BaseNetwork
 
 
-class CartPoleNetwork(BaseNetwork):
+class AbadIANetwork(BaseNetwork):
 
     def __init__(self,
                  state_size: int,

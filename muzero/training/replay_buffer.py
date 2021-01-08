@@ -2,8 +2,8 @@ import random
 from itertools import zip_longest
 from typing import List
 
-from config import MuZeroConfig
-from game.game import AbstractGame
+from muzero.config import MuZeroConfig
+from muzero.game.game import AbstractGame
 
 
 class ReplayBuffer(object):

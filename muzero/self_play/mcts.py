@@ -6,10 +6,10 @@ from typing import List
 
 import numpy
 
-from config import MuZeroConfig
-from game.game import Player, Action, ActionHistory
-from networks.network import NetworkOutput, BaseNetwork
-from self_play.utils import MinMaxStats, Node, softmax_sample
+from muzero.config import MuZeroConfig
+from muzero.game.game import Player, Action, ActionHistory
+from muzero.networks.network import NetworkOutput, BaseNetwork
+from muzero.self_play.utils import MinMaxStats, Node, softmax_sample
 
 
 def add_exploration_noise(config: MuZeroConfig, node: Node):

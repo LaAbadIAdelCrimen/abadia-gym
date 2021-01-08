@@ -83,6 +83,7 @@ class MuZeroConfig(object):
         return self.game(self.discount)
 
     def new_network(self) -> BaseNetwork:
+        print(self.network_args)
         return self.network(**self.network_args)
 
     def uniform_network(self) -> UniformNetwork:
@@ -92,12 +93,12 @@ class MuZeroConfig(object):
         return tf.keras.optimizers.SGD(learning_rate=self.lr, momentum=self.momentum)
 
 
-def make_cartpole_config() -> MuZeroConfig:
+def make_abadia_config() -> MuZeroConfig:
     def visit_softmax_temperature(num_moves, training_steps):
         return 1.0
 
     return MuZeroConfig(
-        game=CartPole,
+        game=AbadIA,
         nb_training_loop=50,
         nb_episodes=20,
         nb_epochs=20,
@@ -105,7 +106,7 @@ def make_cartpole_config() -> MuZeroConfig:
                       'state_size': 4,
                       'representation_size': 4,
                       'max_value': 500},
-        network=CartPoleNetwork,
+        network=AbadIA,
         action_space_size=2,
         max_moves=1000,
         discount=0.99,
