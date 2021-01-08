@@ -1,4 +1,3 @@
-README.md
 setup.py
 gym_abadia.egg-info/PKG-INFO
 gym_abadia.egg-info/SOURCES.txt

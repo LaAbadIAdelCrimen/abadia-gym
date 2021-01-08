@@ -30,10 +30,10 @@ class MuZeroConfig(object):
                  visit_softmax_temperature_fn,
                  lr: float,
                  known_bounds: Optional[KnownBounds] = None):
-        ### Environment
+        # Environment
         self.game = game
 
-        ### Self-Play
+        # Self-Play
         self.action_space_size = action_space_size
         # self.num_actors = num_actors
 
@@ -56,7 +56,7 @@ class MuZeroConfig(object):
         # AlphaZero in board games.
         self.known_bounds = known_bounds
 
-        ### Training
+        # Training
         self.nb_training_loop = nb_training_loop
         self.nb_episodes = nb_episodes  # Nb of episodes per training loop
         self.nb_epochs = nb_epochs  # Nb of epochs per training loop
@@ -102,13 +102,13 @@ def make_abadia_config() -> MuZeroConfig:
         nb_training_loop=50,
         nb_episodes=20,
         nb_epochs=20,
-        network_args={'action_size': 2,
-                      'state_size': 4,
-                      'representation_size': 4,
+        network_args={'action_size': 14,
+                      'state_size': 382,
+                      'representation_size': 64,
                       'max_value': 500},
-        network=AbadIA,
-        action_space_size=2,
-        max_moves=1000,
+        network=AbadIANetwork,
+        action_space_size=14,
+        max_moves=5000,
         discount=0.99,
         dirichlet_alpha=0.25,
         num_simulations=11,  # Odd number perform better in eval mode

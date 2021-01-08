@@ -1,7 +1,7 @@
 # Agent v7 a.k.a. will use MCTS with gym_abadia version 3
 
 import gym
-import gym_abadia
+import gym_abadia.envs
 import numpy as np
 import argparse
 from threading import Thread
