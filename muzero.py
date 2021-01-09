@@ -33,6 +33,5 @@ def muzero(config: MuZeroConfig):
     return storage.latest_network()
 
 if __name__ == '__main__':
-    gym.make('Abadia-v4')
     config = make_abadia_config()
     muzero(config)

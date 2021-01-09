@@ -30,7 +30,7 @@ class MuZeroConfig(object):
                  visit_softmax_temperature_fn,
                  lr: float,
                  known_bounds: Optional[KnownBounds] = None):
-        # Environment
+        # AbadIA Environment
         self.game = game
 
         # Self-Play
@@ -80,6 +80,8 @@ class MuZeroConfig(object):
         # self.lr_decay_steps = lr_decay_steps
 
     def new_game(self) -> AbstractGame:
+        print("Initializing new game")
+
         return self.game(self.discount)
 
     def new_network(self) -> BaseNetwork:
