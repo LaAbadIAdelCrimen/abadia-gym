@@ -9,9 +9,11 @@ from muzero.game.gym_wrappers import ScalingObservationWrapper
 class AbadIA(AbstractGame):
     """The AbadIA gym environment"""
 
-    def __init__(self, discount: float):
+    def __init__(self, discount: float, abadia_gym):
         super().__init__(discount)
-        self.env = gym.make('Abadia-v4')
+        # TODO JT: try to init the gym once to avoid problems with libAbadIA load twice
+        self.env = abadia_gym #gym.make('Abadia-v4')
+        # self.env = abadia_gym
         self.env = ScalingObservationWrapper(self.env, low=[-2.4, -2.0, -0.42, -3.5], high=[2.4, 2.0, 0.42, 3.5])
         self.actions = list(map(lambda i: Action(i), range(self.env.action_space.n)))
         self.observations = [self.env.reset()]

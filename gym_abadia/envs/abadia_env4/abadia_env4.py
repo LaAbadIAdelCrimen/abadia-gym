@@ -136,10 +136,13 @@ class AbadiaEnv4(gym.Env):
     """
 
     def __init__(self):
-        self.__version__ = "0.0.8"
+        self.__version__ = "0.0.10"
         # print("AbadiaEnv4 - Version {}".format(self.__version__))
         logging.basicConfig(format='%(asctime)s:[%(filename)s:%(funcName)s:%(lineno)s]:%(levelname)s:%(message)s',
                             datefmt='%d-%m-%y %H:%M:%S', level=logging.INFO)
+        self.logger = logging.getLogger('root')
+        self.logger.setLevel(logging.INFO)
+
         self.libAbadIA = LibAbadIA()
         self.num_episodes   = 100
         self.num_steps      = 1500
@@ -371,14 +374,15 @@ class AbadiaEnv4(gym.Env):
         reward = float(((self.porcentaje + 1) / 100)) * float (self.curr_step * 0.00001)
 
         # TODO JT: deprecated now only need to check for UP and objects actions
+        # need to make a valid actions function.
 
-        if (self.wallMovs[action] == 1):
-            self.logger.info("***** Invalid move against Wall, penalizing it")
-            reward = -0.00091
+        # if (self.wallMovs[action] == 1):
+        #   self.logger.info("***** Invalid move against Wall, penalizing it")
+        #   reward = -0.00091
 
-        if (self.perMovs[action] == 1):
-            self.logger.info("***** Invalid move against a Character, penalizing it")
-            reward = -0.00092
+        # if (self.perMovs[action] == 1):
+        #   self.logger.info("***** Invalid move against a Character, penalizing it")
+        #   reward = -0.00092
 
         self.reward       = reward
         self.totalReward += reward
@@ -387,15 +391,16 @@ class AbadiaEnv4(gym.Env):
         self.logger.info("reward: {} tr: {} action: {} ".format(reward, self.totalReward, action))
 
         # adding more information for debugging: valid moves, vectors, predictions, etc.
-        ob['valMovs']            = self.valMovs.tolist()
-        ob['wallMovs']           = self.wallMovs.tolist()
-        ob['wallMovs']           = self.wallMovs.tolist()
-        ob['perMovs']            = self.perMovs.tolist()
-        ob['predictions']        = self.calculated_predictions
-        ob['final']              = self.final_predictions
-        ob['vector']             = self.vector_predictions
-        ob['action_predictions'] = self.action_predictions
-        ob['action_type']        = self.action_type
+        # TODO JT: rethink what to do with this
+        # ob['valMovs']            = self.valMovs.tolist()
+        # ob['wallMovs']           = self.wallMovs.tolist()
+        # ob['wallMovs']           = self.wallMovs.tolist()
+        # ob['perMovs']            = self.perMovs.tolist()
+        # ob['predictions']        = self.calculated_predictions
+        # ob['final']              = self.final_predictions
+        # ob['vector']             = self.vector_predictions
+        # ob['action_predictions'] = self.action_predictions
+        # ob['action_type']        = self.action_type
 
         # we make a copy for the current observation in order to calculate
         # the reward for the next state

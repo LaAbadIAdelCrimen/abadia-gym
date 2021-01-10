@@ -2,14 +2,17 @@ import collections
 from typing import Optional, Dict
 
 import tensorflow as tf
+import logging
 
 from muzero.game.abadia import AbadIA
 from muzero.game.game import AbstractGame
 from muzero.networks.abadia_network import AbadIANetwork
 from muzero.networks.network import BaseNetwork, UniformNetwork
 
-KnownBounds = collections.namedtuple('KnownBounds', ['min', 'max'])
+import gym
+import gym_abadia.envs
 
+KnownBounds = collections.namedtuple('KnownBounds', ['min', 'max'])
 
 class MuZeroConfig(object):
 
@@ -30,7 +33,12 @@ class MuZeroConfig(object):
                  visit_softmax_temperature_fn,
                  lr: float,
                  known_bounds: Optional[KnownBounds] = None):
+
+        self.logger = logging.getLogger('root')
+        self.logger.setLevel(logging.INFO)
+
         # AbadIA Environment
+        self.abadia_gym = gym.make('Abadia-v4')
         self.game = game
 
         # Self-Play
@@ -80,9 +88,8 @@ class MuZeroConfig(object):
         # self.lr_decay_steps = lr_decay_steps
 
     def new_game(self) -> AbstractGame:
-        print("Initializing new game")
-
-        return self.game(self.discount)
+        self.logger.info("Initializing new game")
+        return self.game(self.discount, self.abadia_gym)
 
     def new_network(self) -> BaseNetwork:
         print(self.network_args)

@@ -18,4 +18,5 @@ class ScalingObservationWrapper(gym.ObservationWrapper):
         self.max = high - self.mean
 
     def observation(self, observation):
-        return (observation - self.mean) / self.max
+        # TODO JT: checks this return (observation - self.mean) / self.max
+        return observation
